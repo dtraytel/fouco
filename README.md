@@ -13,7 +13,7 @@ The formalization has been processed with Isabelle2014 which is available here:
 
     http://isabelle.in.tum.de/website-Isabelle2014
 
-1. Examples
+**1. Examples**
 
 All definitions and proofs from Section 2 as well as all examples from Hinze and
 James [28] have been formalized and can be browsed in both pdf
@@ -25,7 +25,7 @@ src/Tree_User folders.
 To ease the experimentation we also provide a Haskell file (Examples.hs)
 containing all examples (operating on plain Haskell lists rather than streams).
 
-2. Metatheory
+**2. Metatheory**
 
 The metatheory from Section 3 has been formalized for an arbitrary axiomatized
 functor F (more precisely bounded natural functor). Only html
@@ -33,7 +33,7 @@ functor F (more precisely bounded natural functor). Only html
 raw Isabelle sources which were used to generate this html output are contained
 in the src/Metatheory folder.
 
-3. Prototype package
+**3. Prototype package**
 
 The rudimentary automation that we sketch in Section 4 consists of two shell
 scripts
