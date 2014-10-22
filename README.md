@@ -38,8 +38,8 @@ in the src/Metatheory folder.
 The rudimentary automation that we sketch in Section 4 consists of two shell
 scripts
 
-src/Metatheory/corecupto_init.sh <name> <editor>
-src/Metatheory/corecupto_step.sh <name> <editor>
+    src/Metatheory/corecupto_init.sh <name> <editor>
+    src/Metatheory/corecupto_step.sh <name> <editor>
 
 which are used to initialize the corecursion state and to make a step
 (i.e. register a new well-behaved operation) based on the previous corecursion
