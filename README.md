@@ -17,13 +17,18 @@ The formalization has been processed with Isabelle2014 which is available here:
 
 All definitions and proofs from Section 2 as well as all examples from Hinze and
 James [28] have been formalized and can be browsed in both pdf
-(stream_examples.pdf, tree_examples.pdf, and ufp_examples.pdf) and html
-(html/Corec/index.html) formats. The raw Isabelle sources which were used to
-generate this pdf and html output are contained in the src/Stream_User and
-src/Tree_User folders.
+(stream_examples.pdf, tree_examples.pdf, llist_examples.pdf and
+ufp_examples.pdf) and html (html/Corec/index.html) formats. The raw Isabelle
+sources which were used to generate this pdf and html output are contained in
+the following folders:
+
+    src/Stream_User
+    src/Tree_User
+    src/Binary_Tree_User
+    src/LList_User
 
 To ease the experimentation we also provide a Haskell file (Examples.hs)
-containing all examples (operating on plain Haskell lists rather than streams).
+containing many examples (operating on plain Haskell lists rather than streams).
 
 2. Metatheory
 
@@ -50,6 +55,7 @@ current step number and open the files that the user is supposed to adjust
 with the given <editor>.
 
 The scripts were used to register the example functions on streams and trees as
-well-behaved. The output of the scripts can be found in src/Stream and src/Tree;
-where only the theory files with "Input" in their names have been further edited
-manually. This output was itself used to define the examples from Section 2.
+well-behaved. The output of the scripts can be found in src/Stream, src/Tree,
+src/LList, and src/Binary_Tree; where only the theory files with "Input" in
+their names have been further edited manually. This output was itself used to
+define the examples from Section 2.
