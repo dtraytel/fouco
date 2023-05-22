@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Fib (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Fib</h1>
+
+<span class="command">theory</span> <span class="name">Fib</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Examples.html"><span class="name">Stream_Examples</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Two Examples of Fibonacci streams *}</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">theory</span> Fib
+<span class="keyword2">imports</span> Stream_Examples
+<span class="keyword2">begin</span>
+<span class="comment">(*&gt;*)</span>
+
+<span class="command">definition</span> fibA <span class="delimiter">::</span> stream <span class="keyword2">where</span>
+  <span class="string">&quot;fibA = corecUU1 (&lambda;xs. GUARD1 (0, PLS1 (SCONS1 (1, CONT1 xs), CONT1 xs))) ()&quot;</span>
+
+<span class="command">lemma</span> head_fibA<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head fibA = 0&quot;</span>
+  <span class="command">unfolding</span> fibA_def corecUU1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval1_leaf1&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_fibA<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail fibA = pls (SCons 1 fibA) fibA&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst fibA_def<span class="delimiter">)</span>
+  <span class="command">unfolding</span> corecUU1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval1_leaf1&#39;
+    eval1_\&lt;oo&gt;\&lt;pp&gt;1 alg&Lambda;1_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;1_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF gg1_natural<span class="delimiter">]</span>
+    o_eq_dest<span class="delimiter">[</span>OF eval1_gg1<span class="delimiter">]</span> pls_uniform fibA_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> fibA_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;fibA = SCons 0 (pls (SCons 1 fibA) fibA)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_fibA tail_fibA<span class="delimiter">)</span>
+
+
+<span class="command">definition</span> fibB <span class="delimiter">::</span> stream <span class="keyword2">where</span>
+  <span class="string">&quot;fibB = corecUU1 (&lambda;xs. PLS1 (GUARD1 (0, (SCONS1 (1, CONT1 xs))), GUARD1 (0, CONT1 xs))) ()&quot;</span>
+
+<span class="command">lemma</span> fibB_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;fibB = pls (SCons 0 (SCons 1 fibB)) (SCons 0 fibB)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst fibB_def<span class="delimiter">)</span>
+  <span class="command">unfolding</span> corecUU1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval1_leaf1&#39;
+    eval1_\&lt;oo&gt;\&lt;pp&gt;1 alg&Lambda;1_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;1_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF gg1_natural<span class="delimiter">]</span>
+    o_eq_dest<span class="delimiter">[</span>OF eval1_gg1<span class="delimiter">]</span> pls_uniform fibB_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> <span class="string">&quot;fibA = fibB&quot;</span>
+<span class="command">proof</span> <span class="delimiter">(</span>coinduction rule<span class="delimiter">:</span> stream_coinduct1<span class="delimiter">)</span>
+  <span class="command">case</span> Eq_stream
+  <span class="command">have</span> <span class="var">?head</span> <span class="command">by</span> <span class="delimiter">(</span>subst fibB_code<span class="delimiter">)</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> J.dtor_ctor<span class="delimiter">)</span>
+  <span class="command">moreover</span>
+  <span class="command">have</span> <span class="var">?tail</span> <span class="command">by</span> <span class="delimiter">(</span>subst <span class="delimiter">(</span>2<span class="delimiter">)</span> fibB_code<span class="delimiter">)</span> <span class="delimiter">(</span>auto simp add<span class="delimiter">:</span> J.dtor_ctor intro<span class="delimiter">:</span> genCngdd1_pls genCngdd1_SCons<span class="delimiter">)</span>
+  <span class="command">ultimately</span> <span class="command">show</span> <span class="var">?case</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">end</span>
+<span class="comment">(*&gt;*)</span>
+</pre>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Lift_to_Free9 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Lift_to_Free9</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Lift_to_Free9</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Distributive_Law9.html"><span class="name">Stream_Distributive_Law9</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Lifting of the distributive law to the free algebra *}</span>
+
+
+<span class="comment">(* This is silimar to Lift_to_Free, but uses &Lambda;9, &Sigma;&Sigma;9, dd9, SpK instead of S, etc. *)</span>
+
+<span class="command">theory</span> Stream_Lift_to_Free9
+<span class="keyword2">imports</span> Stream_Distributive_Law9
+<span class="keyword2">begin</span>
+
+<span class="command">subsection</span><span class="verbatim">{* The lifting *}</span>
+
+<span class="comment">(* Our aim is lift &Lambda;9 to an (SpK,SpK,T)-distributive law dd9 compatible with the monadic structure. *)</span>
+
+<span class="comment">(* In order to be able to define dd9, we need a larger codomain type: *)</span>
+<span class="command">definition</span> ddd9 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;9 =&gt; &#39;a &Sigma;&Sigma;9 &times; &#39;a &Sigma;&Sigma;9 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;ddd9 = ext9 &lt;\&lt;oo&gt;\&lt;pp&gt;9 o &Sigma;9_map fst, F_map flat9 o &Lambda;9&gt; (leaf9 ** F_map leaf9)&quot;</span>
+
+<span class="command">definition</span> dd9 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;9 =&gt; &#39;a &Sigma;&Sigma;9 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;dd9 = snd o ddd9&quot;</span>
+
+<span class="command">lemma</span> ddd9_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;9_rel (rel_prod R (F_rel R)) ===&gt; rel_prod (&Sigma;&Sigma;9_rel R) (F_rel (&Sigma;&Sigma;9_rel R))) ddd9 ddd9&quot;</span>
+  <span class="command">unfolding</span> ddd9_def ext9_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> dd9_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;9_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;9_rel R)) dd9 dd9&quot;</span>
+  <span class="command">unfolding</span> dd9_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> F_rel_&Sigma;&Sigma;9_rel<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;9_rel (rel_prod R (F_rel R)) x y ==&gt; F_rel (&Sigma;&Sigma;9_rel R) (dd9 x) (dd9 y)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF dd9_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* We verify the facts for dd9: *)</span>
+<span class="command">theorem</span> dd9_leaf9<span class="delimiter">:</span> <span class="string">&quot;dd9 o leaf9 = F_map leaf9 o snd&quot;</span>
+<span class="command">unfolding</span> dd9_def ddd9_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext9_comp_leaf9 snd_comp_map_prod <span class="command">..</span>
+
+<span class="command">lemma</span> ddd9_natural<span class="delimiter">:</span> <span class="string">&quot;ddd9 o &Sigma;&Sigma;9_map (f ** F_map f) = (&Sigma;&Sigma;9_map f ** F_map (&Sigma;&Sigma;9_map f)) o ddd9&quot;</span>
+  <span class="command">using</span> ddd9_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;9.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">theorem</span> dd9_natural<span class="delimiter">:</span> <span class="string">&quot;dd9 o &Sigma;&Sigma;9_map (f ** F_map f) = F_map (&Sigma;&Sigma;9_map f) o dd9&quot;</span>
+  <span class="command">using</span> dd9_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;9.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;9_dd9<span class="delimiter">:</span> <span class="string">&quot;&Lambda;9 = dd9 o \&lt;oo&gt;\&lt;pp&gt;9 o &Sigma;9_map leaf9&quot;</span>
+  <span class="command">unfolding</span> dd9_def ddd9_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;9.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext9_commute
+  <span class="command">unfolding</span> o_assoc snd_convol ext9_comp_leaf9
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Lambda;9_natural
+  <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf9_flat9 F_map_id id_o
+  <span class="command">..</span>
+
+<span class="command">lemma</span> fst_ddd9<span class="delimiter">:</span> <span class="string">&quot;fst o ddd9 = &Sigma;&Sigma;9_map fst&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;fst o ddd9 = ext9 \&lt;oo&gt;\&lt;pp&gt;9 (leaf9 o fst)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule ext9_unique<span class="delimiter">)</span> <span class="command">unfolding</span> ddd9_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext9_comp_leaf9 ext9_commute
+  <span class="command">unfolding</span> o_assoc fst_comp_map_prod fst_convol
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;9.map_comp0 <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = &Sigma;&Sigma;9_map fst&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext9_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf9_natural \&lt;oo&gt;\&lt;pp&gt;9_natural <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> ddd9_flat9<span class="delimiter">:</span> <span class="string">&quot;(flat9 ** F_map flat9) o ddd9 o &Sigma;&Sigma;9_map ddd9 = ddd9 o flat9&quot;</span> <span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;?L = ext9 &lt;\&lt;oo&gt;\&lt;pp&gt;9 o &Sigma;9_map fst, F_map flat9 o &Lambda;9&gt; ddd9&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule ext9_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat9 ** F_map flat9) o ddd9 o &Sigma;&Sigma;9_map ddd9 o leaf9 = ddd9&quot;</span>
+    <span class="command">unfolding</span> ddd9_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf9_natural
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext9_comp_leaf9
+    <span class="command">unfolding</span> map_prod.comp F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat9_leaf9 F_map_id map_prod.id id_o <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;&lt;flat9 o (\&lt;oo&gt;\&lt;pp&gt;9 o &Sigma;9_map fst) , F_map flat9 o (F_map flat9 o &Lambda;9)&gt;  =
+             &lt;\&lt;oo&gt;\&lt;pp&gt;9 o &Sigma;9_map fst , F_map flat9 o &Lambda;9&gt; o &Sigma;9_map (flat9 ** F_map flat9)&quot;</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> flat9_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc fst_convol snd_convol
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;9.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> fst_comp_map_prod snd_comp_map_prod
+    <span class="command">unfolding</span> &Lambda;9_natural <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat9_assoc <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat9 ** F_map flat9) o ddd9 o &Sigma;&Sigma;9_map ddd9 o \&lt;oo&gt;\&lt;pp&gt;9 =
+          &lt;\&lt;oo&gt;\&lt;pp&gt;9 o &Sigma;9_map fst , F_map flat9 o &Lambda;9&gt; o &Sigma;9_map (flat9 ** F_map flat9 o ddd9 o &Sigma;&Sigma;9_map ddd9)&quot;</span>
+    <span class="command">unfolding</span> ddd9_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> \&lt;oo&gt;\&lt;pp&gt;9_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext9_commute
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;9.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> &Sigma;9.map_comp0
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> map_prod_o_convol
+    <span class="command">unfolding</span> ext9_&Sigma;&Sigma;9_map<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> A <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = ?R&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext9_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;ddd9 o flat9 o leaf9 = ddd9&quot;</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat9_leaf9 o_id <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">show</span> <span class="string">&quot;ddd9 o flat9 o \&lt;oo&gt;\&lt;pp&gt;9 = &lt;\&lt;oo&gt;\&lt;pp&gt;9 o &Sigma;9_map fst , F_map flat9 o &Lambda;9&gt; o &Sigma;9_map (ddd9 o flat9)&quot;</span>
+    <span class="command">unfolding</span> ddd9_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> flat9_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> ext9_commute &Sigma;9.map_comp0 <span class="command">unfolding</span> o_assoc <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> dd9_flat9<span class="delimiter">:</span> <span class="string">&quot;F_map flat9 o dd9 o &Sigma;&Sigma;9_map &lt;&Sigma;&Sigma;9_map fst, dd9&gt; = dd9 o flat9&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;snd o ((flat9 ** F_map flat9) o ddd9 o &Sigma;&Sigma;9_map ddd9) = snd o (ddd9 o flat9)&quot;</span>
+  <span class="command">unfolding</span> ddd9_flat9 <span class="command">..</span>
+  <span class="command">have</span> B<span class="delimiter">:</span> <span class="string">&quot;ddd9 = &lt;&Sigma;&Sigma;9_map fst , snd o ddd9&gt;&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span>
+  <span class="command">unfolding</span> fst_ddd9 <span class="command">by</span> auto
+  <span class="command">show</span> <span class="var">?thesis</span> <span class="command">unfolding</span> dd9_def
+  <span class="command">unfolding</span> A<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> unfolded o_assoc snd_comp_map_prod<span class="delimiter">]</span> o_assoc B<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="comment">(* The next two theorems are not necessary for the development.
+They show that the conditions dd9_leaf9 and dd9_flat9 imply the
+more standard conditions for the distributive law dd9&#39; = &lt;&Sigma;&Sigma;9_map fst, dd9&gt;
+for the functors &Sigma;&Sigma;9 and &#39;a F&#39; = &#39;a &times; &#39;a F_ In fact, they can be shown
+equivalent to these. *)</span>
+
+<span class="command">lemma</span> dd9_leaf92<span class="delimiter">:</span> <span class="string">&quot;&lt;&Sigma;&Sigma;9_map fst, dd9&gt; o leaf9 = leaf9 ** F_map leaf9&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc <span class="command">by</span> <span class="delimiter">(</span>simp_all add<span class="delimiter">:</span> leaf9_natural dd9_leaf9<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ddd9_leaf9<span class="delimiter">:</span> <span class="string">&quot;ddd9 o leaf9 = leaf9 ** F_map leaf9&quot;</span>
+<span class="command">unfolding</span> ddd9_def ext9_comp_leaf9 <span class="command">..</span>
+
+<span class="command">lemma</span> ddd9_\&lt;oo&gt;\&lt;pp&gt;9<span class="delimiter">:</span> <span class="string">&quot;ddd9 o \&lt;oo&gt;\&lt;pp&gt;9 = &lt;\&lt;oo&gt;\&lt;pp&gt;9 o &Sigma;9_map fst , F_map flat9 o &Lambda;9&gt; o &Sigma;9_map ddd9&quot;</span>
+<span class="command">unfolding</span> ddd9_def ext9_commute <span class="command">..</span>
+
+
+<span class="comment">(* More customization *)</span>
+
+<span class="comment">(* TODO Jasmin: Add9 this high-level induction for the relator of datatypes:
+(similarly, coinduction for codatatypes): *)</span>
+<span class="command">lemma</span> &Sigma;&Sigma;9_rel_induct_pointfree<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf9<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf9 x1) (leaf9 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;9<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;9_rel (&Sigma;&Sigma;9_rel R) y1 y2; &Sigma;9_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;9 y1) (\&lt;oo&gt;\&lt;pp&gt;9 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;9_rel R &le; phi&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;&Sigma;&Sigma;9_rel R &le; phi \&lt;sqinter&gt; &Sigma;&Sigma;9_rel R&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>induct rule<span class="delimiter">:</span> &Sigma;&Sigma;9.ctor_rel_induct<span class="delimiter">)</span>
+  <span class="command">using</span> assms &Sigma;&Sigma;9.rel_inject<span class="delimiter">[</span>of R<span class="delimiter">]</span> <span class="command">unfolding</span> rel_pre_&Sigma;&Sigma;9_def &Sigma;&Sigma;9.leaf9_def &Sigma;&Sigma;9.\&lt;oo&gt;\&lt;pp&gt;9_def
+  <span class="command">using</span> inf_greatest<span class="delimiter">[</span>OF &Sigma;9.rel_mono<span class="delimiter">[</span>OF inf_le1<span class="delimiter">]</span> &Sigma;9.rel_mono<span class="delimiter">[</span>OF inf_le2<span class="delimiter">]</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> rel_sum_def BNF_Comp.id_bnf_comp_def vimage2p_def <span class="command">by</span> <span class="delimiter">(</span>auto split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span> blast<span class="delimiter">+</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">by</span> simp
+<span class="command">qed</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;9_rel_induct<span class="delimiter">[</span>case_names leaf9 \&lt;oo&gt;\&lt;pp&gt;9<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf9<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf9 x1) (leaf9 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;9<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;9_rel (&Sigma;&Sigma;9_rel R) y1 y2; &Sigma;9_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;9 y1) (\&lt;oo&gt;\&lt;pp&gt;9 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;9_rel R t1 t2 --&gt; phi t1 t2&quot;</span>
+<span class="command">using</span> &Sigma;&Sigma;9_rel_induct_pointfree<span class="delimiter">[</span>of R<span class="delimiter">,</span> OF assms<span class="delimiter">]</span> <span class="command">by</span> auto
+<span class="comment">(* end TODO *)</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

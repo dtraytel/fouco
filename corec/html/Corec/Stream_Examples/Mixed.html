@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Mixed (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Mixed</h1>
+
+<span class="command">theory</span> <span class="name">Mixed</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Examples.html"><span class="name">Stream_Examples</span></a> <a href="../../HOL/HOL/GCD.html"><span class="name">GCD</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Mixed Recursion-Corecursion *}</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">theory</span> Mixed
+<span class="keyword2">imports</span> Stream_Examples GCD
+<span class="keyword2">begin</span>
+<span class="comment">(*&gt;*)</span>
+
+<span class="command">function</span> primes<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> <span class="delimiter">::</span> <span class="string">&quot;(nat * nat) =&gt; (stream + nat * nat) &Sigma;&Sigma;0 F &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;primes<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (m, n) =
+     (if (m = 0 &and; n &gt; 1) &or; coprime m n then GUARD0 (n, CONT0 (m * n, Suc n))
+     else (primes<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (m, Suc n)))&quot;</span>
+<span class="command">by</span> pat_completeness auto
+<span class="command">termination</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>relation <span class="string">&quot;measure (&lambda;(m, n).
+    if n = 0 then 1 else if coprime m n then 0 else m - n mod m)&quot;</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> mod_Suc intro<span class="delimiter">:</span> Suc_lessI<span class="delimiter">)</span>
+      <span class="command">apply</span> <span class="delimiter">(</span>metis One_nat_def coprime_Suc_nat gcd_nat.commute gcd_red_nat<span class="delimiter">)</span>
+     <span class="command">apply</span> <span class="delimiter">(</span>metis diff_less_mono2 lessI mod_less_divisor<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+<span class="command">definition</span> primes <span class="delimiter">::</span> <span class="string">&quot;nat =&gt; nat =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;primes = curry (corecUU0 primes<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>)&quot;</span>
+
+<span class="command">lemma</span> primes_code<span class="delimiter">:</span>
+  <span class="string">&quot;primes m n =
+    (if (m = 0 &and; n &gt; 1) &or; coprime m n then SCons n (primes (m * n) (Suc n))
+     else primes m (Suc n))&quot;</span>
+  <span class="command">unfolding</span> primes_def curry_def
+  <span class="command">by</span> <span class="delimiter">(</span>subst corecUU0<span class="delimiter">,</span> subst primes<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>.simps<span class="delimiter">)</span>
+    <span class="delimiter">(</span>simp del<span class="delimiter">:</span> primes<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>.simps add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def eval0_leaf0&#39; corecUU0<span class="delimiter">)</span>
+
+<span class="command">lemma</span> primes<span class="delimiter">:</span> <span class="string">&quot;primes 1 2 = SCons 2 (primes 2 3)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>subst primes_code<span class="delimiter">)</span> auto
+
+<span class="command">fun</span> catalan<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> <span class="delimiter">::</span> <span class="string">&quot;nat =&gt; (stream + nat) &Sigma;&Sigma;1 F &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;catalan<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> n =
+     (if n &gt; 0 then PLS1 (catalan<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (n - 1), GUARD1 (0, CONT1 (n+1))) else GUARD1 (1, CONT1 1))&quot;</span>
+
+<span class="command">definition</span> catalan <span class="delimiter">::</span> <span class="string">&quot;nat =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;catalan = corecUU1 catalan<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>&quot;</span>
+
+<span class="command">lemma</span> catalan_code<span class="delimiter">:</span>
+  <span class="string">&quot;catalan n =
+    (if n &gt; 0 then pls (catalan (n - 1)) (SCons 0 (catalan (n + 1)))
+     else SCons 1 (catalan 1))&quot;</span>
+  <span class="command">unfolding</span> catalan_def
+  <span class="command">by</span> <span class="delimiter">(</span>subst corecUU1<span class="delimiter">,</span> subst catalan<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>.simps<span class="delimiter">)</span>
+    <span class="delimiter">(</span>simp del<span class="delimiter">:</span> catalan<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>.simps add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def
+      eval1_\&lt;oo&gt;\&lt;pp&gt;1 eval1_leaf1&#39; alg&Lambda;1_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;1_natural<span class="delimiter">]</span> corecUU1 pls_uniform<span class="delimiter">)</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">end</span>
+<span class="comment">(*&gt;*)</span>
+</pre>
+
+</div>
+</body>
+</html>

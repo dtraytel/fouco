@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory LFilter (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory LFilter</h1>
+
+<span class="command">theory</span> <span class="name">LFilter</span><br/>
+<span class="keyword">imports</span> <a href="LList_Lib.html"><span class="name">LList_Lib</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="comment">(*&lt;*)</span>
+<span class="command">theory</span> LFilter
+<span class="keyword2">imports</span> LList_Lib
+<span class="keyword2">begin</span>
+<span class="comment">(*&gt;*)</span>
+
+<span class="command">section</span> <span class="cartouche">&#8249;lfilter&#8250;</span>
+
+<span class="command">text</span> <span class="cartouche">&#8249;
+Here, we define a monomorphic filter function on lazy lists over natural numbers.
+Unlike, the theory presented in the paper in general the rudimentary package currently
+does not support polymorphism.
+&#8250;</span>
+
+<span class="command">inductive</span> llist_in <span class="keyword2">where</span>
+  <span class="string">&quot;llist_in (LCons x xs) x&quot;</span>
+<span class="delimiter">|</span> <span class="string">&quot;llist_in xs y ==&gt; llist_in (LCons x xs) y&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;lset xs &equiv; {x. llist_in xs x}&quot;</span>
+
+<span class="command">function</span> lfilter<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> <span class="delimiter">::</span> <span class="string">&quot;(nat =&gt; bool) =&gt; llist =&gt; (llist + ((nat =&gt; bool) &times; llist)) &Sigma;&Sigma;0 F &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;lfilter<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> P xs =
+      (if &forall;x &isin; lset xs. &not; P x then GUARD0 (Inl ())
+      else if P (head xs) then GUARD0 (Inr (head xs, CONT0 (P, tail xs)))
+      else lfilter<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> P (tail xs))&quot;</span>
+<span class="command">by</span> pat_completeness auto
+<span class="command">termination</span>
+<span class="command">proof</span> <span class="delimiter">(</span>relation <span class="string">&quot;measure (&lambda;(P, xs). LEAST n. P (head ((tail ^^ n) xs)))&quot;</span><span class="delimiter">,</span> rule wf_measure<span class="delimiter">,</span> clarsimp<span class="delimiter">)</span>
+  <span class="command">fix</span> P xs x
+  <span class="command">assume</span> <span class="string">&quot;llist_in xs x&quot;</span> <span class="string">&quot;P x&quot;</span> <span class="string">&quot;&not; P (head xs)&quot;</span>
+  <span class="command">from</span> this<span class="delimiter">(</span>1<span class="delimiter">,</span>2<span class="delimiter">)</span> <span class="command">obtain</span> a <span class="keyword2">where</span> <span class="string">&quot;P (head ((tail ^^ a) xs))&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>atomize_elim<span class="delimiter">,</span> induct xs x rule<span class="delimiter">:</span> llist_in.induct<span class="delimiter">)</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> J.dtor_ctor funpow_Suc_right
+      simp del<span class="delimiter">:</span> funpow.simps<span class="delimiter">(</span>2<span class="delimiter">)</span> intro<span class="delimiter">:</span> exI<span class="delimiter">[</span>of _ 0<span class="delimiter">]</span> exI<span class="delimiter">[</span>of _ <span class="string">&quot;Suc i&quot;</span> <span class="keyword2">for</span> i<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">moreover</span>
+  <span class="command">with</span> <span class="cartouche">&#8249;&not; P (head xs)&#8250;</span>
+    <span class="command">have</span> <span class="string">&quot;(LEAST n. P (head ((tail ^^ n) xs))) = Suc (LEAST n. P (head ((tail ^^ Suc n) xs)))&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>intro Least_Suc<span class="delimiter">)</span> auto
+  <span class="command">then</span> <span class="command">show</span> <span class="string">&quot;(LEAST n. P (head ((tail ^^ n) (tail xs)))) &lt; (LEAST n. P (head ((tail ^^ n) xs)))&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> funpow_swap1<span class="delimiter">[</span>of tail<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">definition</span> lfilter <span class="delimiter">::</span> <span class="string">&quot;(nat =&gt; bool) =&gt; llist =&gt; llist&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;lfilter P xs = corecUU0 (split lfilter<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>) (P, xs)&quot;</span>
+
+<span class="command">lemma</span> lfilter_code<span class="delimiter">:</span>
+  <span class="string">&quot;lfilter P xs =
+     (if &forall;x &isin; lset xs. &not; P x then LNil
+      else if P (head xs) then LCons (head xs) (lfilter P (tail xs))
+      else lfilter P (tail xs))&quot;</span>
+  <span class="command">unfolding</span> lfilter_def
+  <span class="command">by</span> <span class="delimiter">(</span>subst corecUU0<span class="delimiter">,</span> unfold split<span class="delimiter">,</span> subst lfilter<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>.simps<span class="delimiter">)</span>
+    <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def
+    eval0_\&lt;oo&gt;\&lt;pp&gt;0 eval0_leaf0&#39; o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;0_natural<span class="delimiter">]</span> corecUU0
+    imp_conjL<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> imp_conjR conj_commute del<span class="delimiter">:</span> not_all<span class="delimiter">)</span>
+
+<span class="command">text</span> <span class="cartouche">&#8249;Here is an alternative definition using partial\_function.&#8250;</span>
+
+<span class="command">partial_function</span> <span class="delimiter">(</span>tailrec<span class="delimiter">)</span> lfilter2<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> <span class="delimiter">::</span>
+  <span class="string">&quot;(nat =&gt; bool) =&gt; llist =&gt; (llist + ((nat =&gt; bool) &times; llist)) &Sigma;&Sigma;0 F &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;lfilter2<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> P xs =
+      (if &forall;x &isin; lset xs. &not; P x then GUARD0 (Inl ())
+      else if P (head xs) then GUARD0 (Inr (head xs, CONT0 (P, tail xs)))
+      else lfilter2<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> P (tail xs))&quot;</span>
+
+<span class="command">definition</span> lfilter2 <span class="delimiter">::</span> <span class="string">&quot;(nat =&gt; bool) =&gt; llist =&gt; llist&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;lfilter2 P xs = corecUU0 (split lfilter2<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>) (P, xs)&quot;</span>
+
+<span class="command">lemma</span> lfilter2_code<span class="delimiter">:</span>
+  <span class="string">&quot;lfilter2 P xs =
+     (if &forall;x &isin; lset xs. &not; P x then LNil
+      else if P (head xs) then LCons (head xs) (lfilter2 P (tail xs))
+      else lfilter2 P (tail xs))&quot;</span>
+  <span class="command">unfolding</span> lfilter2_def
+  <span class="command">by</span> <span class="delimiter">(</span>subst corecUU0<span class="delimiter">,</span> unfold split<span class="delimiter">,</span> subst lfilter2<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>.simps<span class="delimiter">)</span>
+    <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def
+    eval0_\&lt;oo&gt;\&lt;pp&gt;0 eval0_leaf0&#39; o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;0_natural<span class="delimiter">]</span> corecUU0
+    imp_conjL<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> imp_conjR conj_commute del<span class="delimiter">:</span> not_all<span class="delimiter">)</span>
+
+<span class="command">end</span>
+</pre>
+
+</div>
+</body>
+</html>

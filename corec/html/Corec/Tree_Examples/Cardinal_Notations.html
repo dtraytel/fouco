@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Cardinal_Notations (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Cardinal_Notations</h1>
+
+<span class="command">theory</span> <span class="name">Cardinal_Notations</span><br/>
+<span class="keyword">imports</span> <a href="../../HOL/HOL/Main.html"><span class="name">Main</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="comment">(*  Title:      HOL/Library/Cardinal_Notations.thy
+    Author:     Jasmin Blanchette, TU Muenchen
+    Copyright   2013
+
+Cardinal notations.
+*)</span>
+
+<span class="command">header</span> <span class="verbatim">{* Cardinal Notations *}</span>
+
+<span class="command">theory</span> Cardinal_Notations
+<span class="keyword2">imports</span> Main
+<span class="keyword2">begin</span>
+
+<span class="command">notation</span>
+  ordLeq2 <span class="delimiter">(</span><span class="keyword2">infix</span> <span class="string">&quot;&lt;=o&quot;</span> 50<span class="delimiter">)</span> <span class="keyword2">and</span>
+  ordLeq3 <span class="delimiter">(</span><span class="keyword2">infix</span> <span class="string">&quot;&le;o&quot;</span> 50<span class="delimiter">)</span> <span class="keyword2">and</span>
+  ordLess2 <span class="delimiter">(</span><span class="keyword2">infix</span> <span class="string">&quot;&lt;o&quot;</span> 50<span class="delimiter">)</span> <span class="keyword2">and</span>
+  ordIso2 <span class="delimiter">(</span><span class="keyword2">infix</span> <span class="string">&quot;=o&quot;</span> 50<span class="delimiter">)</span> <span class="keyword2">and</span>
+  card_of <span class="delimiter">(</span><span class="string">&quot;|_|&quot;</span><span class="delimiter">)</span> <span class="keyword2">and</span>
+  BNF_Cardinal_Arithmetic.csum <span class="delimiter">(</span><span class="keyword2">infixr</span> <span class="string">&quot;+c&quot;</span> 65<span class="delimiter">)</span> <span class="keyword2">and</span>
+  BNF_Cardinal_Arithmetic.cprod <span class="delimiter">(</span><span class="keyword2">infixr</span> <span class="string">&quot;*c&quot;</span> 80<span class="delimiter">)</span> <span class="keyword2">and</span>
+  BNF_Cardinal_Arithmetic.cexp <span class="delimiter">(</span><span class="keyword2">infixr</span> <span class="string">&quot;^c&quot;</span> 90<span class="delimiter">)</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;cinfinite &equiv; BNF_Cardinal_Arithmetic.cinfinite&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;czero &equiv; BNF_Cardinal_Arithmetic.czero&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;cone &equiv; BNF_Cardinal_Arithmetic.cone&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;ctwo &equiv; BNF_Cardinal_Arithmetic.ctwo&quot;</span>
+
+<span class="command">end</span>
+</pre>
+
+</div>
+</body>
+</html>

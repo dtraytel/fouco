@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Lift_to_Free5 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Lift_to_Free5</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Lift_to_Free5</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Distributive_Law5.html"><span class="name">Stream_Distributive_Law5</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Lifting of the distributive law to the free algebra *}</span>
+
+
+<span class="comment">(* This is silimar to Lift_to_Free, but uses &Lambda;5, &Sigma;&Sigma;5, dd5, SpK instead of S, etc. *)</span>
+
+<span class="command">theory</span> Stream_Lift_to_Free5
+<span class="keyword2">imports</span> Stream_Distributive_Law5
+<span class="keyword2">begin</span>
+
+<span class="command">subsection</span><span class="verbatim">{* The lifting *}</span>
+
+<span class="comment">(* Our aim is lift &Lambda;5 to an (SpK,SpK,T)-distributive law dd5 compatible with the monadic structure. *)</span>
+
+<span class="comment">(* In order to be able to define dd5, we need a larger codomain type: *)</span>
+<span class="command">definition</span> ddd5 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;5 =&gt; &#39;a &Sigma;&Sigma;5 &times; &#39;a &Sigma;&Sigma;5 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;ddd5 = ext5 &lt;\&lt;oo&gt;\&lt;pp&gt;5 o &Sigma;5_map fst, F_map flat5 o &Lambda;5&gt; (leaf5 ** F_map leaf5)&quot;</span>
+
+<span class="command">definition</span> dd5 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;5 =&gt; &#39;a &Sigma;&Sigma;5 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;dd5 = snd o ddd5&quot;</span>
+
+<span class="command">lemma</span> ddd5_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;5_rel (rel_prod R (F_rel R)) ===&gt; rel_prod (&Sigma;&Sigma;5_rel R) (F_rel (&Sigma;&Sigma;5_rel R))) ddd5 ddd5&quot;</span>
+  <span class="command">unfolding</span> ddd5_def ext5_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> dd5_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;5_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;5_rel R)) dd5 dd5&quot;</span>
+  <span class="command">unfolding</span> dd5_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> F_rel_&Sigma;&Sigma;5_rel<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;5_rel (rel_prod R (F_rel R)) x y ==&gt; F_rel (&Sigma;&Sigma;5_rel R) (dd5 x) (dd5 y)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF dd5_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* We verify the facts for dd5: *)</span>
+<span class="command">theorem</span> dd5_leaf5<span class="delimiter">:</span> <span class="string">&quot;dd5 o leaf5 = F_map leaf5 o snd&quot;</span>
+<span class="command">unfolding</span> dd5_def ddd5_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext5_comp_leaf5 snd_comp_map_prod <span class="command">..</span>
+
+<span class="command">lemma</span> ddd5_natural<span class="delimiter">:</span> <span class="string">&quot;ddd5 o &Sigma;&Sigma;5_map (f ** F_map f) = (&Sigma;&Sigma;5_map f ** F_map (&Sigma;&Sigma;5_map f)) o ddd5&quot;</span>
+  <span class="command">using</span> ddd5_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;5.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">theorem</span> dd5_natural<span class="delimiter">:</span> <span class="string">&quot;dd5 o &Sigma;&Sigma;5_map (f ** F_map f) = F_map (&Sigma;&Sigma;5_map f) o dd5&quot;</span>
+  <span class="command">using</span> dd5_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;5.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;5_dd5<span class="delimiter">:</span> <span class="string">&quot;&Lambda;5 = dd5 o \&lt;oo&gt;\&lt;pp&gt;5 o &Sigma;5_map leaf5&quot;</span>
+  <span class="command">unfolding</span> dd5_def ddd5_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;5.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext5_commute
+  <span class="command">unfolding</span> o_assoc snd_convol ext5_comp_leaf5
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Lambda;5_natural
+  <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf5_flat5 F_map_id id_o
+  <span class="command">..</span>
+
+<span class="command">lemma</span> fst_ddd5<span class="delimiter">:</span> <span class="string">&quot;fst o ddd5 = &Sigma;&Sigma;5_map fst&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;fst o ddd5 = ext5 \&lt;oo&gt;\&lt;pp&gt;5 (leaf5 o fst)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule ext5_unique<span class="delimiter">)</span> <span class="command">unfolding</span> ddd5_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext5_comp_leaf5 ext5_commute
+  <span class="command">unfolding</span> o_assoc fst_comp_map_prod fst_convol
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;5.map_comp0 <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = &Sigma;&Sigma;5_map fst&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext5_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf5_natural \&lt;oo&gt;\&lt;pp&gt;5_natural <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> ddd5_flat5<span class="delimiter">:</span> <span class="string">&quot;(flat5 ** F_map flat5) o ddd5 o &Sigma;&Sigma;5_map ddd5 = ddd5 o flat5&quot;</span> <span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;?L = ext5 &lt;\&lt;oo&gt;\&lt;pp&gt;5 o &Sigma;5_map fst, F_map flat5 o &Lambda;5&gt; ddd5&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule ext5_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat5 ** F_map flat5) o ddd5 o &Sigma;&Sigma;5_map ddd5 o leaf5 = ddd5&quot;</span>
+    <span class="command">unfolding</span> ddd5_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf5_natural
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext5_comp_leaf5
+    <span class="command">unfolding</span> map_prod.comp F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat5_leaf5 F_map_id map_prod.id id_o <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;&lt;flat5 o (\&lt;oo&gt;\&lt;pp&gt;5 o &Sigma;5_map fst) , F_map flat5 o (F_map flat5 o &Lambda;5)&gt;  =
+             &lt;\&lt;oo&gt;\&lt;pp&gt;5 o &Sigma;5_map fst , F_map flat5 o &Lambda;5&gt; o &Sigma;5_map (flat5 ** F_map flat5)&quot;</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> flat5_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc fst_convol snd_convol
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;5.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> fst_comp_map_prod snd_comp_map_prod
+    <span class="command">unfolding</span> &Lambda;5_natural <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat5_assoc <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat5 ** F_map flat5) o ddd5 o &Sigma;&Sigma;5_map ddd5 o \&lt;oo&gt;\&lt;pp&gt;5 =
+          &lt;\&lt;oo&gt;\&lt;pp&gt;5 o &Sigma;5_map fst , F_map flat5 o &Lambda;5&gt; o &Sigma;5_map (flat5 ** F_map flat5 o ddd5 o &Sigma;&Sigma;5_map ddd5)&quot;</span>
+    <span class="command">unfolding</span> ddd5_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> \&lt;oo&gt;\&lt;pp&gt;5_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext5_commute
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;5.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> &Sigma;5.map_comp0
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> map_prod_o_convol
+    <span class="command">unfolding</span> ext5_&Sigma;&Sigma;5_map<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> A <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = ?R&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext5_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;ddd5 o flat5 o leaf5 = ddd5&quot;</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat5_leaf5 o_id <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">show</span> <span class="string">&quot;ddd5 o flat5 o \&lt;oo&gt;\&lt;pp&gt;5 = &lt;\&lt;oo&gt;\&lt;pp&gt;5 o &Sigma;5_map fst , F_map flat5 o &Lambda;5&gt; o &Sigma;5_map (ddd5 o flat5)&quot;</span>
+    <span class="command">unfolding</span> ddd5_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> flat5_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> ext5_commute &Sigma;5.map_comp0 <span class="command">unfolding</span> o_assoc <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> dd5_flat5<span class="delimiter">:</span> <span class="string">&quot;F_map flat5 o dd5 o &Sigma;&Sigma;5_map &lt;&Sigma;&Sigma;5_map fst, dd5&gt; = dd5 o flat5&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;snd o ((flat5 ** F_map flat5) o ddd5 o &Sigma;&Sigma;5_map ddd5) = snd o (ddd5 o flat5)&quot;</span>
+  <span class="command">unfolding</span> ddd5_flat5 <span class="command">..</span>
+  <span class="command">have</span> B<span class="delimiter">:</span> <span class="string">&quot;ddd5 = &lt;&Sigma;&Sigma;5_map fst , snd o ddd5&gt;&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span>
+  <span class="command">unfolding</span> fst_ddd5 <span class="command">by</span> auto
+  <span class="command">show</span> <span class="var">?thesis</span> <span class="command">unfolding</span> dd5_def
+  <span class="command">unfolding</span> A<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> unfolded o_assoc snd_comp_map_prod<span class="delimiter">]</span> o_assoc B<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="comment">(* The next two theorems are not necessary for the development.
+They show that the conditions dd5_leaf5 and dd5_flat5 imply the
+more standard conditions for the distributive law dd5&#39; = &lt;&Sigma;&Sigma;5_map fst, dd5&gt;
+for the functors &Sigma;&Sigma;5 and &#39;a F&#39; = &#39;a &times; &#39;a F_ In fact, they can be shown
+equivalent to these. *)</span>
+
+<span class="command">lemma</span> dd5_leaf52<span class="delimiter">:</span> <span class="string">&quot;&lt;&Sigma;&Sigma;5_map fst, dd5&gt; o leaf5 = leaf5 ** F_map leaf5&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc <span class="command">by</span> <span class="delimiter">(</span>simp_all add<span class="delimiter">:</span> leaf5_natural dd5_leaf5<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ddd5_leaf5<span class="delimiter">:</span> <span class="string">&quot;ddd5 o leaf5 = leaf5 ** F_map leaf5&quot;</span>
+<span class="command">unfolding</span> ddd5_def ext5_comp_leaf5 <span class="command">..</span>
+
+<span class="command">lemma</span> ddd5_\&lt;oo&gt;\&lt;pp&gt;5<span class="delimiter">:</span> <span class="string">&quot;ddd5 o \&lt;oo&gt;\&lt;pp&gt;5 = &lt;\&lt;oo&gt;\&lt;pp&gt;5 o &Sigma;5_map fst , F_map flat5 o &Lambda;5&gt; o &Sigma;5_map ddd5&quot;</span>
+<span class="command">unfolding</span> ddd5_def ext5_commute <span class="command">..</span>
+
+
+<span class="comment">(* More customization *)</span>
+
+<span class="comment">(* TODO Jasmin: Add5 this high-level induction for the relator of datatypes:
+(similarly, coinduction for codatatypes): *)</span>
+<span class="command">lemma</span> &Sigma;&Sigma;5_rel_induct_pointfree<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf5<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf5 x1) (leaf5 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;5<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;5_rel (&Sigma;&Sigma;5_rel R) y1 y2; &Sigma;5_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;5 y1) (\&lt;oo&gt;\&lt;pp&gt;5 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;5_rel R &le; phi&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;&Sigma;&Sigma;5_rel R &le; phi \&lt;sqinter&gt; &Sigma;&Sigma;5_rel R&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>induct rule<span class="delimiter">:</span> &Sigma;&Sigma;5.ctor_rel_induct<span class="delimiter">)</span>
+  <span class="command">using</span> assms &Sigma;&Sigma;5.rel_inject<span class="delimiter">[</span>of R<span class="delimiter">]</span> <span class="command">unfolding</span> rel_pre_&Sigma;&Sigma;5_def &Sigma;&Sigma;5.leaf5_def &Sigma;&Sigma;5.\&lt;oo&gt;\&lt;pp&gt;5_def
+  <span class="command">using</span> inf_greatest<span class="delimiter">[</span>OF &Sigma;5.rel_mono<span class="delimiter">[</span>OF inf_le1<span class="delimiter">]</span> &Sigma;5.rel_mono<span class="delimiter">[</span>OF inf_le2<span class="delimiter">]</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> rel_sum_def BNF_Comp.id_bnf_comp_def vimage2p_def <span class="command">by</span> <span class="delimiter">(</span>auto split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span> blast<span class="delimiter">+</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">by</span> simp
+<span class="command">qed</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;5_rel_induct<span class="delimiter">[</span>case_names leaf5 \&lt;oo&gt;\&lt;pp&gt;5<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf5<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf5 x1) (leaf5 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;5<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;5_rel (&Sigma;&Sigma;5_rel R) y1 y2; &Sigma;5_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;5 y1) (\&lt;oo&gt;\&lt;pp&gt;5 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;5_rel R t1 t2 --&gt; phi t1 t2&quot;</span>
+<span class="command">using</span> &Sigma;&Sigma;5_rel_induct_pointfree<span class="delimiter">[</span>of R<span class="delimiter">,</span> OF assms<span class="delimiter">]</span> <span class="command">by</span> auto
+<span class="comment">(* end TODO *)</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

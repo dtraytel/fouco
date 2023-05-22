@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Lift_to_Free8 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Lift_to_Free8</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Lift_to_Free8</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Distributive_Law8.html"><span class="name">Stream_Distributive_Law8</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Lifting of the distributive law to the free algebra *}</span>
+
+
+<span class="comment">(* This is silimar to Lift_to_Free, but uses &Lambda;8, &Sigma;&Sigma;8, dd8, SpK instead of S, etc. *)</span>
+
+<span class="command">theory</span> Stream_Lift_to_Free8
+<span class="keyword2">imports</span> Stream_Distributive_Law8
+<span class="keyword2">begin</span>
+
+<span class="command">subsection</span><span class="verbatim">{* The lifting *}</span>
+
+<span class="comment">(* Our aim is lift &Lambda;8 to an (SpK,SpK,T)-distributive law dd8 compatible with the monadic structure. *)</span>
+
+<span class="comment">(* In order to be able to define dd8, we need a larger codomain type: *)</span>
+<span class="command">definition</span> ddd8 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;8 =&gt; &#39;a &Sigma;&Sigma;8 &times; &#39;a &Sigma;&Sigma;8 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;ddd8 = ext8 &lt;\&lt;oo&gt;\&lt;pp&gt;8 o &Sigma;8_map fst, F_map flat8 o &Lambda;8&gt; (leaf8 ** F_map leaf8)&quot;</span>
+
+<span class="command">definition</span> dd8 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;8 =&gt; &#39;a &Sigma;&Sigma;8 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;dd8 = snd o ddd8&quot;</span>
+
+<span class="command">lemma</span> ddd8_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;8_rel (rel_prod R (F_rel R)) ===&gt; rel_prod (&Sigma;&Sigma;8_rel R) (F_rel (&Sigma;&Sigma;8_rel R))) ddd8 ddd8&quot;</span>
+  <span class="command">unfolding</span> ddd8_def ext8_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> dd8_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;8_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;8_rel R)) dd8 dd8&quot;</span>
+  <span class="command">unfolding</span> dd8_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> F_rel_&Sigma;&Sigma;8_rel<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;8_rel (rel_prod R (F_rel R)) x y ==&gt; F_rel (&Sigma;&Sigma;8_rel R) (dd8 x) (dd8 y)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF dd8_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* We verify the facts for dd8: *)</span>
+<span class="command">theorem</span> dd8_leaf8<span class="delimiter">:</span> <span class="string">&quot;dd8 o leaf8 = F_map leaf8 o snd&quot;</span>
+<span class="command">unfolding</span> dd8_def ddd8_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext8_comp_leaf8 snd_comp_map_prod <span class="command">..</span>
+
+<span class="command">lemma</span> ddd8_natural<span class="delimiter">:</span> <span class="string">&quot;ddd8 o &Sigma;&Sigma;8_map (f ** F_map f) = (&Sigma;&Sigma;8_map f ** F_map (&Sigma;&Sigma;8_map f)) o ddd8&quot;</span>
+  <span class="command">using</span> ddd8_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;8.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">theorem</span> dd8_natural<span class="delimiter">:</span> <span class="string">&quot;dd8 o &Sigma;&Sigma;8_map (f ** F_map f) = F_map (&Sigma;&Sigma;8_map f) o dd8&quot;</span>
+  <span class="command">using</span> dd8_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;8.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;8_dd8<span class="delimiter">:</span> <span class="string">&quot;&Lambda;8 = dd8 o \&lt;oo&gt;\&lt;pp&gt;8 o &Sigma;8_map leaf8&quot;</span>
+  <span class="command">unfolding</span> dd8_def ddd8_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;8.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext8_commute
+  <span class="command">unfolding</span> o_assoc snd_convol ext8_comp_leaf8
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Lambda;8_natural
+  <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf8_flat8 F_map_id id_o
+  <span class="command">..</span>
+
+<span class="command">lemma</span> fst_ddd8<span class="delimiter">:</span> <span class="string">&quot;fst o ddd8 = &Sigma;&Sigma;8_map fst&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;fst o ddd8 = ext8 \&lt;oo&gt;\&lt;pp&gt;8 (leaf8 o fst)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule ext8_unique<span class="delimiter">)</span> <span class="command">unfolding</span> ddd8_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext8_comp_leaf8 ext8_commute
+  <span class="command">unfolding</span> o_assoc fst_comp_map_prod fst_convol
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;8.map_comp0 <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = &Sigma;&Sigma;8_map fst&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext8_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf8_natural \&lt;oo&gt;\&lt;pp&gt;8_natural <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> ddd8_flat8<span class="delimiter">:</span> <span class="string">&quot;(flat8 ** F_map flat8) o ddd8 o &Sigma;&Sigma;8_map ddd8 = ddd8 o flat8&quot;</span> <span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;?L = ext8 &lt;\&lt;oo&gt;\&lt;pp&gt;8 o &Sigma;8_map fst, F_map flat8 o &Lambda;8&gt; ddd8&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule ext8_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat8 ** F_map flat8) o ddd8 o &Sigma;&Sigma;8_map ddd8 o leaf8 = ddd8&quot;</span>
+    <span class="command">unfolding</span> ddd8_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf8_natural
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext8_comp_leaf8
+    <span class="command">unfolding</span> map_prod.comp F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat8_leaf8 F_map_id map_prod.id id_o <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;&lt;flat8 o (\&lt;oo&gt;\&lt;pp&gt;8 o &Sigma;8_map fst) , F_map flat8 o (F_map flat8 o &Lambda;8)&gt;  =
+             &lt;\&lt;oo&gt;\&lt;pp&gt;8 o &Sigma;8_map fst , F_map flat8 o &Lambda;8&gt; o &Sigma;8_map (flat8 ** F_map flat8)&quot;</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> flat8_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc fst_convol snd_convol
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;8.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> fst_comp_map_prod snd_comp_map_prod
+    <span class="command">unfolding</span> &Lambda;8_natural <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat8_assoc <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat8 ** F_map flat8) o ddd8 o &Sigma;&Sigma;8_map ddd8 o \&lt;oo&gt;\&lt;pp&gt;8 =
+          &lt;\&lt;oo&gt;\&lt;pp&gt;8 o &Sigma;8_map fst , F_map flat8 o &Lambda;8&gt; o &Sigma;8_map (flat8 ** F_map flat8 o ddd8 o &Sigma;&Sigma;8_map ddd8)&quot;</span>
+    <span class="command">unfolding</span> ddd8_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> \&lt;oo&gt;\&lt;pp&gt;8_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext8_commute
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;8.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> &Sigma;8.map_comp0
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> map_prod_o_convol
+    <span class="command">unfolding</span> ext8_&Sigma;&Sigma;8_map<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> A <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = ?R&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext8_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;ddd8 o flat8 o leaf8 = ddd8&quot;</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat8_leaf8 o_id <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">show</span> <span class="string">&quot;ddd8 o flat8 o \&lt;oo&gt;\&lt;pp&gt;8 = &lt;\&lt;oo&gt;\&lt;pp&gt;8 o &Sigma;8_map fst , F_map flat8 o &Lambda;8&gt; o &Sigma;8_map (ddd8 o flat8)&quot;</span>
+    <span class="command">unfolding</span> ddd8_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> flat8_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> ext8_commute &Sigma;8.map_comp0 <span class="command">unfolding</span> o_assoc <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> dd8_flat8<span class="delimiter">:</span> <span class="string">&quot;F_map flat8 o dd8 o &Sigma;&Sigma;8_map &lt;&Sigma;&Sigma;8_map fst, dd8&gt; = dd8 o flat8&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;snd o ((flat8 ** F_map flat8) o ddd8 o &Sigma;&Sigma;8_map ddd8) = snd o (ddd8 o flat8)&quot;</span>
+  <span class="command">unfolding</span> ddd8_flat8 <span class="command">..</span>
+  <span class="command">have</span> B<span class="delimiter">:</span> <span class="string">&quot;ddd8 = &lt;&Sigma;&Sigma;8_map fst , snd o ddd8&gt;&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span>
+  <span class="command">unfolding</span> fst_ddd8 <span class="command">by</span> auto
+  <span class="command">show</span> <span class="var">?thesis</span> <span class="command">unfolding</span> dd8_def
+  <span class="command">unfolding</span> A<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> unfolded o_assoc snd_comp_map_prod<span class="delimiter">]</span> o_assoc B<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="comment">(* The next two theorems are not necessary for the development.
+They show that the conditions dd8_leaf8 and dd8_flat8 imply the
+more standard conditions for the distributive law dd8&#39; = &lt;&Sigma;&Sigma;8_map fst, dd8&gt;
+for the functors &Sigma;&Sigma;8 and &#39;a F&#39; = &#39;a &times; &#39;a F_ In fact, they can be shown
+equivalent to these. *)</span>
+
+<span class="command">lemma</span> dd8_leaf82<span class="delimiter">:</span> <span class="string">&quot;&lt;&Sigma;&Sigma;8_map fst, dd8&gt; o leaf8 = leaf8 ** F_map leaf8&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc <span class="command">by</span> <span class="delimiter">(</span>simp_all add<span class="delimiter">:</span> leaf8_natural dd8_leaf8<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ddd8_leaf8<span class="delimiter">:</span> <span class="string">&quot;ddd8 o leaf8 = leaf8 ** F_map leaf8&quot;</span>
+<span class="command">unfolding</span> ddd8_def ext8_comp_leaf8 <span class="command">..</span>
+
+<span class="command">lemma</span> ddd8_\&lt;oo&gt;\&lt;pp&gt;8<span class="delimiter">:</span> <span class="string">&quot;ddd8 o \&lt;oo&gt;\&lt;pp&gt;8 = &lt;\&lt;oo&gt;\&lt;pp&gt;8 o &Sigma;8_map fst , F_map flat8 o &Lambda;8&gt; o &Sigma;8_map ddd8&quot;</span>
+<span class="command">unfolding</span> ddd8_def ext8_commute <span class="command">..</span>
+
+
+<span class="comment">(* More customization *)</span>
+
+<span class="comment">(* TODO Jasmin: Add8 this high-level induction for the relator of datatypes:
+(similarly, coinduction for codatatypes): *)</span>
+<span class="command">lemma</span> &Sigma;&Sigma;8_rel_induct_pointfree<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf8<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf8 x1) (leaf8 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;8<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;8_rel (&Sigma;&Sigma;8_rel R) y1 y2; &Sigma;8_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;8 y1) (\&lt;oo&gt;\&lt;pp&gt;8 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;8_rel R &le; phi&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;&Sigma;&Sigma;8_rel R &le; phi \&lt;sqinter&gt; &Sigma;&Sigma;8_rel R&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>induct rule<span class="delimiter">:</span> &Sigma;&Sigma;8.ctor_rel_induct<span class="delimiter">)</span>
+  <span class="command">using</span> assms &Sigma;&Sigma;8.rel_inject<span class="delimiter">[</span>of R<span class="delimiter">]</span> <span class="command">unfolding</span> rel_pre_&Sigma;&Sigma;8_def &Sigma;&Sigma;8.leaf8_def &Sigma;&Sigma;8.\&lt;oo&gt;\&lt;pp&gt;8_def
+  <span class="command">using</span> inf_greatest<span class="delimiter">[</span>OF &Sigma;8.rel_mono<span class="delimiter">[</span>OF inf_le1<span class="delimiter">]</span> &Sigma;8.rel_mono<span class="delimiter">[</span>OF inf_le2<span class="delimiter">]</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> rel_sum_def BNF_Comp.id_bnf_comp_def vimage2p_def <span class="command">by</span> <span class="delimiter">(</span>auto split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span> blast<span class="delimiter">+</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">by</span> simp
+<span class="command">qed</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;8_rel_induct<span class="delimiter">[</span>case_names leaf8 \&lt;oo&gt;\&lt;pp&gt;8<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf8<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf8 x1) (leaf8 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;8<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;8_rel (&Sigma;&Sigma;8_rel R) y1 y2; &Sigma;8_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;8 y1) (\&lt;oo&gt;\&lt;pp&gt;8 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;8_rel R t1 t2 --&gt; phi t1 t2&quot;</span>
+<span class="command">using</span> &Sigma;&Sigma;8_rel_induct_pointfree<span class="delimiter">[</span>of R<span class="delimiter">,</span> OF assms<span class="delimiter">]</span> <span class="command">by</span> auto
+<span class="comment">(* end TODO *)</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Lift_to_Free6 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Lift_to_Free6</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Lift_to_Free6</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Distributive_Law6.html"><span class="name">Stream_Distributive_Law6</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Lifting of the distributive law to the free algebra *}</span>
+
+
+<span class="comment">(* This is silimar to Lift_to_Free, but uses &Lambda;6, &Sigma;&Sigma;6, dd6, SpK instead of S, etc. *)</span>
+
+<span class="command">theory</span> Stream_Lift_to_Free6
+<span class="keyword2">imports</span> Stream_Distributive_Law6
+<span class="keyword2">begin</span>
+
+<span class="command">subsection</span><span class="verbatim">{* The lifting *}</span>
+
+<span class="comment">(* Our aim is lift &Lambda;6 to an (SpK,SpK,T)-distributive law dd6 compatible with the monadic structure. *)</span>
+
+<span class="comment">(* In order to be able to define dd6, we need a larger codomain type: *)</span>
+<span class="command">definition</span> ddd6 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;6 =&gt; &#39;a &Sigma;&Sigma;6 &times; &#39;a &Sigma;&Sigma;6 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;ddd6 = ext6 &lt;\&lt;oo&gt;\&lt;pp&gt;6 o &Sigma;6_map fst, F_map flat6 o &Lambda;6&gt; (leaf6 ** F_map leaf6)&quot;</span>
+
+<span class="command">definition</span> dd6 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;6 =&gt; &#39;a &Sigma;&Sigma;6 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;dd6 = snd o ddd6&quot;</span>
+
+<span class="command">lemma</span> ddd6_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;6_rel (rel_prod R (F_rel R)) ===&gt; rel_prod (&Sigma;&Sigma;6_rel R) (F_rel (&Sigma;&Sigma;6_rel R))) ddd6 ddd6&quot;</span>
+  <span class="command">unfolding</span> ddd6_def ext6_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> dd6_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;6_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;6_rel R)) dd6 dd6&quot;</span>
+  <span class="command">unfolding</span> dd6_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> F_rel_&Sigma;&Sigma;6_rel<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;6_rel (rel_prod R (F_rel R)) x y ==&gt; F_rel (&Sigma;&Sigma;6_rel R) (dd6 x) (dd6 y)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF dd6_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* We verify the facts for dd6: *)</span>
+<span class="command">theorem</span> dd6_leaf6<span class="delimiter">:</span> <span class="string">&quot;dd6 o leaf6 = F_map leaf6 o snd&quot;</span>
+<span class="command">unfolding</span> dd6_def ddd6_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext6_comp_leaf6 snd_comp_map_prod <span class="command">..</span>
+
+<span class="command">lemma</span> ddd6_natural<span class="delimiter">:</span> <span class="string">&quot;ddd6 o &Sigma;&Sigma;6_map (f ** F_map f) = (&Sigma;&Sigma;6_map f ** F_map (&Sigma;&Sigma;6_map f)) o ddd6&quot;</span>
+  <span class="command">using</span> ddd6_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;6.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">theorem</span> dd6_natural<span class="delimiter">:</span> <span class="string">&quot;dd6 o &Sigma;&Sigma;6_map (f ** F_map f) = F_map (&Sigma;&Sigma;6_map f) o dd6&quot;</span>
+  <span class="command">using</span> dd6_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;6.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;6_dd6<span class="delimiter">:</span> <span class="string">&quot;&Lambda;6 = dd6 o \&lt;oo&gt;\&lt;pp&gt;6 o &Sigma;6_map leaf6&quot;</span>
+  <span class="command">unfolding</span> dd6_def ddd6_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;6.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext6_commute
+  <span class="command">unfolding</span> o_assoc snd_convol ext6_comp_leaf6
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Lambda;6_natural
+  <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf6_flat6 F_map_id id_o
+  <span class="command">..</span>
+
+<span class="command">lemma</span> fst_ddd6<span class="delimiter">:</span> <span class="string">&quot;fst o ddd6 = &Sigma;&Sigma;6_map fst&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;fst o ddd6 = ext6 \&lt;oo&gt;\&lt;pp&gt;6 (leaf6 o fst)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule ext6_unique<span class="delimiter">)</span> <span class="command">unfolding</span> ddd6_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext6_comp_leaf6 ext6_commute
+  <span class="command">unfolding</span> o_assoc fst_comp_map_prod fst_convol
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;6.map_comp0 <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = &Sigma;&Sigma;6_map fst&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext6_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf6_natural \&lt;oo&gt;\&lt;pp&gt;6_natural <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> ddd6_flat6<span class="delimiter">:</span> <span class="string">&quot;(flat6 ** F_map flat6) o ddd6 o &Sigma;&Sigma;6_map ddd6 = ddd6 o flat6&quot;</span> <span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;?L = ext6 &lt;\&lt;oo&gt;\&lt;pp&gt;6 o &Sigma;6_map fst, F_map flat6 o &Lambda;6&gt; ddd6&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule ext6_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat6 ** F_map flat6) o ddd6 o &Sigma;&Sigma;6_map ddd6 o leaf6 = ddd6&quot;</span>
+    <span class="command">unfolding</span> ddd6_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf6_natural
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext6_comp_leaf6
+    <span class="command">unfolding</span> map_prod.comp F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat6_leaf6 F_map_id map_prod.id id_o <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;&lt;flat6 o (\&lt;oo&gt;\&lt;pp&gt;6 o &Sigma;6_map fst) , F_map flat6 o (F_map flat6 o &Lambda;6)&gt;  =
+             &lt;\&lt;oo&gt;\&lt;pp&gt;6 o &Sigma;6_map fst , F_map flat6 o &Lambda;6&gt; o &Sigma;6_map (flat6 ** F_map flat6)&quot;</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> flat6_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc fst_convol snd_convol
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;6.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> fst_comp_map_prod snd_comp_map_prod
+    <span class="command">unfolding</span> &Lambda;6_natural <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat6_assoc <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat6 ** F_map flat6) o ddd6 o &Sigma;&Sigma;6_map ddd6 o \&lt;oo&gt;\&lt;pp&gt;6 =
+          &lt;\&lt;oo&gt;\&lt;pp&gt;6 o &Sigma;6_map fst , F_map flat6 o &Lambda;6&gt; o &Sigma;6_map (flat6 ** F_map flat6 o ddd6 o &Sigma;&Sigma;6_map ddd6)&quot;</span>
+    <span class="command">unfolding</span> ddd6_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> \&lt;oo&gt;\&lt;pp&gt;6_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext6_commute
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;6.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> &Sigma;6.map_comp0
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> map_prod_o_convol
+    <span class="command">unfolding</span> ext6_&Sigma;&Sigma;6_map<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> A <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = ?R&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext6_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;ddd6 o flat6 o leaf6 = ddd6&quot;</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat6_leaf6 o_id <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">show</span> <span class="string">&quot;ddd6 o flat6 o \&lt;oo&gt;\&lt;pp&gt;6 = &lt;\&lt;oo&gt;\&lt;pp&gt;6 o &Sigma;6_map fst , F_map flat6 o &Lambda;6&gt; o &Sigma;6_map (ddd6 o flat6)&quot;</span>
+    <span class="command">unfolding</span> ddd6_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> flat6_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> ext6_commute &Sigma;6.map_comp0 <span class="command">unfolding</span> o_assoc <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> dd6_flat6<span class="delimiter">:</span> <span class="string">&quot;F_map flat6 o dd6 o &Sigma;&Sigma;6_map &lt;&Sigma;&Sigma;6_map fst, dd6&gt; = dd6 o flat6&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;snd o ((flat6 ** F_map flat6) o ddd6 o &Sigma;&Sigma;6_map ddd6) = snd o (ddd6 o flat6)&quot;</span>
+  <span class="command">unfolding</span> ddd6_flat6 <span class="command">..</span>
+  <span class="command">have</span> B<span class="delimiter">:</span> <span class="string">&quot;ddd6 = &lt;&Sigma;&Sigma;6_map fst , snd o ddd6&gt;&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span>
+  <span class="command">unfolding</span> fst_ddd6 <span class="command">by</span> auto
+  <span class="command">show</span> <span class="var">?thesis</span> <span class="command">unfolding</span> dd6_def
+  <span class="command">unfolding</span> A<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> unfolded o_assoc snd_comp_map_prod<span class="delimiter">]</span> o_assoc B<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="comment">(* The next two theorems are not necessary for the development.
+They show that the conditions dd6_leaf6 and dd6_flat6 imply the
+more standard conditions for the distributive law dd6&#39; = &lt;&Sigma;&Sigma;6_map fst, dd6&gt;
+for the functors &Sigma;&Sigma;6 and &#39;a F&#39; = &#39;a &times; &#39;a F_ In fact, they can be shown
+equivalent to these. *)</span>
+
+<span class="command">lemma</span> dd6_leaf62<span class="delimiter">:</span> <span class="string">&quot;&lt;&Sigma;&Sigma;6_map fst, dd6&gt; o leaf6 = leaf6 ** F_map leaf6&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc <span class="command">by</span> <span class="delimiter">(</span>simp_all add<span class="delimiter">:</span> leaf6_natural dd6_leaf6<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ddd6_leaf6<span class="delimiter">:</span> <span class="string">&quot;ddd6 o leaf6 = leaf6 ** F_map leaf6&quot;</span>
+<span class="command">unfolding</span> ddd6_def ext6_comp_leaf6 <span class="command">..</span>
+
+<span class="command">lemma</span> ddd6_\&lt;oo&gt;\&lt;pp&gt;6<span class="delimiter">:</span> <span class="string">&quot;ddd6 o \&lt;oo&gt;\&lt;pp&gt;6 = &lt;\&lt;oo&gt;\&lt;pp&gt;6 o &Sigma;6_map fst , F_map flat6 o &Lambda;6&gt; o &Sigma;6_map ddd6&quot;</span>
+<span class="command">unfolding</span> ddd6_def ext6_commute <span class="command">..</span>
+
+
+<span class="comment">(* More customization *)</span>
+
+<span class="comment">(* TODO Jasmin: Add6 this high-level induction for the relator of datatypes:
+(similarly, coinduction for codatatypes): *)</span>
+<span class="command">lemma</span> &Sigma;&Sigma;6_rel_induct_pointfree<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf6<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf6 x1) (leaf6 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;6<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;6_rel (&Sigma;&Sigma;6_rel R) y1 y2; &Sigma;6_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;6 y1) (\&lt;oo&gt;\&lt;pp&gt;6 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;6_rel R &le; phi&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;&Sigma;&Sigma;6_rel R &le; phi \&lt;sqinter&gt; &Sigma;&Sigma;6_rel R&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>induct rule<span class="delimiter">:</span> &Sigma;&Sigma;6.ctor_rel_induct<span class="delimiter">)</span>
+  <span class="command">using</span> assms &Sigma;&Sigma;6.rel_inject<span class="delimiter">[</span>of R<span class="delimiter">]</span> <span class="command">unfolding</span> rel_pre_&Sigma;&Sigma;6_def &Sigma;&Sigma;6.leaf6_def &Sigma;&Sigma;6.\&lt;oo&gt;\&lt;pp&gt;6_def
+  <span class="command">using</span> inf_greatest<span class="delimiter">[</span>OF &Sigma;6.rel_mono<span class="delimiter">[</span>OF inf_le1<span class="delimiter">]</span> &Sigma;6.rel_mono<span class="delimiter">[</span>OF inf_le2<span class="delimiter">]</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> rel_sum_def BNF_Comp.id_bnf_comp_def vimage2p_def <span class="command">by</span> <span class="delimiter">(</span>auto split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span> blast<span class="delimiter">+</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">by</span> simp
+<span class="command">qed</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;6_rel_induct<span class="delimiter">[</span>case_names leaf6 \&lt;oo&gt;\&lt;pp&gt;6<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf6<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf6 x1) (leaf6 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;6<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;6_rel (&Sigma;&Sigma;6_rel R) y1 y2; &Sigma;6_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;6 y1) (\&lt;oo&gt;\&lt;pp&gt;6 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;6_rel R t1 t2 --&gt; phi t1 t2&quot;</span>
+<span class="command">using</span> &Sigma;&Sigma;6_rel_induct_pointfree<span class="delimiter">[</span>of R<span class="delimiter">,</span> OF assms<span class="delimiter">]</span> <span class="command">by</span> auto
+<span class="comment">(* end TODO *)</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

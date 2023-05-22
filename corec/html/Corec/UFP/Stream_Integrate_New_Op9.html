@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Integrate_New_Op9 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Integrate_New_Op9</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Integrate_New_Op9</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Op_Input9.html"><span class="name">Stream_Op_Input9</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span><span class="verbatim">{* The integration of a new operation in the up-to setting *}</span>
+
+<span class="command">theory</span> Stream_Integrate_New_Op9
+<span class="keyword2">imports</span> Stream_Op_Input9
+<span class="keyword2">begin</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* The assumptions *}</span>
+
+<span class="comment">(*
+(* The operation that creates the new distributive law, since its definition splits
+trough a natural transformation ll, which will be defined in More_Corec_Upto9 as follows: *)
+definition alg&rho;9 :: &quot;J K9 =&gt; J&quot; where
+&quot;alg&rho;9 = unfoldU8 (&rho;9 o K9_map &lt;id, dtor_J&gt;)&quot;
+*)</span>
+
+<span class="command">lemma</span> &rho;9_natural<span class="delimiter">:</span> <span class="string">&quot;&rho;9 o K9_map (f ** F_map f) = F_map (&Sigma;&Sigma;9_map f) o &rho;9&quot;</span>
+  <span class="command">using</span> &rho;9_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp &Sigma;&Sigma;9.rel_Grp K9.rel_Grp prod.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">subsection</span><span class="verbatim">{* The integration *}</span>
+
+<span class="command">definition</span> embL9 <span class="delimiter">::</span> <span class="string">&quot;&#39;a &Sigma;&Sigma;8 =&gt; &#39;a &Sigma;&Sigma;9&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;embL9 &equiv; ext8 (\&lt;oo&gt;\&lt;pp&gt;9 o Abs_&Sigma;9 o Inl) leaf9&quot;</span>
+
+<span class="command">definition</span> embR9 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a K9) &Sigma;&Sigma;8 =&gt; &#39;a &Sigma;&Sigma;9&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;embR9 &equiv; ext8 (\&lt;oo&gt;\&lt;pp&gt;9 o Abs_&Sigma;9 o Inl) (\&lt;oo&gt;\&lt;pp&gt;9 o &Sigma;9_map leaf9 o Abs_&Sigma;9 o Inr)&quot;</span>
+
+<span class="command">definition</span> &Lambda;9 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;9 =&gt; &#39;a &Sigma;&Sigma;9 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;&Lambda;9 = case_sum (F_map embL9 o &Lambda;8) &rho;9 o Rep_&Sigma;9&quot;</span>
+
+<span class="command">lemma</span> embL9_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;8_rel R ===&gt; &Sigma;&Sigma;9_rel R) embL9 embL9&quot;</span>
+  <span class="command">unfolding</span> embL9_def ext8_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> embR9_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;8_rel (K9_rel R) ===&gt; &Sigma;&Sigma;9_rel R) embR9 embR9&quot;</span>
+  <span class="command">unfolding</span> embR9_def ext8_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> &Lambda;9_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;9_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;9_rel R)) &Lambda;9 &Lambda;9&quot;</span>
+  <span class="command">unfolding</span> &Lambda;9_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> &Lambda;9_natural<span class="delimiter">:</span> <span class="string">&quot;&Lambda;9 o &Sigma;9_map (f ** F_map f) = F_map (&Sigma;&Sigma;9_map f) o &Lambda;9&quot;</span>
+  <span class="command">using</span> &Lambda;9_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp &Sigma;&Sigma;9.rel_Grp &Sigma;9.rel_Grp prod.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> embL9_natural<span class="delimiter">:</span> <span class="string">&quot;embL9 o &Sigma;&Sigma;8_map f = &Sigma;&Sigma;9_map f o embL9&quot;</span>
+  <span class="command">using</span> embL9_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;8.rel_Grp &Sigma;&Sigma;9.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> embR9_natural<span class="delimiter">:</span> <span class="string">&quot;embR9 o &Sigma;&Sigma;8_map (K9_map f) = &Sigma;&Sigma;9_map f o embR9&quot;</span>
+  <span class="command">using</span> embR9_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;8.rel_Grp K9.rel_Grp &Sigma;&Sigma;9.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;9_Inl<span class="delimiter">:</span> <span class="string">&quot;&Lambda;9 o Abs_&Sigma;9 o Inl = F_map embL9 o &Lambda;8&quot;</span>
+  <span class="keyword2">and</span> &Lambda;9_Inr<span class="delimiter">:</span> <span class="string">&quot;&Lambda;9 o Abs_&Sigma;9 o Inr = &rho;9&quot;</span>
+<span class="command">unfolding</span> &Lambda;9_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> Rep_&Sigma;9_o_Abs_&Sigma;9 o_id <span class="command">by</span> auto
+
+<span class="command">lemma</span> embL9_leaf8<span class="delimiter">:</span> <span class="string">&quot;embL9 o leaf8 = leaf9&quot;</span>
+<span class="command">unfolding</span> embL9_def ext8_comp_leaf8 <span class="command">..</span>
+
+<span class="command">lemma</span> embL9_\&lt;oo&gt;\&lt;pp&gt;8<span class="delimiter">:</span> <span class="string">&quot;embL9 o \&lt;oo&gt;\&lt;pp&gt;8 = \&lt;oo&gt;\&lt;pp&gt;9 o Abs_&Sigma;9 o Inl o &Sigma;8_map embL9&quot;</span>
+<span class="command">unfolding</span> embL9_def ext8_commute <span class="command">..</span>
+
+<span class="command">lemma</span> embR9_leaf8<span class="delimiter">:</span> <span class="string">&quot;embR9 o leaf8 = \&lt;oo&gt;\&lt;pp&gt;9 o Abs_&Sigma;9 o Inr o K9_map leaf9&quot;</span>
+<span class="command">unfolding</span> embR9_def ext8_comp_leaf8
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> Abs_&Sigma;9_natural map_sum_Inr <span class="command">..</span>
+
+<span class="command">lemma</span> embR9_\&lt;oo&gt;\&lt;pp&gt;8<span class="delimiter">:</span> <span class="string">&quot;embR9 o \&lt;oo&gt;\&lt;pp&gt;8 = \&lt;oo&gt;\&lt;pp&gt;9 o Abs_&Sigma;9 o  Inl o &Sigma;8_map embR9&quot;</span>
+<span class="command">unfolding</span> embR9_def ext8_commute <span class="command">..</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

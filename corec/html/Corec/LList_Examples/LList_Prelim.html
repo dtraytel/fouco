@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory LList_Prelim (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory LList_Prelim</h1>
+
+<span class="command">theory</span> <span class="name">LList_Prelim</span><br/>
+<span class="keyword">imports</span> <a href="LList_Incremental.html"><span class="name">LList_Incremental</span></a> <a href="Lattice_Syntax.html"><span class="name">Lattice_Syntax</span></a> <a href="Cardinal_Notations.html"><span class="name">Cardinal_Notations</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span><span class="verbatim">{* Preliminaries *}</span>
+
+<span class="command">theory</span> LList_Prelim
+<span class="keyword2">imports</span> LList_Incremental
+  <span class="string">&quot;~~/src/HOL/Library/Lattice_Syntax&quot;</span>
+  <span class="string">&quot;~~/src/HOL/Library/Cardinal_Notations&quot;</span>
+<span class="keyword2">keywords</span> <span class="string">&quot;composition_bnf&quot;</span> <span class="delimiter">::</span> thy_decl
+<span class="keyword2">begin</span>
+
+<span class="command">notation</span> BNF_Def.convol <span class="delimiter">(</span><span class="string">&quot;&lt;_ , _&gt;&quot;</span><span class="delimiter">)</span>
+
+<span class="command">declare</span> <span class="delimiter">[</span><span class="delimiter">[</span>bnf_note_all<span class="delimiter">]</span><span class="delimiter">]</span>
+
+<span class="command">subsection</span><span class="verbatim">{* Preliminaries *}</span>
+
+<span class="command">interpretation</span> lifting_syntax <span class="command">.</span>
+
+<span class="command">lemma</span> map_sum_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;((R ===&gt; T) ===&gt; (S ===&gt; U) ===&gt; rel_sum R S ===&gt; rel_sum T U) map_sum map_sum&quot;</span>
+  <span class="command">unfolding</span> rel_fun_def rel_sum_def <span class="command">by</span> <span class="delimiter">(</span>auto split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span>
+
+<span class="command">lemma</span> convol_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;((R ===&gt; S) ===&gt; (R ===&gt; T) ===&gt; R ===&gt; rel_prod S T) BNF_Def.convol BNF_Def.convol&quot;</span>
+  <span class="command">unfolding</span> rel_prod_def rel_fun_def convol_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> id_bnf_comp_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(R ===&gt; R) BNF_Comp.id_bnf_comp BNF_Comp.id_bnf_comp&quot;</span>
+  <span class="command">unfolding</span> BNF_Comp.id_bnf_comp_def rel_fun_def <span class="command">by</span> blast
+
+
+
+<span class="command">lemma</span> Grp_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;[|bi_unique R; bi_unique S|] ==&gt;
+  (rel_set R ===&gt; (R ===&gt; S) ===&gt; R ===&gt; S ===&gt; op =) BNF_Def.Grp BNF_Def.Grp&quot;</span>
+  <span class="command">unfolding</span> Grp_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> rel_set_def rel_fun_def bi_unique_def <span class="command">by</span> metis
+
+<span class="command">lemma</span> conversep_tansfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;((A ===&gt; B ===&gt; op =) ===&gt; B ===&gt; A ===&gt; op =) conversep conversep&quot;</span>
+  <span class="command">unfolding</span> rel_fun_def conversep.simps bi_total_def <span class="command">by</span> metis
+
+<span class="command">lemma</span> relcompp_tansfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;bi_total B ==&gt;
+  ((A ===&gt; B ===&gt; op =) ===&gt; (B ===&gt; C ===&gt; op =) ===&gt; A ===&gt; C ===&gt; op =) op OO op OO&quot;</span>
+  <span class="command">unfolding</span> rel_fun_def relcompp.simps bi_total_def <span class="command">by</span> metis
+
+<span class="command">ML</span> <span class="verbatim">{*
+fun composition_bnf (inline_opt, (b, str)) lthy =
+  let
+    val T = Syntax.read_typ lthy str;
+    fun qualify b&#39; = if length (Binding.dest b&#39; |&gt; #2) &lt;= 2 then b
+      else Binding.qualify true (Binding.name_of b) b&#39;;
+    val inline = (case inline_opt of true =&gt; BNF_Def.Dont_Inline | _ =&gt; BNF_Def.Do_Inline);
+    val ((bnf, (_, _)), (_, lthy&#39;)) =
+      BNF_Comp.bnf_of_typ inline qualify (distinct op = o flat) [] [] T
+        ((BNF_Comp.empty_comp_cache, BNF_Comp.empty_unfolds), lthy)
+  in
+    BNF_Def.note_bnf_thms BNF_Def.Note_All I b bnf lthy&#39; |&gt; snd
+  end;
+
+val _ =
+  Outer_Syntax.local_theory @{command_spec &quot;composition_bnf&quot;} &quot;define BNF by composition&quot;
+    ((Parse.opt_keyword &quot;open&quot; &gt;&gt; not) --
+      (BNF_Util.parse_binding_colon -- Parse.typ) &gt;&gt; composition_bnf);
+*}</span>
+
+<span class="comment">(* Products: *)</span>
+<span class="command">abbreviation</span> map_prod_abbr <span class="delimiter">(</span><span class="keyword2">infix</span> <span class="string">&quot;**&quot;</span> 80<span class="delimiter">)</span> <span class="keyword2">where</span> <span class="string">&quot;f ** g &equiv; map_prod f g&quot;</span>
+
+<span class="command">lemma</span> fst_o_Pair<span class="delimiter">:</span> <span class="string">&quot;fst o (&lambda; a. Pair a b) = id&quot;</span>
+<span class="command">by</span> <span class="delimiter">(</span>rule ext<span class="delimiter">,</span> auto<span class="delimiter">)</span>
+
+<span class="command">lemma</span> snd_o_Pair<span class="delimiter">:</span> <span class="string">&quot;snd o Pair a = id&quot;</span>
+<span class="command">by</span> <span class="delimiter">(</span>rule ext<span class="delimiter">,</span> auto<span class="delimiter">)</span>
+
+<span class="command">lemma</span> fst_snd_cong<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;fst o f = fst o g&quot;</span> <span class="keyword2">and</span> <span class="string">&quot;snd o f = snd o g&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;f = g&quot;</span>
+<span class="command">using</span> assms <span class="command">unfolding</span> comp_def fun_eq_iff
+<span class="command">by</span> <span class="delimiter">(</span>metis <span class="delimiter">(</span>lifting<span class="delimiter">)</span> prod_eqI<span class="delimiter">)</span>
+
+<span class="command">declare</span> fst_convol<span class="delimiter">[</span>simp<span class="delimiter">]</span>   <span class="command">declare</span> snd_convol<span class="delimiter">[</span>simp<span class="delimiter">]</span>
+
+<span class="command">lemma</span> convol_comp<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;&lt;f1 o g, f2 o g&gt; = &lt;f1,f2&gt; o g&quot;</span>
+<span class="command">unfolding</span> comp_def fun_eq_iff
+<span class="command">by</span> <span class="delimiter">(</span>metis fst_convol o_def snd_convol surjective_pairing<span class="delimiter">)</span>
+
+<span class="command">lemma</span> convol_comp_id1<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;&lt;g, f2 o g&gt; = &lt;id,f2&gt; o g&quot;</span>
+<span class="command">using</span> convol_comp<span class="delimiter">[</span>of id<span class="delimiter">]</span> <span class="command">by</span> simp
+
+<span class="command">lemma</span> convol_comp_id2<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;&lt;f1 o g, g&gt; = &lt;f1,id&gt; o g&quot;</span>
+<span class="command">using</span> convol_comp<span class="delimiter">[</span>of _ _ id<span class="delimiter">]</span> <span class="command">by</span> simp
+
+<span class="comment">(* Sums: *)</span>
+<span class="command">lemma</span> map_sum_Inl<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="string">&quot;map_sum f1 f2 o Inl = Inl o f1&quot;</span>
+<span class="command">unfolding</span> map_sum_def comp_def <span class="command">by</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span> auto
+
+<span class="command">lemma</span> map_sum_Inr<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="string">&quot;map_sum f1 f2 o Inr = Inr o f2&quot;</span>
+<span class="command">unfolding</span> map_sum_def comp_def <span class="command">by</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span> auto
+
+<span class="command">lemma</span> sum_comp_cases<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;f o Inl = g o Inl&quot;</span> <span class="keyword2">and</span> <span class="string">&quot;f o Inr = g o Inr&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;f = g&quot;</span>
+<span class="command">proof</span><span class="delimiter">(</span>rule ext<span class="delimiter">)</span>
+  <span class="command">fix</span> a <span class="command">show</span> <span class="string">&quot;f a = g a&quot;</span>
+  <span class="command">using</span> assms <span class="command">unfolding</span> comp_def fun_eq_iff <span class="command">by</span> <span class="delimiter">(</span>cases a<span class="delimiter">)</span> auto
+<span class="command">qed</span>
+
+<span class="command">lemma</span> eq_o_InrI<span class="delimiter">:</span> <span class="string">&quot;[|g o Inl = h; case_sum h f = g|] ==&gt; f = g o Inr&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> fun_eq_iff split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span>
+
+<span class="command">lemma</span> case_sum_comp<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="string">&quot;case_sum (h o f1) (h o f2) = h o case_sum f1 f2&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span> <span class="command">by</span> <span class="delimiter">(</span>case_tac x<span class="delimiter">,</span> auto<span class="delimiter">)</span>
+
+<span class="command">lemma</span> case_sum_Inl_Inr<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="string">&quot;case_sum (Inl o f1) (Inr o f2) = map_sum f1 f2&quot;</span>
+<span class="command">unfolding</span> map_sum_def <span class="command">apply</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span> <span class="command">by</span> <span class="delimiter">(</span>case_tac x<span class="delimiter">,</span> auto<span class="delimiter">)</span>
+
+<span class="command">lemma</span> case_sum_Inl_Inr1<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="string">&quot;case_sum Inl (Inr o f) = map_sum id f&quot;</span>
+<span class="command">unfolding</span> map_sum_def <span class="command">apply</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span> <span class="command">by</span> <span class="delimiter">(</span>case_tac x<span class="delimiter">,</span> auto<span class="delimiter">)</span>
+
+<span class="command">lemma</span> case_sum_Inl_Inr2<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="string">&quot;case_sum (Inl o f) Inr = map_sum f id&quot;</span>
+<span class="command">unfolding</span> map_sum_def <span class="command">apply</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span> <span class="command">by</span> <span class="delimiter">(</span>case_tac x<span class="delimiter">,</span> auto<span class="delimiter">)</span>
+
+<span class="command">lemma</span> case_sum_triv<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;case_sum Inl Inr = id&quot;</span>
+<span class="command">unfolding</span> map_sum_def <span class="command">apply</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span> <span class="command">by</span> <span class="delimiter">(</span>case_tac x<span class="delimiter">,</span> auto<span class="delimiter">)</span>
+
+<span class="command">lemma</span> case_sum_Inl_Inr_L<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;case_sum (f o Inl) (f o Inr) = f&quot;</span>
+<span class="command">by</span> <span class="delimiter">(</span>metis case_sum_expand_Inr&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> symp_iff<span class="delimiter">:</span> <span class="string">&quot;symp R &lt;-&gt; R = R^--1&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis antisym conversep.cases conversep_le_swap predicate2I symp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> transp_iff<span class="delimiter">:</span> <span class="string">&quot;transp R &lt;-&gt; R OO R &le; R&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis predicate2D relcompp.relcompI transpI transp_relcompp_less_eq<span class="delimiter">)</span>
+
+<span class="command">lemma</span> equivp_inf<span class="delimiter">:</span> <span class="string">&quot;[|equivp R; equivp S|] ==&gt; equivp (R \&lt;sqinter&gt; S)&quot;</span>
+  <span class="command">unfolding</span> equivp_def inf_fun_def inf_bool_def <span class="command">by</span> metis
+
+<span class="command">lemma</span> vimage2p_rel_prod<span class="delimiter">:</span> <span class="string">&quot;BNF_Def.vimage2p (&lt;f1, g1&gt;) (&lt;f2, g2&gt;) (rel_prod R S) =
+  BNF_Def.vimage2p f1 f2 R \&lt;sqinter&gt; BNF_Def.vimage2p g1 g2 S&quot;</span>
+  <span class="command">unfolding</span> vimage2p_def rel_prod_def convol_def <span class="command">by</span> auto
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

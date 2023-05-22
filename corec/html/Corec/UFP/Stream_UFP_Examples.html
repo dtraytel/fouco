@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_UFP_Examples (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_UFP_Examples</h1>
+
+<span class="command">theory</span> <span class="name">Stream_UFP_Examples</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Lib.html"><span class="name">Stream_Lib</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Stream Examples *}</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">theory</span> Stream_UFP_Examples
+<span class="keyword2">imports</span> Stream_Lib
+<span class="keyword2">begin</span>
+<span class="comment">(*&gt;*)</span>
+
+<span class="command">subsection</span> <span class="verbatim">{* one *}</span>
+
+<span class="command">definition</span> one <span class="delimiter">::</span> stream <span class="keyword2">where</span>
+  <span class="string">&quot;one = dtor_corec_J (&lambda;_. (1, Inr ())) ()&quot;</span>
+
+<span class="command">lemma</span> head_one<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head one = 1&quot;</span>
+  <span class="command">unfolding</span> one_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_one<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail one = one&quot;</span>
+  <span class="command">unfolding</span> one_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> one_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;one = SCons 1 one&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_one tail_one<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* plus *}</span>
+
+<span class="command">definition</span> plus <span class="delimiter">::</span> <span class="string">&quot;stream =&gt; stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;plus s t = dtor_corec_J (&lambda;(s, t). (head s + head t, Inr (tail s, tail t))) (s, t)&quot;</span>
+
+<span class="command">lemma</span> head_plus<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (plus s t) = head s + head t&quot;</span>
+  <span class="command">unfolding</span> plus_def J.dtor_corec map_pre_J_def BNF_Comp.id_bnf_comp_def <span class="command">by</span> simp
+
+<span class="command">lemma</span> tail_plus<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (plus s t) = plus (tail s) (tail t)&quot;</span>
+  <span class="command">unfolding</span> plus_def J.dtor_corec map_pre_J_def BNF_Comp.id_bnf_comp_def <span class="command">by</span> simp
+
+<span class="command">lemma</span> plus_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;plus (SCons m s) (SCons n t) = SCons (m + n) (plus s t)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>smt2 J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_plus tail_plus<span class="delimiter">)</span>
+
+<span class="command">lemma</span> plus_uniform<span class="delimiter">:</span> <span class="string">&quot;plus xs ys = alg&rho;1 (xs, ys)&quot;</span>
+  <span class="command">unfolding</span> plus_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule fun_cong<span class="delimiter">[</span>OF sym<span class="delimiter">[</span>OF J.dtor_corec_unique<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> alg&rho;1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def fun_eq_iff convol_def &rho;1_def alg&rho;1_def<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* nat *}</span>
+
+<span class="command">definition</span> nat <span class="delimiter">::</span> <span class="string">&quot;stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;nat = corecUU1 (&lambda;_. GUARD1 (0, PLS1 (CONT1 (), END1 one))) ()&quot;</span>
+
+<span class="command">lemma</span> head_nat<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head nat = 0&quot;</span>
+  <span class="command">unfolding</span> nat_def corecUU1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval1_leaf1&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_nat<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail nat = plus nat one&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst nat_def<span class="delimiter">)</span> <span class="command">unfolding</span> corecUU1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval1_leaf1&#39;
+    eval1_\&lt;oo&gt;\&lt;pp&gt;1 alg&Lambda;1_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;1_natural<span class="delimiter">]</span> plus_uniform nat_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> nat_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;nat = SCons 0 (plus nat one)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_nat tail_nat<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* id *}</span>
+
+<span class="command">definition</span> id <span class="delimiter">::</span> <span class="string">&quot;stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;id s = dtor_corec_J (&lambda;s. (head s, Inl (tail s))) s&quot;</span>
+
+<span class="command">lemma</span> head_id<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (id s) = head s&quot;</span>
+  <span class="command">unfolding</span> id_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_id<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (id s) = tail s&quot;</span>
+  <span class="command">unfolding</span> id_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> id_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;id (SCons m s) = SCons m s&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_id tail_id<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* fib *}</span>
+
+<span class="command">definition</span> fib <span class="delimiter">::</span> stream <span class="keyword2">where</span>
+  <span class="string">&quot;fib = corecUU1 (&lambda;xs. GUARD1 (0, PLS1 (SCONS1 (1, CONT1 xs), CONT1 xs))) ()&quot;</span>
+
+<span class="command">lemma</span> head_fib<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head fib = 0&quot;</span>
+  <span class="command">unfolding</span> fib_def corecUU1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval1_leaf1&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_fib<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail fib = plus (SCons 1 fib) fib&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst fib_def<span class="delimiter">)</span> <span class="command">unfolding</span> corecUU1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval1_leaf1&#39;
+    eval1_\&lt;oo&gt;\&lt;pp&gt;1 alg&Lambda;1_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;1_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF gg1_natural<span class="delimiter">]</span>
+    o_eq_dest<span class="delimiter">[</span>OF eval1_gg1<span class="delimiter">]</span> plus_uniform fib_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> fib_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;fib = SCons 0 (plus (SCons 1 fib) fib)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_fib tail_fib<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* sum *}</span>
+
+<span class="command">definition</span> sum <span class="delimiter">::</span> <span class="string">&quot;stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;sum s = corecUU1 (&lambda;s. GUARD1 (0, PLS1 (END1 s, CONT1 s))) s&quot;</span>
+
+<span class="command">lemma</span> head_sum<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (sum s) = 0&quot;</span>
+  <span class="command">unfolding</span> sum_def corecUU1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval1_leaf1&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_sum<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (sum s) = plus s (sum s)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst sum_def<span class="delimiter">)</span> <span class="command">unfolding</span> corecUU1
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval1_leaf1&#39;
+    eval1_\&lt;oo&gt;\&lt;pp&gt;1 alg&Lambda;1_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;1_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF gg1_natural<span class="delimiter">]</span>
+    o_eq_dest<span class="delimiter">[</span>OF eval1_gg1<span class="delimiter">]</span> plus_uniform sum_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> sum_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;sum s = SCons 0 (plus s (sum s))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_sum tail_sum<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* alternate *}</span>
+
+<span class="command">definition</span> alternate <span class="delimiter">::</span> <span class="string">&quot;stream =&gt; stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;alternate s t = dtor_corec_J (&lambda;(s, t). (head s, Inr (tail t, tail s))) (s, t)&quot;</span>
+
+<span class="command">lemma</span> head_alternate<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (alternate s t) = head s&quot;</span>
+  <span class="command">unfolding</span> alternate_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_alternate<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (alternate s t) = alternate (tail t) (tail s)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst alternate_def<span class="delimiter">)</span> <span class="command">unfolding</span> J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def alternate_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> alternate_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;alternate (SCons m s) (SCons n t) = SCons m (alternate t s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_alternate tail_alternate<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* interleave *}</span>
+
+<span class="command">definition</span> interleave <span class="delimiter">::</span> <span class="string">&quot;stream =&gt; stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;interleave s t = dtor_corec_J (&lambda;(s, t). (head s, Inr (t, tail s))) (s, t)&quot;</span>
+
+<span class="command">lemma</span> head_interleave<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (interleave s t) = head s&quot;</span>
+  <span class="command">unfolding</span> interleave_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_interleave<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (interleave s t) = interleave t (tail s)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst interleave_def<span class="delimiter">)</span> <span class="command">unfolding</span> J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def interleave_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> interleave_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;interleave (SCons m s) (SCons n t) = SCons m (interleave (SCons n t) s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_interleave tail_interleave<span class="delimiter">)</span>
+
+<span class="command">lemma</span> interleave_uniform<span class="delimiter">:</span> <span class="string">&quot;interleave s t = alg&rho;6 (s, t)&quot;</span>
+  <span class="command">unfolding</span> interleave_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule fun_cong<span class="delimiter">[</span>OF sym<span class="delimiter">[</span>OF J.dtor_corec_unique<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> alg&rho;6 o_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc
+  <span class="command">apply</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def fun_eq_iff J.dtor_ctor
+    &rho;6_def Let_def convol_def eval6_\&lt;oo&gt;\&lt;pp&gt;6 eval6_leaf6&#39;
+    o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;6_natural<span class="delimiter">]</span> alg&Lambda;6_Inr alg&rho;6_def<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* merge *}</span>
+
+<span class="command">definition</span> merge <span class="keyword2">where</span>
+  <span class="string">&quot;merge s t = dtor_corec_J (&lambda;(s, t).
+    if head s &le; head t then (head s, Inr (tail s, t)) else (head t, Inr (s, tail t))) (s, t)&quot;</span>
+
+<span class="command">lemma</span> head_merge<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (merge s t) = (if head s &le; head t then head s else head t)&quot;</span>
+  <span class="command">unfolding</span> merge_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_merge<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (merge s t) = (if head s &le; head t then merge (tail s) t else merge s (tail t))&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst merge_def<span class="delimiter">)</span> <span class="command">unfolding</span> J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def merge_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> merge_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;merge (SCons m s) (SCons n t) =
+  (if m &le; n then SCons m (merge s (SCons n t)) else SCons n (merge (SCons m s) t))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>smt2 J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_merge tail_merge<span class="delimiter">)</span>
+
+<span class="command">lemma</span> merge_uniform<span class="delimiter">:</span> <span class="string">&quot;merge s t = alg&rho;8 (s, t)&quot;</span>
+  <span class="command">unfolding</span> merge_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule fun_cong<span class="delimiter">[</span>OF sym<span class="delimiter">[</span>OF J.dtor_corec_unique<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> alg&rho;8 o_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc
+  <span class="command">apply</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def fun_eq_iff J.dtor_ctor
+    &rho;8_def Let_def convol_def eval8_\&lt;oo&gt;\&lt;pp&gt;8 eval8_leaf8&#39;
+    o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;8_natural<span class="delimiter">]</span> alg&Lambda;8_Inr alg&rho;8_def<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* dup *}</span>
+
+<span class="command">definition</span> dup <span class="keyword2">where</span>
+  <span class="string">&quot;dup s = dtor_corec_J (&lambda;s. (head s, Inl s)) s&quot;</span>
+
+<span class="command">lemma</span> head_dup<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (dup s) = head s&quot;</span>
+  <span class="command">unfolding</span> dup_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_dup<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (dup s) = s&quot;</span>
+  <span class="command">unfolding</span> dup_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> dup_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;dup (SCons m s) = SCons m (SCons m s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor J.dtor_ctor fst_conv prod.collapse head_dup tail_dup<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* inv *}</span>
+
+<span class="command">definition</span> inv <span class="delimiter">::</span> <span class="string">&quot;stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;inv s = dtor_corec_J (&lambda;s. (1 - head s, Inr (tail s))) s&quot;</span>
+
+<span class="command">lemma</span> head_inv<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (inv s) = 1 - head s&quot;</span>
+  <span class="command">unfolding</span> inv_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_inv<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (inv s) = inv (tail s)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst inv_def<span class="delimiter">)</span> <span class="command">unfolding</span> J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def inv_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> inv_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;inv (SCons m s) = SCons (1 - m) (inv s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_inv tail_inv<span class="delimiter">)</span>
+
+<span class="command">lemma</span> inv_uniform<span class="delimiter">:</span> <span class="string">&quot;inv s = alg&rho;7 (K7.I s)&quot;</span>
+  <span class="command">unfolding</span> inv_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule fun_cong<span class="delimiter">[</span>OF sym<span class="delimiter">[</span>OF J.dtor_corec_unique<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> alg&rho;7 o_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc
+  <span class="command">apply</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def fun_eq_iff J.dtor_ctor
+    &rho;7_def Let_def convol_def eval7_\&lt;oo&gt;\&lt;pp&gt;7 eval7_leaf7&#39;
+    o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;7_natural<span class="delimiter">]</span> alg&Lambda;7_Inr alg&rho;7_def<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* thue *}</span>
+
+<span class="command">definition</span> thue&#39; <span class="delimiter">::</span> stream <span class="keyword2">where</span>
+  <span class="string">&quot;thue&#39; = corecUU7 (&lambda;_. GUARD7 (1, INTERLEAVE7 (CONT7 (), INV7 (I (CONT7 ()))))) ()&quot;</span>
+
+<span class="command">lemma</span> head_thue&#39;<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head thue&#39; = 1&quot;</span>
+  <span class="command">unfolding</span> thue&#39;_def corecUU7
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval7_leaf7&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_thue&#39;<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail thue&#39; = interleave thue&#39; (inv thue&#39;)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst thue&#39;_def<span class="delimiter">)</span> <span class="command">unfolding</span> corecUU7
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval7_leaf7&#39; eval7_\&lt;oo&gt;\&lt;pp&gt;7
+    alg&Lambda;7_Inl alg&Lambda;7_Inr alg&Lambda;6_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;7_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;6_natural<span class="delimiter">]</span>
+    interleave_uniform inv_uniform thue&#39;_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> thue&#39;_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;thue&#39; = SCons 1 (interleave thue&#39; (inv thue&#39;))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_thue&#39; tail_thue&#39;<span class="delimiter">)</span>
+
+<span class="command">definition</span> thue <span class="delimiter">::</span> stream <span class="keyword2">where</span>
+  <span class="string">&quot;thue = SCons 0 thue&#39;&quot;</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* times *}</span>
+
+<span class="command">definition</span> times <span class="delimiter">::</span> <span class="string">&quot;nat =&gt; stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;times n s = dtor_corec_J (&lambda;s. (n * head s, Inr (tail s))) s&quot;</span>
+
+<span class="command">lemma</span> head_times<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (times n s) = n * head s&quot;</span>
+  <span class="command">unfolding</span> times_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_times<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (times n s) = times n (tail s)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst times_def<span class="delimiter">)</span> <span class="command">unfolding</span> J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def times_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> times_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;times n (SCons m s) = SCons (n * m) (times n s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_times tail_times<span class="delimiter">)</span>
+
+<span class="command">lemma</span> times_uniform<span class="delimiter">:</span> <span class="string">&quot;times m s = alg&rho;9 (m, s)&quot;</span>
+  <span class="command">unfolding</span> times_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule fun_cong<span class="delimiter">[</span>OF sym<span class="delimiter">[</span>OF J.dtor_corec_unique<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> alg&rho;9 o_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc
+  <span class="command">apply</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def fun_eq_iff J.dtor_ctor
+    &rho;9_def Let_def convol_def eval9_\&lt;oo&gt;\&lt;pp&gt;9 eval9_leaf9&#39;
+    o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;9_natural<span class="delimiter">]</span> alg&Lambda;9_Inr alg&rho;9_def<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* ham *}</span>
+
+<span class="command">definition</span> ham <span class="delimiter">::</span> stream <span class="keyword2">where</span>
+  <span class="string">&quot;ham = corecUU9 (&lambda;_. GUARD9 (1, MERGE9 (TIMES9 (2, CONT9 ()), TIMES9 (3, CONT9 ())))) ()&quot;</span>
+
+<span class="command">lemma</span> head_ham<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head ham = 1&quot;</span>
+  <span class="command">unfolding</span> ham_def corecUU9
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval9_leaf9&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_ham<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail ham = merge (times 2 ham) (times 3 ham)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst ham_def<span class="delimiter">)</span> <span class="command">unfolding</span> corecUU9
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval9_leaf9&#39; eval9_\&lt;oo&gt;\&lt;pp&gt;9
+    alg&Lambda;9_Inl alg&Lambda;9_Inr alg&Lambda;8_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;9_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;8_natural<span class="delimiter">]</span>
+    merge_uniform times_uniform ham_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ham_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;ham = SCons 1 (merge (times 2 ham) (times 3 ham))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_ham tail_ham<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* even *}</span>
+
+<span class="command">definition</span> even <span class="delimiter">::</span> <span class="string">&quot;stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;even s = dtor_corec_J (&lambda;s. (head s, Inr (tail (tail s)))) s&quot;</span>
+
+<span class="command">lemma</span> head_even<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (even s) = head s&quot;</span>
+  <span class="command">unfolding</span> even_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_even<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (even s) = even (tail (tail s))&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst even_def<span class="delimiter">)</span> <span class="command">unfolding</span> J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def even_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> even_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;even (SCons n (SCons m s)) = SCons n (even s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_even tail_even<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* odd *}</span>
+
+<span class="command">definition</span> odd <span class="delimiter">::</span> <span class="string">&quot;stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;odd s = dtor_corec_J (&lambda;s. (head (tail s), Inr (tail (tail s)))) s&quot;</span>
+
+<span class="command">lemma</span> head_odd<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (odd s) = head (tail s)&quot;</span>
+  <span class="command">unfolding</span> odd_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_odd<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (odd s) = odd (tail (tail s))&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst odd_def<span class="delimiter">)</span> <span class="command">unfolding</span> J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def odd_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> odd_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;odd (SCons n (SCons m s)) = SCons m (odd s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_odd tail_odd<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* drop *}</span>
+
+<span class="command">definition</span> drop <span class="delimiter">::</span> <span class="string">&quot;nat =&gt; nat =&gt; stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;drop i l s = dtor_corec_J (&lambda;(i, l, s).
+     case i of
+       Suc i =&gt; (head s, Inr (i, l, tail s))
+     | 0 =&gt; (head (tail s), Inr (l - 2, l, tail (tail s)))) (i, l, s)&quot;</span>
+
+<span class="command">lemma</span> head_drop<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (drop i l s) = (case i of Suc _ =&gt; head s | 0 =&gt; head (tail s))&quot;</span>
+  <span class="command">unfolding</span> drop_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def split<span class="delimiter">:</span> nat.splits<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_drop<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;tail (drop i l s) = (case i of Suc i =&gt; drop i l (tail s) | 0 =&gt; drop (l - 2) l (tail (tail s)))&quot;</span>
+  <span class="command">unfolding</span> drop_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def split<span class="delimiter">:</span> nat.splits<span class="delimiter">)</span>
+
+<span class="command">lemma</span> drop_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;drop (Suc i) l (SCons m s) = SCons m (drop i l s)&quot;</span>
+  <span class="string">&quot;drop 0 l (SCons m (SCons n s)) = SCons n (drop (l - 2) l s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>smt2 J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_drop tail_drop nat.case<span class="delimiter">)</span><span class="delimiter">+</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* diff *}</span>
+
+<span class="command">definition</span> diff <span class="delimiter">::</span> <span class="string">&quot;stream =&gt; stream&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;diff s = dtor_corec_J (&lambda;s. (head (tail s) - head s, Inr (tail s))) s&quot;</span>
+
+<span class="command">lemma</span> head_diff<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (diff s) = head (tail s) - head s&quot;</span>
+  <span class="command">unfolding</span> diff_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_diff<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (diff s) = diff (tail s)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst diff_def<span class="delimiter">)</span> <span class="command">unfolding</span> J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def diff_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> diff_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;diff (SCons m (SCons n s)) = SCons (n - m) (diff (SCons n s))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse head_diff tail_diff<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* Some Proofs *}</span>
+
+<span class="command">theorem</span> thue_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;thue = SCons 0 (interleave (inv thue) (tail thue))&quot;</span>
+  <span class="command">unfolding</span> thue_def J.ctor_inject Pair_eq
+  <span class="command">by</span> <span class="delimiter">(</span>rule conjI<span class="delimiter">[</span>OF refl<span class="delimiter">]</span><span class="delimiter">,</span> coinduction rule<span class="delimiter">:</span> stream_coinduct0<span class="delimiter">)</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> J.dtor_ctor<span class="delimiter">)</span>
+
+<span class="command">theorem</span> plus_commute<span class="delimiter">:</span> <span class="string">&quot;plus s t = plus t s&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> s t rule<span class="delimiter">:</span> stream_coinduct<span class="delimiter">)</span> auto
+
+<span class="command">theorem</span> plus_assoc<span class="delimiter">:</span> <span class="string">&quot;plus (plus s t) u = plus s (plus t u)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> s t u rule<span class="delimiter">:</span> stream_coinduct<span class="delimiter">)</span> auto
+
+<span class="command">theorem</span> plus_commute_assoc<span class="delimiter">:</span> <span class="string">&quot;plus s (plus t u) = plus t (plus s u)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis plus_assoc plus_commute<span class="delimiter">)</span>
+
+<span class="command">theorem</span> even_plus<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;even (plus s t) = plus (even s) (even t)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> s t rule<span class="delimiter">:</span> stream_coinduct<span class="delimiter">)</span> auto
+
+<span class="command">theorem</span> odd_alt<span class="delimiter">:</span> <span class="string">&quot;odd s = even (tail s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> s rule<span class="delimiter">:</span> stream_coinduct<span class="delimiter">)</span> auto
+
+<span class="command">theorem</span> even_alt<span class="delimiter">:</span> <span class="string">&quot;even s = SCons (head s) (odd (tail s))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> s rule<span class="delimiter">:</span> stream_coinduct0<span class="delimiter">)</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> J.dtor_ctor odd_alt<span class="delimiter">)</span>
+
+<span class="command">theorem</span> sum_odd_fib<span class="delimiter">:</span> <span class="string">&quot;sum (odd fib) = even fib&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction rule<span class="delimiter">:</span> stream_coinduct1<span class="delimiter">)</span>
+    <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> J.dtor_ctor plus_assoc plus_commute_assoc odd_alt
+      intro<span class="delimiter">:</span> genCngdd1_alg&rho;1<span class="delimiter">[</span>folded plus_uniform<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">end</span>
+<span class="comment">(*&gt;*)</span>
+</pre>
+
+</div>
+</body>
+</html>

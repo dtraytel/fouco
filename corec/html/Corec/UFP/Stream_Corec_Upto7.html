@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Corec_Upto7 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Corec_Upto7</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Corec_Upto7</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Lift_to_Free7.html"><span class="name">Stream_Lift_to_Free7</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Corecursion and coinduction up to *}</span>
+
+<span class="command">theory</span> Stream_Corec_Upto7
+<span class="keyword2">imports</span> Stream_Lift_to_Free7
+<span class="keyword2">begin</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* The algebra associated to dd7 *}</span>
+
+<span class="command">definition</span> <span class="string">&quot;eval7 &equiv; dtor_unfold_J (dd7 o &Sigma;&Sigma;7_map &lt;id, dtor_J&gt;)&quot;</span>
+
+<span class="command">lemma</span> eval7<span class="delimiter">:</span> <span class="string">&quot;F_map eval7 o dd7 o &Sigma;&Sigma;7_map &lt;id, dtor_J&gt; = dtor_J o eval7&quot;</span>
+  <span class="command">unfolding</span> eval7_def dtor_unfold_J_pointfree <span class="command">unfolding</span> o_assoc <span class="command">..</span>
+
+<span class="command">lemma</span> eval7_ctor_J<span class="delimiter">:</span> <span class="string">&quot;ctor_J o F_map eval7 o dd7 o &Sigma;&Sigma;7_map &lt;id, dtor_J&gt; = eval7&quot;</span>
+  <span class="command">unfolding</span> o_def spec<span class="delimiter">[</span>OF eval7<span class="delimiter">[</span>unfolded o_def fun_eq_iff<span class="delimiter">]</span><span class="delimiter">]</span> J.ctor_dtor <span class="command">..</span>
+
+<span class="command">lemma</span> eval7_leaf7<span class="delimiter">:</span> <span class="string">&quot;eval7 o leaf7 = id&quot;</span>
+<span class="command">proof</span> <span class="delimiter">(</span>rule trans<span class="delimiter">)</span>
+  <span class="command">show</span> <span class="string">&quot;eval7 o leaf7 = dtor_unfold_J dtor_J&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule J.dtor_unfold_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc eval7<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf7_natural
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span>
+  <span class="command">unfolding</span> F_map_comp o_assoc <span class="command">apply</span> <span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> dd7_leaf7 <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">by</span> simp
+<span class="command">qed</span><span class="delimiter">(</span>metis F_map_id J.dtor_unfold_unique fun.map_id o_id<span class="delimiter">)</span>
+
+<span class="command">lemma</span> eval7_flat7<span class="delimiter">:</span> <span class="string">&quot;eval7 o flat7 = eval7 o &Sigma;&Sigma;7_map eval7&quot;</span>
+<span class="command">proof</span> <span class="delimiter">(</span>rule trans<span class="delimiter">)</span>
+  <span class="command">let</span> <span class="var">?K7</span> <span class="delimiter">=</span> <span class="string">&quot;dtor_unfold_J (dd7 o &Sigma;&Sigma;7_map &lt;&Sigma;&Sigma;7_map fst, dd7&gt; o &Sigma;&Sigma;7_map (&Sigma;&Sigma;7_map &lt;id, dtor_J&gt;))&quot;</span>
+  <span class="command">show</span> <span class="string">&quot;eval7 o flat7 = ?K7&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule J.dtor_unfold_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> F_map_comp o_assoc
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> dd7_flat7
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> snd_convol
+  <span class="command">unfolding</span> flat7_natural
+  <span class="command">unfolding</span> o_assoc eval7 <span class="command">..</span>
+  <span class="comment">(*  *)</span>
+  <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;&lt;eval7, dtor_J o eval7&gt; = &lt;id,dtor_J&gt; o eval7&quot;</span> <span class="command">by</span> simp
+  <span class="command">show</span> <span class="string">&quot;?K7 = eval7 o &Sigma;&Sigma;7_map eval7&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule J.dtor_unfold_unique<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> map_prod_o_convol id_o
+  <span class="command">unfolding</span> F_map_comp o_assoc
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> dd7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> map_prod_o_convol <span class="command">unfolding</span> convol_o
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> fst_convol &Sigma;&Sigma;7.map_id0 o_id
+  <span class="command">unfolding</span> o_assoc eval7 <span class="command">unfolding</span> A <span class="command">unfolding</span> convol_o id_o
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span> <span class="command">apply</span><span class="delimiter">(</span>subst eval7<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> convol_o id_o <span class="command">..</span>
+<span class="command">qed</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* The correspondence between coalgebras up to and coalgebras *}</span>
+
+<span class="comment">(* This correspondence, and add7 the lemmas of this subsection, make
+sense not only for (J,dtor_J,eval7), but also for any dd7-bialgebra *)</span>
+
+<span class="comment">(* Coalgebra-up-to to coalgebra and vice versa: *)</span>
+<span class="command">definition</span> cut&Sigma;&Sigma;7Oc <span class="delimiter">::</span> <span class="string">&quot;(&#39;a =&gt; &#39;a &Sigma;&Sigma;7 F) =&gt; (&#39;a &Sigma;&Sigma;7 =&gt; &#39;a &Sigma;&Sigma;7 F)&quot;</span>
+<span class="keyword2">where</span> <span class="string">&quot;cut&Sigma;&Sigma;7Oc s &equiv; F_map flat7 o dd7 o &Sigma;&Sigma;7_map &lt;leaf7, s&gt;&quot;</span>
+<span class="command">definition</span> c&Sigma;&Sigma;7Ocut <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &Sigma;&Sigma;7 =&gt; &#39;a &Sigma;&Sigma;7 F) =&gt; (&#39;a =&gt; &#39;a &Sigma;&Sigma;7 F)&quot;</span>
+<span class="keyword2">where</span> <span class="string">&quot;c&Sigma;&Sigma;7Ocut s&#39; &equiv; s&#39; o leaf7&quot;</span>
+
+<span class="command">lemma</span> c&Sigma;&Sigma;7Ocut_cut&Sigma;&Sigma;7Oc<span class="delimiter">:</span> <span class="string">&quot;c&Sigma;&Sigma;7Ocut (cut&Sigma;&Sigma;7Oc s) = s&quot;</span>
+<span class="command">unfolding</span> c&Sigma;&Sigma;7Ocut_def cut&Sigma;&Sigma;7Oc_def
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> leaf7_natural
+<span class="command">unfolding</span> o_assoc <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> dd7_leaf7 <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat7_leaf7
+<span class="command">unfolding</span> F_map_id id_o <span class="command">by</span> simp
+
+<span class="command">lemma</span> cut&Sigma;&Sigma;7Oc_inj<span class="delimiter">:</span> <span class="string">&quot;cut&Sigma;&Sigma;7Oc s7 = cut&Sigma;&Sigma;7Oc s2 &lt;-&gt; s7 = s2&quot;</span>
+<span class="command">by</span> <span class="delimiter">(</span>metis c&Sigma;&Sigma;7Ocut_cut&Sigma;&Sigma;7Oc<span class="delimiter">)</span>
+
+<span class="command">lemma</span> c&Sigma;&Sigma;7Ocut_surj<span class="delimiter">:</span> <span class="string">&quot;&exist; s&#39;. c&Sigma;&Sigma;7Ocut s&#39; = s&quot;</span>
+<span class="command">using</span> c&Sigma;&Sigma;7Ocut_cut&Sigma;&Sigma;7Oc <span class="command">by</span><span class="delimiter">(</span>rule exI<span class="delimiter">[</span>of _ <span class="string">&quot;cut&Sigma;&Sigma;7Oc s&quot;</span><span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* Morphism-up-to to morphism and vice versa: *)</span>
+<span class="comment">(* The dd7-extension of a function *)</span>
+<span class="command">definition</span> extdd7 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a =&gt; J) =&gt; (&#39;a &Sigma;&Sigma;7 =&gt; J)&quot;</span>
+<span class="keyword2">where</span> <span class="string">&quot;extdd7 f &equiv; eval7 o &Sigma;&Sigma;7_map f&quot;</span>
+<span class="comment">(* The restriction of a function *)</span>  <span class="command">term</span> eval7
+<span class="command">definition</span> restr <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &Sigma;&Sigma;7 =&gt; J) =&gt; (&#39;a =&gt; J)&quot;</span>
+<span class="keyword2">where</span> <span class="string">&quot;restr f&#39; &equiv; f&#39; o leaf7&quot;</span>
+
+<span class="comment">(* We think of extdd7 and restr as operating
+extdd7 : Hom_dd7(s,dtor_J) -&gt; Hom(cut&Sigma;&Sigma;7Oc s,dtor_J) and
+restr : Hom(cut&Sigma;&Sigma;7Oc s,dtor_J) -&gt; Hom_dd7(s,dtor_J), where
+Hom(cut&Sigma;&Sigma;7Oc s,dtor_J) is the set of coalgebra morphisms betwee cut&Sigma;&Sigma;7Oc s and dtor_J and
+Hom_dd7(s,dtor_J) is the set of coalgebra up-to-dd7-morphisms between s and dtor_J  *)</span>
+
+<span class="comment">(* extdd7 is wedd7-defined: *)</span>
+<span class="command">lemma</span> extdd7_mor<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f<span class="delimiter">:</span>  <span class="string">&quot;F_map (extdd7 f) o s = dtor_J o f&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;F_map (extdd7 f) o cut&Sigma;&Sigma;7Oc s = dtor_J o (extdd7 f)&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> AA<span class="delimiter">:</span> <span class="string">&quot;eval7 ** F_map eval7 o (&Sigma;&Sigma;7_map f ** F_map (&Sigma;&Sigma;7_map f) o &lt;leaf7 , s&gt;) =
+            &lt;f , F_map eval7 o (F_map (&Sigma;&Sigma;7_map f) o s)&gt;&quot;</span>
+  <span class="command">unfolding</span> map_prod_o_convol <span class="command">unfolding</span> leaf7_natural o_assoc eval7_leaf7 id_o  <span class="command">..</span>
+  <span class="command">show</span> <span class="var">?thesis</span>
+  <span class="command">unfolding</span> extdd7_def
+  <span class="command">unfolding</span> o_assoc eval7<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> convol_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> id_o
+  <span class="command">unfolding</span> f<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> unfolded extdd7_def<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> F_map_comp o_assoc
+  <span class="command">unfolding</span> cut&Sigma;&Sigma;7Oc_def
+  <span class="command">unfolding</span> o_assoc
+  <span class="command">unfolding</span> F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> flat7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc F_map_comp
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> dd7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> eval7_flat7
+  <span class="command">unfolding</span> F_map_comp <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> dd7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> AA<span class="delimiter">[</span>unfolded o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> mor_cut&Sigma;&Sigma;7Oc_flat7<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f&#39;<span class="delimiter">:</span> <span class="string">&quot;F_map f&#39; o cut&Sigma;&Sigma;7Oc s = dtor_J o f&#39;&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;eval7 o &Sigma;&Sigma;7_map f&#39; = f&#39; o flat7&quot;</span>
+<span class="command">proof</span><span class="delimiter">(</span>rule trans<span class="delimiter">)</span> <span class="comment">(* this proof is clearly improvable: *)</span>
+  <span class="command">def</span> h <span class="delimiter">&equiv;</span> <span class="string">&quot;dd7 o &Sigma;&Sigma;7_map &lt;id,cut&Sigma;&Sigma;7Oc s&gt;&quot;</span>
+  <span class="command">have</span> f&#39;_id<span class="delimiter">:</span> <span class="string">&quot;f&#39; = f&#39; o id&quot;</span> <span class="command">by</span> simp
+  <span class="command">show</span> <span class="string">&quot;eval7 o &Sigma;&Sigma;7_map f&#39; = dtor_unfold_J h&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule J.dtor_unfold_unique<span class="delimiter">,</span> rule sym<span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc eval7<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> convol_comp_id1<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> f&#39;<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span><span class="delimiter">(</span>subst f&#39;_id<span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc &Sigma;&Sigma;7.map_comp0
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> F_map_comp
+  <span class="command">unfolding</span> h_def <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> dd7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> map_prod_o_convol <span class="command">..</span>
+  <span class="comment">(*  *)</span>
+  <span class="command">have</span> AA<span class="delimiter">:</span> <span class="string">&quot;&lt;id , cut&Sigma;&Sigma;7Oc s&gt; = (flat7 ** F_map flat7) o (id ** dd7) o &lt;leaf7, &Sigma;&Sigma;7_map &lt;leaf7 , s&gt;&gt;&quot;</span>
+  <span class="command">unfolding</span> map_prod_o_convol o_assoc map_prod.comp cut&Sigma;&Sigma;7Oc_def o_id flat7_leaf7 <span class="command">..</span>
+  <span class="command">have</span> BB<span class="delimiter">:</span> <span class="string">&quot;flat7 ** F_map flat7 o id ** dd7 o &lt;leaf7 , &Sigma;&Sigma;7_map &lt;leaf7 , s&gt;&gt; = flat7 ** F_map flat7 o id ** dd7 o &lt;&Sigma;&Sigma;7_map leaf7 , &Sigma;&Sigma;7_map &lt;leaf7 , s&gt;&gt;&quot;</span>
+  <span class="command">unfolding</span> map_prod.comp <span class="command">unfolding</span> map_prod_o_convol <span class="command">unfolding</span> o_id <span class="command">unfolding</span> flat7_leaf7 leaf7_flat7 <span class="command">..</span>
+  <span class="command">show</span> <span class="string">&quot;dtor_unfold_J h = f&#39; o flat7&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule J.dtor_unfold_unique<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> rule sym<span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc f&#39;<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_map_comp o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule arg_cong<span class="delimiter">[</span>of _ _ <span class="string">&quot;op o (F_map f&#39;)&quot;</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> h_def
+  <span class="command">unfolding</span> AA BB
+  <span class="command">unfolding</span> &Sigma;&Sigma;7.map_comp0 <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> dd7_natural
+  <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> flat7_assoc <span class="command">unfolding</span> F_map_comp
+  <span class="command">unfolding</span> cut&Sigma;&Sigma;7Oc_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">apply</span><span class="delimiter">(</span>rule arg_cong<span class="delimiter">[</span>of _ _ <span class="string">&quot;op o (F_map flat7)&quot;</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> map_prod_o_convol id_o
+  <span class="command">unfolding</span> flat7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> o_assoc
+  <span class="command">unfolding</span> dd7_flat7<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> convol_o <span class="command">unfolding</span> &Sigma;&Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> fst_convol <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="comment">(* restr is wedd7-defined:  *)</span>
+<span class="command">lemma</span> restr_mor<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f&#39;<span class="delimiter">:</span> <span class="string">&quot;F_map f&#39; o cut&Sigma;&Sigma;7Oc s = dtor_J o f&#39;&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;F_map (extdd7 (restr f&#39;)) o s = dtor_J o restr f&#39;&quot;</span>
+<span class="command">unfolding</span> extdd7_def restr_def &Sigma;&Sigma;7.map_comp0
+<span class="command">unfolding</span> o_assoc mor_cut&Sigma;&Sigma;7Oc_flat7<span class="delimiter">[</span>OF f&#39;<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf7_flat7 o_id
+<span class="command">unfolding</span> o_assoc f&#39;<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> c&Sigma;&Sigma;7Ocut_cut&Sigma;&Sigma;7Oc<span class="delimiter">[</span>unfolded c&Sigma;&Sigma;7Ocut_def<span class="delimiter">]</span> <span class="command">..</span>
+
+<span class="command">lemma</span> extdd7_restr<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f&#39;<span class="delimiter">:</span> <span class="string">&quot;F_map f&#39; o cut&Sigma;&Sigma;7Oc s = dtor_J o f&#39;&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;extdd7 (restr f&#39;) = f&#39;&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;f&#39; = eval7 o &Sigma;&Sigma;7_map f&#39; o leaf7&quot;</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf7_natural
+  <span class="command">unfolding</span> o_assoc eval7_leaf7 <span class="command">by</span> simp
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = eval7 o &Sigma;&Sigma;7_map (f&#39; o leaf7)&quot;</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;7.map_comp0 o_assoc
+  <span class="command">unfolding</span> mor_cut&Sigma;&Sigma;7Oc_flat7<span class="delimiter">[</span>OF f&#39;<span class="delimiter">]</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat7_leaf7 leaf7_flat7 <span class="command">..</span>
+  <span class="command">finally</span> <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;f&#39; = eval7 o &Sigma;&Sigma;7_map (f&#39; o leaf7)&quot;</span> <span class="command">.</span>
+  <span class="command">show</span> <span class="var">?thesis</span> <span class="command">unfolding</span> extdd7_def restr_def A<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> restr_inj<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f7&#39;<span class="delimiter">:</span> <span class="string">&quot;F_map f7&#39; o cut&Sigma;&Sigma;7Oc s = dtor_J o f7&#39;&quot;</span>
+<span class="keyword2">and</span> f2&#39;<span class="delimiter">:</span> <span class="string">&quot;F_map f2&#39; o cut&Sigma;&Sigma;7Oc s = dtor_J o f2&#39;&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;restr f7&#39; = restr f2&#39; &lt;-&gt; f7&#39; = f2&#39;&quot;</span>
+<span class="command">using</span> extdd7_restr<span class="delimiter">[</span>OF f7&#39;<span class="delimiter">]</span> extdd7_restr<span class="delimiter">[</span>OF f2&#39;<span class="delimiter">]</span> <span class="command">by</span> metis
+
+<span class="command">lemma</span> extdd7_surj<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f&#39;<span class="delimiter">:</span> <span class="string">&quot;F_map f&#39; o cut&Sigma;&Sigma;7Oc s = dtor_J o f&#39;&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&exist; f. extdd7 f = f&#39;&quot;</span>
+<span class="command">using</span> extdd7_restr<span class="delimiter">[</span>OF f&#39;<span class="delimiter">]</span> <span class="command">by</span><span class="delimiter">(</span>rule exI<span class="delimiter">[</span>of _ <span class="string">&quot;restr f&#39;&quot;</span><span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="command">lemma</span> restr_extdd7<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f<span class="delimiter">:</span> <span class="string">&quot;F_map (extdd7 f) o s = dtor_J o f&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;restr (extdd7 f) = f&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;dtor_J o f = F_map (extdd7 f) o s&quot;</span> <span class="command">using</span> assms <span class="command">unfolding</span> extdd7_def <span class="command">by</span> <span class="delimiter">(</span>rule sym<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = dtor_J o restr (extdd7 f)&quot;</span>
+  <span class="command">unfolding</span> restr_def <span class="command">unfolding</span> o_assoc extdd7_mor<span class="delimiter">[</span>OF f<span class="delimiter">,</span> symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> c&Sigma;&Sigma;7Ocut_cut&Sigma;&Sigma;7Oc<span class="delimiter">[</span>unfolded c&Sigma;&Sigma;7Ocut_def<span class="delimiter">]</span> <span class="command">..</span>
+  <span class="command">finally</span> <span class="command">have</span> <span class="string">&quot;dtor_J o f = dtor_J o restr (extdd7 f)&quot;</span> <span class="command">.</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">unfolding</span> dtor_J_o_inj <span class="command">by</span> <span class="delimiter">(</span>rule sym<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> extdd7_inj<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f1<span class="delimiter">:</span> <span class="string">&quot;F_map (extdd7 f1) o s = dtor_J o f1&quot;</span>
+<span class="keyword2">and</span> f2<span class="delimiter">:</span> <span class="string">&quot;F_map (extdd7 f2) o s = dtor_J o f2&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;extdd7 f1 = extdd7 f2 &lt;-&gt; f1 = f2&quot;</span>
+<span class="command">using</span> restr_extdd7<span class="delimiter">[</span>OF f1<span class="delimiter">]</span> restr_extdd7<span class="delimiter">[</span>OF f2<span class="delimiter">]</span> <span class="command">by</span> metis
+
+<span class="command">lemma</span> restr_surj<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f<span class="delimiter">:</span> <span class="string">&quot;F_map (extdd7 f) o s = dtor_J o f&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&exist; f&#39;. restr f&#39; = f&quot;</span>
+<span class="command">using</span> restr_extdd7<span class="delimiter">[</span>OF f<span class="delimiter">]</span> <span class="command">by</span><span class="delimiter">(</span>rule exI<span class="delimiter">[</span>of _ <span class="string">&quot;extdd7 f&quot;</span><span class="delimiter">]</span><span class="delimiter">)</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* Coiteration up-to *}</span>
+
+<span class="command">definition</span> <span class="string">&quot;unfoldU7 s &equiv; restr (dtor_unfold_J (cut&Sigma;&Sigma;7Oc s))&quot;</span>
+
+<span class="command">theorem</span> unfoldU7_pointfree<span class="delimiter">:</span>
+<span class="string">&quot;F_map (extdd7 (unfoldU7 s)) o s = dtor_J o unfoldU7 s&quot;</span>
+<span class="command">unfolding</span> unfoldU7_def <span class="command">apply</span><span class="delimiter">(</span>rule restr_mor<span class="delimiter">)</span>
+<span class="command">unfolding</span> dtor_unfold_J_pointfree <span class="command">..</span>
+
+<span class="command">theorem</span> unfoldU7<span class="delimiter">:</span> <span class="string">&quot;F_map (extdd7 (unfoldU7 s)) (s a) = dtor_J (unfoldU7 s a)&quot;</span>
+<span class="command">using</span> unfoldU7_pointfree <span class="command">unfolding</span> o_def fun_eq_iff <span class="command">by</span><span class="delimiter">(</span>rule allE<span class="delimiter">)</span>
+
+<span class="command">theorem</span> unfoldU7_ctor_J<span class="delimiter">:</span>
+<span class="string">&quot;ctor_J (F_map (extdd7 (unfoldU7 s)) (s a)) = unfoldU7 s a&quot;</span>
+<span class="command">using</span> unfoldU7 <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor<span class="delimiter">)</span>
+
+<span class="command">theorem</span> unfoldU7_unique<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;F_map (extdd7 f) o s = dtor_J o f&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;f = unfoldU7 s&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">note</span> f <span class="delimiter">=</span> extdd7_mor<span class="delimiter">[</span>OF assms<span class="delimiter">]</span>  <span class="command">note</span> co <span class="delimiter">=</span> extdd7_mor<span class="delimiter">[</span>OF unfoldU7_pointfree<span class="delimiter">]</span>
+  <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;extdd7 f = extdd7 (unfoldU7 s)&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule trans<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;extdd7 f = dtor_unfold_J (cut&Sigma;&Sigma;7Oc s)&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>rule J.dtor_unfold_unique<span class="delimiter">)</span> <span class="command">using</span> f <span class="command">.</span>
+    <span class="command">show</span> <span class="string">&quot;dtor_unfold_J (cut&Sigma;&Sigma;7Oc s) = extdd7 (unfoldU7 s)&quot;</span>
+     <span class="command">apply</span><span class="delimiter">(</span>rule J.dtor_unfold_unique<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">using</span> co <span class="command">.</span>
+  <span class="command">qed</span>
+  <span class="command">show</span> <span class="var">?thesis</span> <span class="command">using</span> A <span class="command">unfolding</span> extdd7_inj<span class="delimiter">[</span>OF assms unfoldU7_pointfree<span class="delimiter">]</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> unfoldU7_ctor_J_pointfree<span class="delimiter">:</span>
+<span class="string">&quot;ctor_J o F_map (extdd7 (unfoldU7 s)) o s = unfoldU7 s&quot;</span>
+<span class="command">unfolding</span> o_def fun_eq_iff <span class="command">by</span> <span class="delimiter">(</span>subst unfoldU7_ctor_J<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="delimiter">(</span>rule allI<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+
+<span class="comment">(* Corecursion up to: *)</span>
+<span class="command">definition</span> corecU7 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;7 F) =&gt; &#39;a =&gt; J&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;corecU7 s = unfoldU7 (case_sum (dd7 o leaf7 o &lt;Inl, F_map Inl o dtor_J&gt;) s) o Inr&quot;</span>
+
+<span class="command">definition</span> extddRec7 <span class="keyword2">where</span>
+<span class="string">&quot;extddRec7 f &equiv; eval7 o &Sigma;&Sigma;7_map (case_sum id f)&quot;</span>
+
+<span class="command">lemma</span> unfoldU7_Inl<span class="delimiter">:</span>
+<span class="string">&quot;unfoldU7 (case_sum (dd7 o leaf7 o &lt;Inl , F_map Inl o dtor_J&gt;) s) o Inl = id&quot;</span>
+<span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;?L = unfoldU7 (dd7 o leaf7 o &lt;id, dtor_J&gt;)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule unfoldU7_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc unfoldU7_pointfree<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> case_sum_o_inj extdd7_def F_map_comp &Sigma;&Sigma;7.map_comp0
+  <span class="command">unfolding</span> o_assoc <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+                          subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> dd7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> leaf7_natural
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> map_prod_o_convol o_id <span class="command">..</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = ?R&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule unfoldU7_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> extdd7_def &Sigma;&Sigma;7.map_id0 o_id dd7_leaf7
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> snd_convol
+  <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> eval7_leaf7 F_map_id id_o <span class="command">..</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> corecU7_pointfree<span class="delimiter">:</span>
+<span class="string">&quot;F_map (extddRec7 (corecU7 s)) o s = dtor_J o corecU7 s&quot;</span> <span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> corecU7_def
+<span class="command">unfolding</span> o_assoc unfoldU7_pointfree<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> extddRec7_def
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> case_sum_o_inj
+<span class="command">apply</span><span class="delimiter">(</span>subst unfoldU7_Inl<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> of s<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> o_assoc case_sum_Inl_Inr_L extdd7_def <span class="command">..</span>
+
+<span class="command">theorem</span> corecU7<span class="delimiter">:</span>
+<span class="string">&quot;F_map (extddRec7 (corecU7 s)) (s a) = dtor_J (corecU7 s a)&quot;</span>
+<span class="command">using</span> corecU7_pointfree <span class="command">unfolding</span> o_def fun_eq_iff <span class="command">by</span><span class="delimiter">(</span>rule allE<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* Coinduction up-to *}</span>
+
+<span class="command">definition</span> <span class="string">&quot;cptdd7 R &equiv; (&Sigma;&Sigma;7_rel R ===&gt; R) eval7 eval7&quot;</span>
+
+<span class="command">definition</span> <span class="string">&quot;cngdd7 R &equiv; equivp R &and; cptdd7 R&quot;</span>
+
+<span class="command">lemma</span> cngdd7_Retr<span class="delimiter">:</span> <span class="string">&quot;cngdd7 R ==&gt; cngdd7 (R \&lt;sqinter&gt; Retr R)&quot;</span>
+  <span class="command">unfolding</span> cngdd7_def cptdd7_def
+  <span class="command">apply</span> <span class="delimiter">(</span>erule conjE<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule conjI<span class="delimiter">[</span>OF equivp_inf<span class="delimiter">[</span>OF _ equivp_retr<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> assumption
+  <span class="command">apply</span> assumption
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funI<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>frule predicate2D<span class="delimiter">[</span>OF &Sigma;&Sigma;7_rel_inf<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule inf2E<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule inf2I<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule rel_funE<span class="delimiter">)</span>
+  <span class="command">apply</span> assumption
+  <span class="command">apply</span> assumption
+  <span class="command">apply</span> <span class="delimiter">(</span>subst Retr_def<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst eval7_def<span class="delimiter">)</span><span class="delimiter">+</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst J.dtor_unfold<span class="delimiter">)</span><span class="delimiter">+</span>
+  <span class="command">unfolding</span> F_rel_F_map_F_map Grp_def relcompp.simps<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> conversep.simps<span class="delimiter">[</span>abs_def<span class="delimiter">]</span>
+  <span class="command">apply</span> auto
+  <span class="command">unfolding</span> eval7_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule predicate2D<span class="delimiter">[</span>OF F_rel_mono<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule predicate2I<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">)</span>
+  <span class="command">apply</span> assumption
+  <span class="command">apply</span> <span class="delimiter">(</span>rule F_rel_&Sigma;&Sigma;7_rel<span class="delimiter">)</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;7_rel_&Sigma;&Sigma;7_map_&Sigma;&Sigma;7_map vimage2p_rel_prod vimage2p_id
+  <span class="command">unfolding</span> vimage2p_def Retr_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span> assumption
+  <span class="command">done</span>
+
+<span class="comment">(* The generated congruence: *)</span>
+<span class="command">definition</span> <span class="string">&quot;genCngdd7 R j1 j2 &equiv; &forall; R&#39;. R &le; R&#39; &and; cngdd7 R&#39; --&gt; R&#39; j1 j2&quot;</span>
+
+<span class="command">lemma</span> cngdd7_genCngdd7<span class="delimiter">:</span> <span class="string">&quot;cngdd7 (genCngdd7 R)&quot;</span>
+<span class="command">unfolding</span> cngdd7_def <span class="command">proof</span> safe
+  <span class="command">show</span> <span class="string">&quot;cptdd7 (genCngdd7 R)&quot;</span>
+  <span class="command">unfolding</span> cptdd7_def rel_fun_def <span class="command">proof</span> safe
+    <span class="command">fix</span> x y <span class="command">assume</span> A<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;7_rel (genCngdd7 R) x y&quot;</span>
+    <span class="command">show</span> <span class="string">&quot;genCngdd7 R (eval7 x) (eval7 y)&quot;</span>
+    <span class="command">unfolding</span> genCngdd7_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> <span class="command">proof</span> safe
+      <span class="command">fix</span> R&#39; <span class="command">assume</span> <span class="string">&quot;R &le; R&#39;&quot;</span> <span class="keyword2">and</span> 2<span class="delimiter">:</span> <span class="string">&quot;cngdd7 R&#39;&quot;</span>
+      <span class="command">hence</span> <span class="string">&quot;&Sigma;&Sigma;7_rel R&#39; x y&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>metis A &Sigma;&Sigma;7.rel_mono_strong genCngdd7_def<span class="delimiter">)</span>
+      <span class="command">thus</span> <span class="string">&quot;R&#39; (eval7 x) (eval7 y)&quot;</span> <span class="command">using</span> 2 <span class="command">unfolding</span> cngdd7_def cptdd7_def rel_fun_def <span class="command">by</span> auto
+    <span class="command">qed</span>
+  <span class="command">qed</span>
+<span class="command">qed</span><span class="delimiter">(</span>rule equivpI<span class="delimiter">,</span> unfold reflp_def symp_def transp_def genCngdd7_def cngdd7_def equivp_def<span class="delimiter">,</span> auto<span class="delimiter">)</span>
+
+<span class="command">lemma</span>
+    genCngdd7_refl<span class="delimiter">[</span>intro<span class="delimiter">,</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;genCngdd7 R j j&quot;</span>
+<span class="keyword2">and</span> genCngdd7_sym<span class="delimiter">[</span>intro<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;genCngdd7 R j1 j2 ==&gt; genCngdd7 R j2 j1&quot;</span>
+<span class="keyword2">and</span> genCngdd7_trans<span class="delimiter">[</span>intro<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;[|genCngdd7 R j1 j2; genCngdd7 R j2 j3|] ==&gt; genCngdd7 R j1 j3&quot;</span>
+<span class="command">using</span> cngdd7_genCngdd7 <span class="command">unfolding</span> cngdd7_def equivp_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> genCngdd7_eval7_rel_fun<span class="delimiter">:</span> <span class="string">&quot;(&Sigma;&Sigma;7_rel (genCngdd7 R) ===&gt; genCngdd7 R) eval7 eval7&quot;</span>
+<span class="command">using</span> cngdd7_genCngdd7 <span class="command">unfolding</span> cngdd7_def cptdd7_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> genCngdd7_eval7<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;7_rel (genCngdd7 R) x y ==&gt; genCngdd7 R (eval7 x) (eval7 y)&quot;</span>
+<span class="command">using</span> genCngdd7_eval7_rel_fun <span class="command">unfolding</span> rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> leq_genCngdd7<span class="delimiter">:</span> <span class="string">&quot;R &le; genCngdd7 R&quot;</span>
+<span class="keyword2">and</span> imp_genCngdd7<span class="delimiter">[</span>intro<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;R j1 j2 ==&gt; genCngdd7 R j1 j2&quot;</span>
+<span class="command">unfolding</span> genCngdd7_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> <span class="command">by</span> auto
+
+<span class="command">lemma</span> genCngdd7_minimal<span class="delimiter">:</span> <span class="string">&quot;[|R &le; R&#39;; cngdd7 R&#39;|] ==&gt; genCngdd7 R &le; R&#39;&quot;</span>
+<span class="command">unfolding</span> genCngdd7_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> <span class="command">by</span> <span class="delimiter">(</span>metis <span class="delimiter">(</span>lifting<span class="delimiter">,</span> no_types<span class="delimiter">)</span> predicate2I<span class="delimiter">)</span>
+
+<span class="command">theorem</span> coinductionU_genCngdd7<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;&forall; a b. R a b --&gt; F_rel (genCngdd7 R) (dtor_J a) (dtor_J b)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;R a b --&gt; a = b&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">let</span> <span class="var">?R&#39;</span> <span class="delimiter">=</span> <span class="string">&quot;genCngdd7 R&quot;</span>
+  <span class="command">have</span> <span class="string">&quot;R &le; Retr ?R&#39;&quot;</span> <span class="command">using</span> assms <span class="command">unfolding</span> Retr_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> <span class="command">by</span> auto
+  <span class="command">hence</span> <span class="string">&quot;R &le; ?R&#39; \&lt;sqinter&gt; Retr ?R&#39;&quot;</span> <span class="command">using</span> leq_genCngdd7 <span class="command">by</span> auto
+  <span class="command">moreover</span> <span class="command">have</span> <span class="string">&quot;cngdd7 (?R&#39; \&lt;sqinter&gt; Retr ?R&#39;)&quot;</span> <span class="command">using</span> cngdd7_Retr<span class="delimiter">[</span>OF cngdd7_genCngdd7<span class="delimiter">[</span>of R<span class="delimiter">]</span><span class="delimiter">]</span> <span class="command">.</span>
+  <span class="command">ultimately</span> <span class="command">have</span> <span class="string">&quot;?R&#39; &le; ?R&#39; \&lt;sqinter&gt; Retr ?R&#39;&quot;</span> <span class="command">using</span> genCngdd7_minimal <span class="command">by</span> metis
+  <span class="command">hence</span> <span class="string">&quot;?R&#39; &le; Retr ?R&#39;&quot;</span> <span class="command">by</span> auto
+  <span class="command">hence</span> <span class="string">&quot;?R&#39; a b --&gt; a = b&quot;</span>  <span class="command">unfolding</span> Retr_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> <span class="command">by</span> <span class="delimiter">(</span>intro J.dtor_coinduct<span class="delimiter">)</span> auto
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">using</span> leq_genCngdd7 <span class="command">by</span> auto
+<span class="command">qed</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* Flattening from term algebra to &quot;one-step&quot; algebra *}</span>
+
+<span class="comment">(* Since (J &Sigma;&Sigma;7, eval7) is an Eilenberg-Moore algebra (i.e., is compatible with
+the monadic structure, it yields an algebra on the signature functor.
+This is crucial for having suitable simplification rules. *)</span>
+
+<span class="comment">(* The one-step algebra (naturally associated to &Lambda;7, not to dd7): *)</span>
+<span class="command">definition</span> alg&Lambda;7 <span class="delimiter">::</span> <span class="string">&quot;J &Sigma;7 =&gt; J&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;alg&Lambda;7 = eval7 o \&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map leaf7&quot;</span>
+
+<span class="command">theorem</span> eval7_comp_\&lt;oo&gt;\&lt;pp&gt;7<span class="delimiter">:</span> <span class="string">&quot;eval7 o \&lt;oo&gt;\&lt;pp&gt;7 = alg&Lambda;7 o &Sigma;7_map eval7&quot;</span>
+<span class="command">unfolding</span> alg&Lambda;7_def
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> leaf7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> &Sigma;7.map_comp0
+<span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> \&lt;oo&gt;\&lt;pp&gt;7_natural
+<span class="command">unfolding</span> o_assoc eval7_flat7<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> flat7_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat7_leaf7 &Sigma;7.map_id0 o_id <span class="command">..</span>
+
+<span class="command">theorem</span> eval7_\&lt;oo&gt;\&lt;pp&gt;7<span class="delimiter">:</span> <span class="string">&quot;eval7 (\&lt;oo&gt;\&lt;pp&gt;7 t) = alg&Lambda;7 (&Sigma;7_map eval7 t)&quot;</span>
+<span class="command">using</span> eval7_comp_\&lt;oo&gt;\&lt;pp&gt;7 <span class="command">unfolding</span> o_def fun_eq_iff <span class="command">by</span> <span class="delimiter">(</span>rule allE<span class="delimiter">)</span>
+
+<span class="command">theorem</span> eval7_leaf7&#39;<span class="delimiter">:</span> <span class="string">&quot;eval7 (leaf7 j) = j&quot;</span>
+<span class="command">using</span> eval7_leaf7 <span class="command">unfolding</span> o_def fun_eq_iff id_def <span class="command">by</span> <span class="delimiter">(</span>rule allE<span class="delimiter">)</span>
+
+<span class="command">theorem</span> dtor_J_alg&Lambda;7<span class="delimiter">:</span> <span class="string">&quot;dtor_J o alg&Lambda;7 = F_map eval7 o &Lambda;7 o &Sigma;7_map &lt;id, dtor_J&gt;&quot;</span>
+  <span class="command">unfolding</span> alg&Lambda;7_def eval7_def o_assoc dtor_unfold_J_pointfree &Lambda;7_dd7
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> \&lt;oo&gt;\&lt;pp&gt;7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf7_natural
+  <span class="command">..</span>
+
+<span class="command">theorem</span> dtor_J_alg&Lambda;7&#39;<span class="delimiter">:</span> <span class="string">&quot;dtor_J (alg&Lambda;7 t) = F_map eval7 (&Lambda;7 (&Sigma;7_map (&lt;id, dtor_J&gt;) t))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>rule trans<span class="delimiter">[</span>OF o_eq_dest<span class="delimiter">[</span>OF dtor_J_alg&Lambda;7<span class="delimiter">]</span> o_apply<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="command">theorem</span> ctor_J_alg&Lambda;7<span class="delimiter">:</span> <span class="string">&quot;alg&Lambda;7 t = ctor_J (F_map eval7 (&Lambda;7 (&Sigma;7_map (&lt;id, dtor_J&gt;) t)))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>rule iffD1<span class="delimiter">[</span>OF J.dtor_inject trans<span class="delimiter">[</span>OF dtor_J_alg&Lambda;7&#39; J.dtor_ctor<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* Note: The user wi&Lambda;7 indicate an &quot;equation&quot; equ :: J &Sigma;7 =&gt; (J &Sigma;&Sigma;7) F
+in order to define the operation alg&Lambda;7 :: J &Sigma;7 =&gt; J on the final coalgebra
+according to dtor_J_alg&Lambda;7.
+The package wi&Lambda;7 identify the polymorphic function &Lambda;7 :: (&#39;a &times; &#39;a F) &Sigma;7 =&gt; &#39;a &Sigma;&Sigma;7 F
+such that equ = &Lambda;7 o &Sigma;7 &lt;id, dtor_J&gt;. Then the package wi&Lambda;7 attempt to prove
+automatica&Lambda;7y that &Lambda;7 is natural.  If the proof fails, the user wi&Lambda;7 be asked to prove it.
+Upon success, the distributive law is being registered.
+*)</span>
+
+<span class="comment">(* Customizing coinduction up-to: *)</span>
+<span class="command">definition</span> <span class="string">&quot;cpt&Lambda;7 R &equiv; (&Sigma;7_rel R ===&gt; R) alg&Lambda;7 alg&Lambda;7&quot;</span>
+
+<span class="command">definition</span> <span class="string">&quot;cng&Lambda;7 R &equiv; equivp R &and; cpt&Lambda;7 R&quot;</span>
+
+<span class="command">lemma</span> cptdd7_iff_cpt&Lambda;7<span class="delimiter">:</span> <span class="string">&quot;cptdd7 R &lt;-&gt; cpt&Lambda;7 R&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule iffI<span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>unfold cpt&Lambda;7_def cptdd7_def alg&Lambda;7_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="delimiter">[</span>1<span class="delimiter">]</span>
+<span class="command">apply</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF comp_transfer<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">apply</span> transfer_prover
+
+<span class="command">apply</span> <span class="delimiter">(</span>unfold cpt&Lambda;7_def cptdd7_def<span class="delimiter">)</span> <span class="delimiter">[</span>1<span class="delimiter">]</span>
+<span class="command">unfolding</span> rel_fun_def
+<span class="command">apply</span> <span class="delimiter">(</span>rule allI<span class="delimiter">)</span><span class="delimiter">+</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule &Sigma;&Sigma;7_rel_induct<span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>simp only<span class="delimiter">:</span> eval7_leaf7&#39;<span class="delimiter">)</span>
+<span class="command">unfolding</span> eval7_\&lt;oo&gt;\&lt;pp&gt;7
+<span class="command">apply</span> <span class="delimiter">(</span>drule spec2<span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>erule mp<span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule iffD2<span class="delimiter">[</span>OF &Sigma;7_rel_&Sigma;7_map_&Sigma;7_map<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>subst vimage2p_def<span class="delimiter">)</span>
+<span class="command">apply</span> assumption
+<span class="command">done</span>
+
+<span class="comment">(* This is the definition of genCngdd7 we need to work with: *)</span>
+<span class="command">theorem</span> genCngdd7_def2<span class="delimiter">:</span> <span class="string">&quot;genCngdd7 R j1 j2 &lt;-&gt; (&forall; R&#39;. R &le; R&#39; &and; cng&Lambda;7 R&#39; --&gt; R&#39; j1 j2)&quot;</span>
+<span class="command">unfolding</span> genCngdd7_def cngdd7_def cng&Lambda;7_def cptdd7_iff_cpt&Lambda;7 <span class="command">..</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* Incremental coinduction *}</span>
+
+<span class="command">interpretation</span> I7<span class="delimiter">:</span> Incremental <span class="keyword2">where</span> Retr <span class="delimiter">=</span> Retr <span class="keyword2">and</span> Cl <span class="delimiter">=</span> genCngdd7
+<span class="command">proof</span>
+  <span class="command">show</span> <span class="string">&quot;mono Retr&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>rule mono_retr<span class="delimiter">)</span>
+<span class="command">next</span>
+  <span class="command">show</span> <span class="string">&quot;mono genCngdd7&quot;</span> <span class="command">unfolding</span> mono_def
+  <span class="command">unfolding</span> genCngdd7_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> <span class="command">by</span> <span class="delimiter">(</span>smt order.trans predicate2I<span class="delimiter">)</span>
+<span class="command">next</span>
+  <span class="command">fix</span> r <span class="command">show</span> <span class="string">&quot;genCngdd7 (genCngdd7 r) = genCngdd7 r&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis cngdd7_genCngdd7 genCngdd7_minimal leq_genCngdd7 order_class.order.antisym<span class="delimiter">)</span>
+<span class="command">next</span>
+  <span class="command">fix</span> r <span class="command">show</span> <span class="string">&quot;r &le; genCngdd7 r&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>metis leq_genCngdd7<span class="delimiter">)</span>
+<span class="command">next</span>
+  <span class="command">fix</span> r <span class="command">assume</span> <span class="string">&quot;genCngdd7 r = r&quot;</span> <span class="command">thus</span> <span class="string">&quot;genCngdd7 (r \&lt;sqinter&gt; Retr r) = r \&lt;sqinter&gt; Retr r&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis antisym cngdd7_Retr cngdd7_genCngdd7 genCngdd7_minimal
+            inf.orderI inf_idem leq_genCngdd7<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">definition</span> ded7 <span class="keyword2">where</span> <span class="string">&quot;ded7 r s &equiv; I7.ded r s&quot;</span>
+
+<span class="command">theorems</span> Ax <span class="delimiter">=</span> I7.Ax&#39;<span class="delimiter">[</span>unfolded ded7_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">]</span>
+<span class="command">theorems</span> Split <span class="delimiter">=</span> I7.Split<span class="delimiter">[</span>unfolded ded7_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">]</span>
+<span class="command">theorems</span> Coind <span class="delimiter">=</span> I7.Coind<span class="delimiter">[</span>unfolded ded7_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">]</span>
+
+<span class="command">theorem</span> soundness_ded<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;ded7 (op =) s&quot;</span>  <span class="keyword2">shows</span> <span class="string">&quot;s &le; (op =)&quot;</span>
+<span class="command">unfolding</span> gfp_Retr_eq<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">apply</span><span class="delimiter">(</span>rule I7.soundness_ded<span class="delimiter">[</span>unfolded ded7_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">]</span> <span class="delimiter">)</span>
+<span class="command">using</span> assms <span class="command">unfolding</span> gfp_Retr_eq<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ded7_def <span class="command">.</span>
+
+<span class="command">unused_thms</span>
+
+<span class="command">end</span>
+</pre>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Binary_Tree_Op_Input2 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Binary_Tree_Op_Input2</h1>
+
+<span class="command">theory</span> <span class="name">Binary_Tree_Op_Input2</span><br/>
+<span class="keyword">imports</span> <a href="Binary_Tree_FreeAlg2.html"><span class="name">Binary_Tree_FreeAlg2</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> Binary_Tree_Op_Input2
+<span class="keyword2">imports</span> Binary_Tree_FreeAlg2
+<span class="keyword2">begin</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;PLS2 &equiv; \&lt;oo&gt;\&lt;pp&gt;2 o Abs_&Sigma;2 o Inl o Abs_&Sigma;1 o Inr :: &#39;a &Sigma;&Sigma;2 K1 =&gt; &#39;a &Sigma;&Sigma;2&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;DIV2 &equiv; \&lt;oo&gt;\&lt;pp&gt;2 o Abs_&Sigma;2 o Inr :: &#39;a &Sigma;&Sigma;2 K2 =&gt; &#39;a &Sigma;&Sigma;2&quot;</span>
+
+<span class="command">lemma</span> DIV2_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K2_rel (&Sigma;&Sigma;2_rel R) ===&gt; &Sigma;&Sigma;2_rel R) DIV2 DIV2&quot;</span>
+  <span class="command">by</span> transfer_prover
+
+<span class="comment">(* &rho;2 :: &quot;(&#39;a &times; &#39;a F) K2 =&gt; (&#39;a K2) T0 F&quot; *)</span>
+<span class="command">definition</span> &rho;2 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) K2 =&gt; &#39;a &Sigma;&Sigma;2 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;&rho;2 a_m_l_r_b_n_l_r =
+ (let a_m_l_r = fst a_m_l_r_b_n_l_r ; b_n_l_r = snd a_m_l_r_b_n_l_r ;
+      a = fst a_m_l_r ; m = fst (snd a_m_l_r) ; al = fst (snd (snd a_m_l_r)) ; ar = snd (snd (snd a_m_l_r)) ;
+      b = fst b_n_l_r ; n = fst (snd b_n_l_r) ; bl = fst (snd (snd b_n_l_r)) ; br = snd (snd (snd b_n_l_r))
+  in (m / n, K2_as_&Sigma;&Sigma;2 (al,bl), K2_as_&Sigma;&Sigma;2 (ar,br)))&quot;</span>
+
+<span class="command">lemma</span> &rho;2_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K2_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;2_rel R)) &rho;2 &rho;2&quot;</span>
+  <span class="command">unfolding</span> Let_def &rho;2_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> rel_pre_J_def id_apply vimage2p_def BNF_Comp.id_bnf_comp_def
+  <span class="command">by</span> transfer_prover
+
+
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Binary_Tree_UFP_Examples (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Binary_Tree_UFP_Examples</h1>
+
+<span class="command">theory</span> <span class="name">Binary_Tree_UFP_Examples</span><br/>
+<span class="keyword">imports</span> <a href="Binary_Tree_Lib.html"><span class="name">Binary_Tree_Lib</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Binary Tree Examples *}</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">theory</span> Binary_Tree_UFP_Examples
+<span class="keyword2">imports</span> Binary_Tree_Lib
+<span class="keyword2">begin</span>
+<span class="comment">(*&gt;*)</span>
+
+<span class="command">subsection</span> <span class="verbatim">{* one *}</span>
+
+<span class="command">definition</span> one <span class="delimiter">::</span> <span class="string">&quot;btree&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;one = dtor_corec_J (&lambda;_. (1, Inr (), Inr ())) ()&quot;</span>
+
+<span class="command">lemma</span> val_one<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;val one = 1&quot;</span>
+  <span class="command">unfolding</span> one_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> left_one<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;left one = one&quot;</span>
+  <span class="command">unfolding</span> one_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> right_one<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;right one = one&quot;</span>
+  <span class="command">unfolding</span> one_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> one_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;one = Node 1 one one&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse val_one left_one right_one<span class="delimiter">)</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* plus *}</span>
+
+<span class="command">definition</span> plus <span class="delimiter">::</span> <span class="string">&quot;btree =&gt; btree =&gt; btree&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;plus t u = dtor_corec_J
+     (&lambda;(t, u). (val t + val u, Inr (left t, left u), Inr (right t, right u))) (t, u)&quot;</span>
+
+<span class="command">lemma</span> val_plus<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;val (plus t u) = val t + val u&quot;</span>
+  <span class="command">unfolding</span> plus_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> left_plus<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;left (plus t u) = plus (left t) (left u)&quot;</span>
+  <span class="command">unfolding</span> plus_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> right_plus<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;right (plus t u) = plus (right t) (right u)&quot;</span>
+  <span class="command">unfolding</span> plus_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> plus_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;plus (Node x1 l1 r1) (Node x2 l2 r2) = Node (x1 + x2) (plus l1 l2) (plus r1 r2)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>smt2 J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse val_plus left_plus right_plus<span class="delimiter">)</span>
+
+<span class="command">lemma</span> plus_uniform<span class="delimiter">:</span> <span class="string">&quot;plus s t = alg&rho;1 (s, t)&quot;</span>
+  <span class="command">unfolding</span> plus_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule fun_cong<span class="delimiter">[</span>OF sym<span class="delimiter">[</span>OF J.dtor_corec_unique<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> alg&rho;1 o_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc
+  <span class="command">apply</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def fun_eq_iff J.dtor_ctor
+    &rho;1_def Let_def convol_def eval1_\&lt;oo&gt;\&lt;pp&gt;1 eval1_leaf1&#39;
+    o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;1_natural<span class="delimiter">]</span> alg&Lambda;1_Inr alg&rho;1_def<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* divide *}</span>
+
+<span class="command">definition</span> divide <span class="delimiter">::</span> <span class="string">&quot;btree =&gt; btree =&gt; btree&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;divide t u = dtor_corec_J
+     (&lambda;(t, u). (val t / val u, Inr (left t, left u), Inr (right t, right u))) (t, u)&quot;</span>
+
+<span class="command">lemma</span> val_divide<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;val (divide t u) = val t / val u&quot;</span>
+  <span class="command">unfolding</span> divide_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> left_divide<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;left (divide t u) = divide (left t) (left u)&quot;</span>
+  <span class="command">unfolding</span> divide_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> right_divide<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;right (divide t u) = divide (right t) (right u)&quot;</span>
+  <span class="command">unfolding</span> divide_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> divide_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;divide (Node x1 l1 r1) (Node x2 l2 r2) = Node (x1 / x2) (divide l1 l2) (divide r1 r2)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>smt2 J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse val_divide left_divide right_divide<span class="delimiter">)</span>
+
+<span class="command">lemma</span> divide_uniform<span class="delimiter">:</span> <span class="string">&quot;divide s t = alg&rho;2 (s, t)&quot;</span>
+  <span class="command">unfolding</span> divide_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule fun_cong<span class="delimiter">[</span>OF sym<span class="delimiter">[</span>OF J.dtor_corec_unique<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> alg&rho;2 o_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc
+  <span class="command">apply</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def fun_eq_iff J.dtor_ctor
+    &rho;2_def Let_def convol_def eval2_\&lt;oo&gt;\&lt;pp&gt;2 eval2_leaf2&#39;
+    o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;2_natural<span class="delimiter">]</span> alg&Lambda;2_Inr alg&rho;2_def<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+
+<span class="command">subsection</span> <span class="verbatim">{* bird *}</span>
+
+<span class="command">definition</span> bird <span class="keyword2">where</span>
+  <span class="string">&quot;bird = corecUU2 (&lambda;_. GUARD2 (1,
+     DIV2 (END2 one, PLS2 (CONT2 (), END2 one)),
+     PLS2 (DIV2 (END2 one, CONT2 ()), END2 one))) ()&quot;</span>
+
+<span class="command">lemma</span> val_bird<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;val bird = 1&quot;</span>
+  <span class="command">unfolding</span> bird_def corecUU2
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval2_leaf2&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> left_bird<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;left bird = divide one (plus bird one)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst bird_def<span class="delimiter">)</span> <span class="command">unfolding</span> corecUU2
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval2_leaf2&#39; eval2_\&lt;oo&gt;\&lt;pp&gt;2
+    alg&Lambda;2_Inl alg&Lambda;2_Inr alg&Lambda;1_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;2_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;1_natural<span class="delimiter">]</span>
+    plus_uniform divide_uniform bird_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> right_bird<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;right bird = plus (divide one bird) one&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst bird_def<span class="delimiter">)</span> <span class="command">unfolding</span> corecUU2
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval2_leaf2&#39; eval2_\&lt;oo&gt;\&lt;pp&gt;2
+    alg&Lambda;2_Inl alg&Lambda;2_Inr alg&Lambda;1_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;2_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;1_natural<span class="delimiter">]</span>
+    plus_uniform divide_uniform bird_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> bird_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;bird = Node 1 (divide one (plus bird one)) (plus (divide one bird) one)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse val_bird left_bird right_bird<span class="delimiter">)</span>
+
+<span class="command">subsection</span> <span class="verbatim">{* mirror *}</span>
+
+<span class="command">definition</span> mirror <span class="delimiter">::</span> <span class="string">&quot;btree =&gt; btree&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;mirror t = dtor_corec_J (&lambda;t. (val t, Inr (right t), Inr (left t))) t&quot;</span>
+
+<span class="command">lemma</span> val_mirror<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;val (mirror t) = val t&quot;</span>
+  <span class="command">unfolding</span> mirror_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> left_mirror<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;left (mirror t) = mirror (right t)&quot;</span>
+  <span class="command">unfolding</span> mirror_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> right_mirror<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;right (mirror t) = mirror (left t)&quot;</span>
+  <span class="command">unfolding</span> mirror_def J.dtor_corec
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> mirror_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;mirror (Node x l r) = Node x (mirror r) (mirror l)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor J.dtor_ctor fst_conv snd_conv prod.collapse val_mirror left_mirror right_mirror<span class="delimiter">)</span>
+
+<span class="command">subsection</span> <span class="verbatim">{* Some Proofs *}</span>
+
+<span class="command">theorem</span> mirror_one<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;mirror one = one&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction rule<span class="delimiter">:</span> btree_coinduct<span class="delimiter">)</span> auto
+
+<span class="command">theorem</span> mirror_plus<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;mirror (plus r s) = plus (mirror r) (mirror s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> r s rule<span class="delimiter">:</span> btree_coinduct<span class="delimiter">)</span> auto
+
+<span class="command">theorem</span> mirror_divide<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;mirror (divide r s) = divide (mirror r) (mirror s)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> r s rule<span class="delimiter">:</span> btree_coinduct<span class="delimiter">)</span> auto
+
+<span class="command">theorem</span> divide_divide_one<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;divide one (divide one r) = r&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> r rule<span class="delimiter">:</span> btree_coinduct<span class="delimiter">)</span> auto
+
+<span class="command">theorem</span> mirror_bird<span class="delimiter">:</span> <span class="string">&quot;mirror bird = divide one bird&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>coinduction rule<span class="delimiter">:</span> btree_coinduct2<span class="delimiter">)</span>
+    <span class="delimiter">(</span>auto intro<span class="delimiter">!</span><span class="delimiter">:</span> genCngdd2_alg&rho;1<span class="delimiter">[</span>folded plus_uniform<span class="delimiter">]</span> intro<span class="delimiter">:</span> genCngdd2_alg&rho;2<span class="delimiter">[</span>folded divide_uniform<span class="delimiter">]</span>
+      genCngdd2_trans<span class="delimiter">[</span>OF genCngdd2_alg&rho;2<span class="delimiter">[</span>folded divide_uniform<span class="delimiter">]</span><span class="delimiter">,</span> of _ _ _ _ <span class="string">&quot;divide one bird&quot;</span><span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">end</span>
+<span class="comment">(*&gt;*)</span>
+</pre>
+
+</div>
+</body>
+</html>

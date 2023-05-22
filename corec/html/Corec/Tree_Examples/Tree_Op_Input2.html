@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Tree_Op_Input2 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Tree_Op_Input2</h1>
+
+<span class="command">theory</span> <span class="name">Tree_Op_Input2</span><br/>
+<span class="keyword">imports</span> <a href="Tree_FreeAlg2.html"><span class="name">Tree_FreeAlg2</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> Tree_Op_Input2
+<span class="keyword2">imports</span> Tree_FreeAlg2
+<span class="keyword2">begin</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;PLS2 &equiv; \&lt;oo&gt;\&lt;pp&gt;2 o Abs_&Sigma;2 o Inl o Abs_&Sigma;1 o Inr :: &#39;a &Sigma;&Sigma;2 K1 =&gt; &#39;a &Sigma;&Sigma;2&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;PRD2 &equiv; \&lt;oo&gt;\&lt;pp&gt;2 o Abs_&Sigma;2 o Inr :: &#39;a &Sigma;&Sigma;2 K2 =&gt; &#39;a &Sigma;&Sigma;2&quot;</span>
+
+<span class="command">lemma</span> PLS2_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K1_rel (&Sigma;&Sigma;2_rel R) ===&gt; &Sigma;&Sigma;2_rel R) PLS2 PLS2&quot;</span>
+  <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> PRD2_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K2_rel (&Sigma;&Sigma;2_rel R) ===&gt; &Sigma;&Sigma;2_rel R) PRD2 PRD2&quot;</span>
+  <span class="command">by</span> transfer_prover
+
+<span class="command">definition</span> &rho;2 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) K2 =&gt; &#39;a &Sigma;&Sigma;2 F&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;&rho;2 a_m_a&#39;_b_n_b&#39; =
+    (let a_m_a&#39; = fst a_m_a&#39;_b_n_b&#39; ; b_n_b&#39; = snd a_m_a&#39;_b_n_b&#39; ;
+      a = fst a_m_a&#39; ; m = fst (snd a_m_a&#39;) ; a&#39; = snd (snd a_m_a&#39;) ;
+      b = fst b_n_b&#39; ; n = fst (snd b_n_b&#39;) ; b&#39; = snd (snd b_n_b&#39;)
+    in (m * n, map (&lambda;(a&#39;, b&#39;). PLS2 (K2_as_&Sigma;&Sigma;2 (a, b&#39;), K2_as_&Sigma;&Sigma;2 (a&#39;, b))) (zip a&#39; b&#39;)))&quot;</span>
+
+<span class="command">lemma</span> &rho;2_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K2_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;2_rel R)) &rho;2 &rho;2&quot;</span>
+  <span class="command">unfolding</span> Let_def &rho;2_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> rel_pre_J_def id_apply vimage2p_def BNF_Comp.id_bnf_comp_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funI<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF Pair_transfer<span class="delimiter">]</span><span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">)</span>
+   <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF map_transfer<span class="delimiter">]</span><span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF zip_transfer<span class="delimiter">]</span><span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">)</span>
+     <span class="command">apply</span> auto <span class="delimiter">[</span>2<span class="delimiter">]</span>
+    <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF case_prod_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funI<span class="delimiter">)</span><span class="delimiter">+</span>
+    <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF PLS2_transfer<span class="delimiter">[</span>unfolded id_apply<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF Pair_transfer<span class="delimiter">]</span><span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="command">apply</span> auto
+    <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF K2_as_&Sigma;&Sigma;2_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="command">apply</span> auto
+    <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF K2_as_&Sigma;&Sigma;2_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="command">apply</span> auto
+  <span class="command">done</span>
+
+
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

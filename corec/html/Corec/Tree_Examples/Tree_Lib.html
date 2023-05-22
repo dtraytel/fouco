@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Tree_Lib (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Tree_Lib</h1>
+
+<span class="command">theory</span> <span class="name">Tree_Lib</span><br/>
+<span class="keyword">imports</span> <a href="Tree_More_Corec_Upto2.html"><span class="name">Tree_More_Corec_Upto2</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> Tree_Lib
+<span class="keyword2">imports</span> <span class="string">&quot;../Tree/Tree_Behavior_BNF&quot;</span> <span class="string">&quot;../Tree/Tree_More_Corec_Upto2&quot;</span>
+<span class="keyword2">begin</span>
+
+<span class="comment">(* todo: make them defs eventually: *)</span>
+<span class="command">type_synonym</span> tree <span class="delimiter">=</span> J
+<span class="command">abbreviation</span> <span class="string">&quot;val xs &equiv; fst (dtor_J xs)&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;sub xs &equiv; snd (dtor_J xs)&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;Node n ts &equiv; ctor_J (n, ts)&quot;</span>
+<span class="command">code_datatype</span> ctor_J
+<span class="command">declare</span> J.dtor_ctor<span class="delimiter">[</span>code<span class="delimiter">]</span>
+
+<span class="command">definition</span> tmap <span class="keyword2">where</span>
+  <span class="string">&quot;tmap f = corec_J (&lambda;xs. (f (val xs), map Inr (sub xs)))&quot;</span>
+
+<span class="command">lemma</span> head_tmap<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;val (tmap f xs) = f (val xs)&quot;</span>
+  <span class="command">unfolding</span> tmap_def corec_J_def J.dtor_corec BNF_Comp.id_bnf_comp_def map_pre_J_def <span class="command">by</span> simp
+
+<span class="command">lemma</span> tail_tmap<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;sub (tmap f xs) = map (tmap f) (sub xs)&quot;</span>
+  <span class="command">unfolding</span> tmap_def corec_J_def J.dtor_corec BNF_Comp.id_bnf_comp_def map_pre_J_def <span class="command">by</span> simp
+
+<span class="command">lemma</span> tmap_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tmap f xs = Node (f (val xs)) (map (tmap f) (sub xs))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_tmap tail_tmap<span class="delimiter">)</span>
+
+<span class="command">section</span> <span class="verbatim">{* Abbreviations *}</span>
+          
+<span class="command">abbreviation</span> <span class="string">&quot;NODE0 &equiv; gg0  :: &#39;a &Sigma;&Sigma;0 F =&gt; &#39;a &Sigma;&Sigma;0&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF0 &equiv; leaf0&quot;</span>
+<span class="command">abbreviation</span> GUARD0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD0 &equiv; LEAF0&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END0 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END0 xs &equiv; LEAF0 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT0 a &equiv; LEAF0 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;NODE1 &equiv; gg1  :: &#39;a &Sigma;&Sigma;1 F =&gt; &#39;a &Sigma;&Sigma;1&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF1 &equiv; leaf1&quot;</span>
+<span class="command">abbreviation</span> GUARD1 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD1 &equiv; LEAF1&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END1 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END1 xs &equiv; LEAF1 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT1 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT1 a &equiv; LEAF1 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;NODE2 &equiv; gg2  :: &#39;a &Sigma;&Sigma;2 F =&gt; &#39;a &Sigma;&Sigma;2&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF2 &equiv; leaf2&quot;</span>
+<span class="command">abbreviation</span> GUARD2 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;2&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD2 &equiv; LEAF2&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END2 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;2&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END2 xs &equiv; LEAF2 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT2 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;2&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT2 a &equiv; LEAF2 (Inr a)&quot;</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

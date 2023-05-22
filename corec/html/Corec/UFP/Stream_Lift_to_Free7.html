@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Lift_to_Free7 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Lift_to_Free7</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Lift_to_Free7</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Distributive_Law7.html"><span class="name">Stream_Distributive_Law7</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Lifting of the distributive law to the free algebra *}</span>
+
+
+<span class="comment">(* This is silimar to Lift_to_Free, but uses &Lambda;7, &Sigma;&Sigma;7, dd7, SpK instead of S, etc. *)</span>
+
+<span class="command">theory</span> Stream_Lift_to_Free7
+<span class="keyword2">imports</span> Stream_Distributive_Law7
+<span class="keyword2">begin</span>
+
+<span class="command">subsection</span><span class="verbatim">{* The lifting *}</span>
+
+<span class="comment">(* Our aim is lift &Lambda;7 to an (SpK,SpK,T)-distributive law dd7 compatible with the monadic structure. *)</span>
+
+<span class="comment">(* In order to be able to define dd7, we need a larger codomain type: *)</span>
+<span class="command">definition</span> ddd7 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;7 =&gt; &#39;a &Sigma;&Sigma;7 &times; &#39;a &Sigma;&Sigma;7 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;ddd7 = ext7 &lt;\&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map fst, F_map flat7 o &Lambda;7&gt; (leaf7 ** F_map leaf7)&quot;</span>
+
+<span class="command">definition</span> dd7 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;7 =&gt; &#39;a &Sigma;&Sigma;7 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;dd7 = snd o ddd7&quot;</span>
+
+<span class="command">lemma</span> ddd7_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;7_rel (rel_prod R (F_rel R)) ===&gt; rel_prod (&Sigma;&Sigma;7_rel R) (F_rel (&Sigma;&Sigma;7_rel R))) ddd7 ddd7&quot;</span>
+  <span class="command">unfolding</span> ddd7_def ext7_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> dd7_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;7_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;7_rel R)) dd7 dd7&quot;</span>
+  <span class="command">unfolding</span> dd7_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> F_rel_&Sigma;&Sigma;7_rel<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;7_rel (rel_prod R (F_rel R)) x y ==&gt; F_rel (&Sigma;&Sigma;7_rel R) (dd7 x) (dd7 y)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF dd7_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* We verify the facts for dd7: *)</span>
+<span class="command">theorem</span> dd7_leaf7<span class="delimiter">:</span> <span class="string">&quot;dd7 o leaf7 = F_map leaf7 o snd&quot;</span>
+<span class="command">unfolding</span> dd7_def ddd7_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext7_comp_leaf7 snd_comp_map_prod <span class="command">..</span>
+
+<span class="command">lemma</span> ddd7_natural<span class="delimiter">:</span> <span class="string">&quot;ddd7 o &Sigma;&Sigma;7_map (f ** F_map f) = (&Sigma;&Sigma;7_map f ** F_map (&Sigma;&Sigma;7_map f)) o ddd7&quot;</span>
+  <span class="command">using</span> ddd7_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;7.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">theorem</span> dd7_natural<span class="delimiter">:</span> <span class="string">&quot;dd7 o &Sigma;&Sigma;7_map (f ** F_map f) = F_map (&Sigma;&Sigma;7_map f) o dd7&quot;</span>
+  <span class="command">using</span> dd7_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;7.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;7_dd7<span class="delimiter">:</span> <span class="string">&quot;&Lambda;7 = dd7 o \&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map leaf7&quot;</span>
+  <span class="command">unfolding</span> dd7_def ddd7_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext7_commute
+  <span class="command">unfolding</span> o_assoc snd_convol ext7_comp_leaf7
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Lambda;7_natural
+  <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf7_flat7 F_map_id id_o
+  <span class="command">..</span>
+
+<span class="command">lemma</span> fst_ddd7<span class="delimiter">:</span> <span class="string">&quot;fst o ddd7 = &Sigma;&Sigma;7_map fst&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;fst o ddd7 = ext7 \&lt;oo&gt;\&lt;pp&gt;7 (leaf7 o fst)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule ext7_unique<span class="delimiter">)</span> <span class="command">unfolding</span> ddd7_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext7_comp_leaf7 ext7_commute
+  <span class="command">unfolding</span> o_assoc fst_comp_map_prod fst_convol
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;7.map_comp0 <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = &Sigma;&Sigma;7_map fst&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext7_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf7_natural \&lt;oo&gt;\&lt;pp&gt;7_natural <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> ddd7_flat7<span class="delimiter">:</span> <span class="string">&quot;(flat7 ** F_map flat7) o ddd7 o &Sigma;&Sigma;7_map ddd7 = ddd7 o flat7&quot;</span> <span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;?L = ext7 &lt;\&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map fst, F_map flat7 o &Lambda;7&gt; ddd7&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule ext7_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat7 ** F_map flat7) o ddd7 o &Sigma;&Sigma;7_map ddd7 o leaf7 = ddd7&quot;</span>
+    <span class="command">unfolding</span> ddd7_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf7_natural
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext7_comp_leaf7
+    <span class="command">unfolding</span> map_prod.comp F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat7_leaf7 F_map_id map_prod.id id_o <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;&lt;flat7 o (\&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map fst) , F_map flat7 o (F_map flat7 o &Lambda;7)&gt;  =
+             &lt;\&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map fst , F_map flat7 o &Lambda;7&gt; o &Sigma;7_map (flat7 ** F_map flat7)&quot;</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> flat7_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc fst_convol snd_convol
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> fst_comp_map_prod snd_comp_map_prod
+    <span class="command">unfolding</span> &Lambda;7_natural <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat7_assoc <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat7 ** F_map flat7) o ddd7 o &Sigma;&Sigma;7_map ddd7 o \&lt;oo&gt;\&lt;pp&gt;7 =
+          &lt;\&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map fst , F_map flat7 o &Lambda;7&gt; o &Sigma;7_map (flat7 ** F_map flat7 o ddd7 o &Sigma;&Sigma;7_map ddd7)&quot;</span>
+    <span class="command">unfolding</span> ddd7_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> \&lt;oo&gt;\&lt;pp&gt;7_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext7_commute
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;7.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> &Sigma;7.map_comp0
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> map_prod_o_convol
+    <span class="command">unfolding</span> ext7_&Sigma;&Sigma;7_map<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> A <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = ?R&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext7_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;ddd7 o flat7 o leaf7 = ddd7&quot;</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat7_leaf7 o_id <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">show</span> <span class="string">&quot;ddd7 o flat7 o \&lt;oo&gt;\&lt;pp&gt;7 = &lt;\&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map fst , F_map flat7 o &Lambda;7&gt; o &Sigma;7_map (ddd7 o flat7)&quot;</span>
+    <span class="command">unfolding</span> ddd7_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> flat7_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> ext7_commute &Sigma;7.map_comp0 <span class="command">unfolding</span> o_assoc <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> dd7_flat7<span class="delimiter">:</span> <span class="string">&quot;F_map flat7 o dd7 o &Sigma;&Sigma;7_map &lt;&Sigma;&Sigma;7_map fst, dd7&gt; = dd7 o flat7&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;snd o ((flat7 ** F_map flat7) o ddd7 o &Sigma;&Sigma;7_map ddd7) = snd o (ddd7 o flat7)&quot;</span>
+  <span class="command">unfolding</span> ddd7_flat7 <span class="command">..</span>
+  <span class="command">have</span> B<span class="delimiter">:</span> <span class="string">&quot;ddd7 = &lt;&Sigma;&Sigma;7_map fst , snd o ddd7&gt;&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span>
+  <span class="command">unfolding</span> fst_ddd7 <span class="command">by</span> auto
+  <span class="command">show</span> <span class="var">?thesis</span> <span class="command">unfolding</span> dd7_def
+  <span class="command">unfolding</span> A<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> unfolded o_assoc snd_comp_map_prod<span class="delimiter">]</span> o_assoc B<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="comment">(* The next two theorems are not necessary for the development.
+They show that the conditions dd7_leaf7 and dd7_flat7 imply the
+more standard conditions for the distributive law dd7&#39; = &lt;&Sigma;&Sigma;7_map fst, dd7&gt;
+for the functors &Sigma;&Sigma;7 and &#39;a F&#39; = &#39;a &times; &#39;a F_ In fact, they can be shown
+equivalent to these. *)</span>
+
+<span class="command">lemma</span> dd7_leaf72<span class="delimiter">:</span> <span class="string">&quot;&lt;&Sigma;&Sigma;7_map fst, dd7&gt; o leaf7 = leaf7 ** F_map leaf7&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc <span class="command">by</span> <span class="delimiter">(</span>simp_all add<span class="delimiter">:</span> leaf7_natural dd7_leaf7<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ddd7_leaf7<span class="delimiter">:</span> <span class="string">&quot;ddd7 o leaf7 = leaf7 ** F_map leaf7&quot;</span>
+<span class="command">unfolding</span> ddd7_def ext7_comp_leaf7 <span class="command">..</span>
+
+<span class="command">lemma</span> ddd7_\&lt;oo&gt;\&lt;pp&gt;7<span class="delimiter">:</span> <span class="string">&quot;ddd7 o \&lt;oo&gt;\&lt;pp&gt;7 = &lt;\&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map fst , F_map flat7 o &Lambda;7&gt; o &Sigma;7_map ddd7&quot;</span>
+<span class="command">unfolding</span> ddd7_def ext7_commute <span class="command">..</span>
+
+
+<span class="comment">(* More customization *)</span>
+
+<span class="comment">(* TODO Jasmin: Add7 this high-level induction for the relator of datatypes:
+(similarly, coinduction for codatatypes): *)</span>
+<span class="command">lemma</span> &Sigma;&Sigma;7_rel_induct_pointfree<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf7<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf7 x1) (leaf7 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;7<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;7_rel (&Sigma;&Sigma;7_rel R) y1 y2; &Sigma;7_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;7 y1) (\&lt;oo&gt;\&lt;pp&gt;7 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;7_rel R &le; phi&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;&Sigma;&Sigma;7_rel R &le; phi \&lt;sqinter&gt; &Sigma;&Sigma;7_rel R&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>induct rule<span class="delimiter">:</span> &Sigma;&Sigma;7.ctor_rel_induct<span class="delimiter">)</span>
+  <span class="command">using</span> assms &Sigma;&Sigma;7.rel_inject<span class="delimiter">[</span>of R<span class="delimiter">]</span> <span class="command">unfolding</span> rel_pre_&Sigma;&Sigma;7_def &Sigma;&Sigma;7.leaf7_def &Sigma;&Sigma;7.\&lt;oo&gt;\&lt;pp&gt;7_def
+  <span class="command">using</span> inf_greatest<span class="delimiter">[</span>OF &Sigma;7.rel_mono<span class="delimiter">[</span>OF inf_le1<span class="delimiter">]</span> &Sigma;7.rel_mono<span class="delimiter">[</span>OF inf_le2<span class="delimiter">]</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> rel_sum_def BNF_Comp.id_bnf_comp_def vimage2p_def <span class="command">by</span> <span class="delimiter">(</span>auto split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span> blast<span class="delimiter">+</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">by</span> simp
+<span class="command">qed</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;7_rel_induct<span class="delimiter">[</span>case_names leaf7 \&lt;oo&gt;\&lt;pp&gt;7<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf7<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf7 x1) (leaf7 x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;7<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;7_rel (&Sigma;&Sigma;7_rel R) y1 y2; &Sigma;7_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;7 y1) (\&lt;oo&gt;\&lt;pp&gt;7 y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;7_rel R t1 t2 --&gt; phi t1 t2&quot;</span>
+<span class="command">using</span> &Sigma;&Sigma;7_rel_induct_pointfree<span class="delimiter">[</span>of R<span class="delimiter">,</span> OF assms<span class="delimiter">]</span> <span class="command">by</span> auto
+<span class="comment">(* end TODO *)</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

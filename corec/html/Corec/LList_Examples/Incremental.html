@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Incremental (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Incremental</h1>
+
+<span class="command">theory</span> <span class="name">Incremental</span><br/>
+<span class="keyword">imports</span> <a href="../../HOL/HOL/Main.html"><span class="name">Main</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Incremental coinduction *}</span>
+
+<span class="command">theory</span> Incremental
+<span class="keyword2">imports</span>
+  Main
+<span class="keyword2">begin</span>
+
+
+<span class="command">locale</span> Incremental <span class="delimiter">=</span>
+  <span class="keyword2">fixes</span> Retr <span class="delimiter">::</span> <span class="string">&quot;(&#39;a :: complete_lattice) =&gt; &#39;a&quot;</span>
+  <span class="keyword2">and</span> Cl <span class="delimiter">::</span> <span class="string">&quot;(&#39;a :: complete_lattice) =&gt; &#39;a&quot;</span>
+  <span class="keyword2">assumes</span> mono_Retr<span class="delimiter">:</span> <span class="string">&quot;mono Retr&quot;</span>
+      <span class="keyword2">and</span> mono_Cl<span class="delimiter">:</span> <span class="string">&quot;mono Cl&quot;</span>
+      <span class="keyword2">and</span> idem_Cl<span class="delimiter">:</span> <span class="string">&quot;Cl (Cl r) = Cl r&quot;</span>
+      <span class="keyword2">and</span> ext_Cl<span class="delimiter">:</span> <span class="string">&quot;r &le; Cl r&quot;</span>
+      <span class="keyword2">and</span> Cl_Retr<span class="delimiter">:</span> <span class="string">&quot;Cl r = r ==&gt; Cl (inf r (Retr r)) = inf r (Retr r)&quot;</span>
+<span class="keyword2">begin</span>
+
+<span class="command">lemma</span> leq_Cl<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;Cl s = s&quot;</span> <span class="keyword2">and</span> <span class="string">&quot;r &le; s&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;Cl r &le; s&quot;</span>
+<span class="command">by</span> <span class="delimiter">(</span>metis assms monoE mono_Cl<span class="delimiter">)</span>
+
+<span class="command">lemma</span> Cl_respectful_Retr<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> rs<span class="delimiter">:</span> <span class="string">&quot;r &le; s&quot;</span> <span class="keyword2">and</span> rrs<span class="delimiter">:</span> <span class="string">&quot;r &le; Retr s&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;Cl r &le; Retr (Cl s)&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">let</span> <span class="var">?ss</span> <span class="delimiter">=</span> <span class="string">&quot;Cl s&quot;</span>
+  <span class="command">have</span> <span class="string">&quot;Cl ?ss = ?ss&quot;</span> <span class="command">using</span> idem_Cl <span class="command">.</span>
+  <span class="command">from</span> Cl_Retr<span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">have</span> 1<span class="delimiter">:</span> <span class="string">&quot;Cl (inf ?ss (Retr ?ss)) = inf ?ss (Retr ?ss)&quot;</span> <span class="command">.</span>
+  <span class="command">have</span> <span class="string">&quot;r &le; ?ss&quot;</span> <span class="command">using</span> rs ext_Cl <span class="command">by</span> <span class="delimiter">(</span>metis order_trans<span class="delimiter">)</span>
+  <span class="command">moreover</span> <span class="command">have</span> <span class="string">&quot;r &le; Retr ?ss&quot;</span> <span class="command">using</span> rrs ext_Cl mono_Retr <span class="command">by</span> <span class="delimiter">(</span>metis mono_def order_trans<span class="delimiter">)</span>
+  <span class="command">ultimately</span> <span class="command">have</span> <span class="string">&quot;r &le; inf ?ss (Retr ?ss)&quot;</span> <span class="command">by</span> simp
+  <span class="command">from</span> leq_Cl<span class="delimiter">[</span>OF 1 this<span class="delimiter">]</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">by</span> simp
+<span class="command">qed</span>
+
+<span class="comment">(* Parenthesis: Using that Cl is a closure operator, respectfulness is actually equivalent to Cl_Retr
+(the proof does not use Cl_Retr) *)</span>
+<span class="command">lemma</span>
+<span class="keyword2">assumes</span> respectful<span class="delimiter">:</span> <span class="string">&quot;!! r s. [|r &le; s; r &le; Retr s|] ==&gt; Cl r &le; Retr (Cl s)&quot;</span>
+<span class="keyword2">and</span> r<span class="delimiter">:</span> <span class="string">&quot;Cl r = r&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;Cl (inf r (Retr r)) = inf r (Retr r)&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> 1<span class="delimiter">:</span> <span class="string">&quot;Cl (inf r (Retr r)) &le; r&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>metis inf_le1 monoE mono_Cl r<span class="delimiter">)</span>
+  <span class="command">have</span> <span class="string">&quot;Cl (inf r (Retr r)) &le; Retr (Cl r)&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>rule respectful<span class="delimiter">)</span> auto
+  <span class="command">hence</span> <span class="string">&quot;Cl (inf r (Retr r)) &le; Retr r&quot;</span> <span class="command">unfolding</span> r <span class="command">.</span>
+  <span class="command">with</span> 1 <span class="command">show</span> <span class="var">?thesis</span> <span class="command">by</span> <span class="delimiter">(</span>metis antisym ext_Cl inf.bounded_iff<span class="delimiter">)</span>
+<span class="command">qed</span>
+<span class="comment">(* end parenthesis *)</span>
+
+<span class="comment">(* The theorems from Dreyer, but stated directly with the &quot;up to&quot; G: *)</span>
+
+<span class="command">lemma</span> Cl_sound_Retr<span class="delimiter">:</span> <span class="comment">(* Dreyer seems to claim that only monotonicity of Cl suffices  *)</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;r &le; Retr (Cl r)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;r &le; gfp Retr&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;Cl r &le; Retr (Cl (Cl r))&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>rule Cl_respectful_Retr<span class="delimiter">)</span>
+  <span class="command">using</span> ext_Cl assms <span class="command">by</span> auto
+  <span class="command">hence</span> <span class="string">&quot;Cl r &le; Retr (Cl r)&quot;</span> <span class="command">unfolding</span> idem_Cl <span class="command">.</span>
+  <span class="command">hence</span> <span class="string">&quot;Cl r &le; gfp Retr&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>metis gfp_upperbound<span class="delimiter">)</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">using</span> ext_Cl <span class="command">by</span> <span class="delimiter">(</span>metis order.trans<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> mono_Retr_Cl<span class="delimiter">:</span> <span class="string">&quot;mono (Retr o Cl)&quot;</span>
+<span class="command">using</span> mono_Retr mono_Cl <span class="command">unfolding</span> mono_def <span class="command">by</span> <span class="delimiter">(</span>metis comp_apply<span class="delimiter">)</span>
+
+<span class="comment">(* Dreyer only proves &le;, since he does not assume extensiveness;
+however, his greatest respectful function is extensive, so he could have proved that for it. *)</span>
+<span class="command">lemma</span> gfp_Retr_Cl<span class="delimiter">:</span> <span class="string">&quot;gfp (Retr o Cl) = gfp Retr&quot;</span>
+<span class="command">proof</span><span class="delimiter">(</span>rule order_class.antisym<span class="delimiter">)</span>
+  <span class="command">show</span> <span class="string">&quot;gfp (Retr o Cl) &le; gfp Retr&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule Cl_sound_Retr<span class="delimiter">)</span> <span class="command">using</span> gfp_lemma2<span class="delimiter">[</span>OF mono_Retr_Cl<span class="delimiter">]</span> <span class="command">by</span> simp
+<span class="command">next</span>
+  <span class="command">show</span> <span class="string">&quot;gfp Retr &le; gfp (Retr o Cl)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule gfp_mono<span class="delimiter">)</span> <span class="command">using</span> ext_Cl mono_Retr <span class="command">unfolding</span> mono_def <span class="command">by</span> auto
+<span class="command">qed</span>
+
+<span class="command">definition</span> G <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; &#39;a&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;G r &equiv; gfp (&lambda; s. Retr (Cl (sup r s)))&quot;</span>
+
+<span class="command">lemma</span> mono_pre_G<span class="delimiter">:</span> <span class="string">&quot;mono (&lambda; s. Retr (Cl (sup r s)))&quot;</span>
+<span class="command">using</span> mono_Retr mono_Cl <span class="command">unfolding</span> mono_def <span class="command">by</span> <span class="delimiter">(</span>metis dual_order.refl sup_mono<span class="delimiter">)</span>
+
+<span class="command">lemma</span> G_unfold<span class="delimiter">:</span> <span class="string">&quot;G r = Retr (Cl (sup r (G r)))&quot;</span>
+<span class="command">using</span> gfp_unfold<span class="delimiter">[</span>OF mono_pre_G<span class="delimiter">]</span> <span class="command">unfolding</span> G_def <span class="command">.</span>
+
+<span class="command">lemma</span> G_mono<span class="delimiter">[</span>simp<span class="delimiter">,</span> intro<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;r &le; s ==&gt; G r &le; G s&quot;</span>
+<span class="command">unfolding</span> G_def <span class="command">apply</span><span class="delimiter">(</span>rule gfp_mono<span class="delimiter">)</span> <span class="command">by</span> <span class="delimiter">(</span>metis monoE mono_Cl mono_Retr order_refl sup.mono<span class="delimiter">)</span>
+
+<span class="command">lemma</span> mono_G<span class="delimiter">:</span> <span class="string">&quot;mono G&quot;</span>
+<span class="command">using</span> G_mono <span class="command">unfolding</span> mono_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> G_initialize<span class="delimiter">:</span> <span class="string">&quot;gfp Retr = G bot&quot;</span>
+<span class="command">unfolding</span> G_def gfp_Retr_Cl<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> G_accumulate<span class="delimiter">:</span> <span class="string">&quot;r &le; G s &lt;-&gt; r &le; G (sup s r)&quot;</span>
+<span class="command">proof</span>
+  <span class="command">assume</span> <span class="string">&quot;r &le; G s&quot;</span>  <span class="command">thus</span> <span class="string">&quot;r &le; G (sup s r)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis G_mono le_sup_iff sup.orderI sup_absorb2 sup_idem<span class="delimiter">)</span>
+<span class="command">next</span>
+  <span class="command">assume</span> r<span class="delimiter">:</span> <span class="string">&quot;r &le; G (sup s r)&quot;</span>
+  <span class="command">have</span> 0<span class="delimiter">:</span> <span class="string">&quot;sup s (G (sup s r)) = sup (sup s r) (G (sup s r))&quot;</span>
+  <span class="command">using</span> r <span class="command">by</span> <span class="delimiter">(</span>metis sup_absorb2 sup_commute sup_left_commute<span class="delimiter">)</span>
+  <span class="command">have</span> <span class="string">&quot;G (sup s r) &le; G s&quot;</span>
+  <span class="command">unfolding</span> G_def <span class="command">apply</span><span class="delimiter">(</span>rule gfp_upperbound<span class="delimiter">)</span> <span class="command">unfolding</span> G_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> 0
+  <span class="command">unfolding</span> G_unfold<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">by</span> simp
+  <span class="command">thus</span> <span class="string">&quot;r &le; G s&quot;</span> <span class="command">using</span> r <span class="command">by</span> <span class="delimiter">(</span>metis order.trans<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> G_compose<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> 11<span class="delimiter">:</span> <span class="string">&quot;s1 &le; G r1&quot;</span> <span class="keyword2">and</span> 22<span class="delimiter">:</span> <span class="string">&quot;s2 &le; G r2&quot;</span> <span class="keyword2">and</span> 12<span class="delimiter">:</span> <span class="string">&quot;r1 &le; sup r s2&quot;</span> <span class="keyword2">and</span> 21<span class="delimiter">:</span> <span class="string">&quot;r2 &le; sup r s1&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;sup s1 s2 &le; G r&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">let</span> <span class="var">?K</span> <span class="delimiter">=</span> <span class="string">&quot;G (sup r (sup s1 s2))&quot;</span>
+  <span class="command">have</span> <span class="string">&quot;s1 &le; G (sup r s2)&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>metis <span class="string">&quot;11&quot;</span> <span class="string">&quot;12&quot;</span> G_mono order.trans<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... &le; ?K&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>metis G_mono le_sup_iff sup.orderI sup_idem<span class="delimiter">)</span>
+  <span class="command">finally</span> <span class="command">have</span> s1<span class="delimiter">:</span> <span class="string">&quot;s1 &le; ?K&quot;</span> <span class="command">.</span>
+  <span class="command">have</span> <span class="string">&quot;s2 &le; G (sup r s1)&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>metis <span class="string">&quot;22&quot;</span> <span class="string">&quot;21&quot;</span> G_mono order.trans<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... &le; ?K&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>metis G_mono le_sup_iff sup.orderI sup_idem<span class="delimiter">)</span>
+  <span class="command">finally</span> <span class="command">have</span> s2<span class="delimiter">:</span> <span class="string">&quot;s2 &le; ?K&quot;</span> <span class="command">.</span>
+  <span class="command">from</span> s1 s2 <span class="command">have</span> <span class="string">&quot;sup s1 s2 &le; ?K&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>metis sup_least<span class="delimiter">)</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">unfolding</span> G_accumulate<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="comment">(* My incremental coinduction system, with their semantics (their suggestion was correct): *)</span>
+
+<span class="command">definition</span> ded <span class="delimiter">(</span><span class="keyword2">infix</span> <span class="string">&quot;\&lt;turnstile&gt;&quot;</span> 40<span class="delimiter">)</span> <span class="keyword2">where</span> <span class="string">&quot;r \&lt;turnstile&gt; s &equiv; s &le; Cl (sup r (G r))&quot;</span>
+
+<span class="command">lemma</span> gfp_le_G<span class="delimiter">:</span> <span class="string">&quot;gfp Retr &le; G r&quot;</span>
+<span class="command">by</span> <span class="delimiter">(</span>metis G_initialize bot.extremum mono_G mono_def<span class="delimiter">)</span>
+
+
+<span class="comment">(* Soundness of my rules (with the names from my paper): *)</span>
+<span class="command">theorem</span> Ax<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;s &le; Cl (sup r (gfp Retr))&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;r \&lt;turnstile&gt; s&quot;</span>
+<span class="command">using</span> assms gfp_le_G <span class="command">unfolding</span> ded_def
+<span class="command">by</span> <span class="delimiter">(</span>metis <span class="delimiter">(</span>hide_lams<span class="delimiter">,</span> mono_tags<span class="delimiter">)</span> eq_iff monoD mono_Cl order.trans sup.mono<span class="delimiter">)</span>
+
+<span class="command">theorem</span> Split<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;!! s. s &isin; S ==&gt; r \&lt;turnstile&gt; s&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;r \&lt;turnstile&gt; Sup S&quot;</span>
+<span class="command">using</span> assms <span class="command">unfolding</span> ded_def <span class="command">by</span> <span class="delimiter">(</span>metis Sup_least<span class="delimiter">)</span>
+
+<span class="comment">(* Note one can prove something slightly more general than the following,
+assuming &quot;s &le; Retr (Cl p)&quot;, but does not see useful. *)</span>
+<span class="command">theorem</span> Coind<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;s &le; Retr p&quot;</span> <span class="keyword2">and</span> <span class="string">&quot;sup r s \&lt;turnstile&gt; p&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;r \&lt;turnstile&gt; s&quot;</span>
+<span class="comment">(* p is the interpolant, ideally computable automatically for streams: *)</span>
+<span class="command">proof</span>-
+  <span class="command">let</span> <span class="var">?rs</span> <span class="delimiter">=</span> <span class="string">&quot;sup r s&quot;</span>
+  <span class="command">have</span> <span class="string">&quot;s &le; Retr (Cl (sup ?rs (G ?rs)))&quot;</span> <span class="command">using</span> assms <span class="command">unfolding</span> ded_def
+    <span class="command">by</span> <span class="delimiter">(</span>metis <span class="delimiter">(</span>full_types<span class="delimiter">)</span> monoD mono_Retr order_trans<span class="delimiter">)</span>
+  <span class="command">hence</span> <span class="string">&quot;s &le; G r&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>subst G_accumulate<span class="delimiter">)</span> <span class="command">unfolding</span> G_unfold<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">.</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">unfolding</span> ded_def
+    <span class="command">by</span> <span class="delimiter">(</span>metis ext_Cl order.trans sup.bounded_iff<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> soundness_ded<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;gfp Retr \&lt;turnstile&gt; s&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;s &le; gfp Retr&quot;</span>
+<span class="command">using</span> assms <span class="command">unfolding</span> ded_def
+<span class="command">by</span> <span class="delimiter">(</span>metis Cl_respectful_Retr Cl_sound_Retr G_unfold dual_order.antisym dual_order.refl
+          ext_Cl gfp_le_G le_supI2 sup_least<span class="delimiter">)</span>
+
+
+<span class="comment">(* Simplification of Ax for the case where &quot;gfp Retr&quot; does not bring anything new
+to Cl; e.g., as for codatatypes, where &quot;gfp Retr&quot; is equality and Cl is the congruence closure
+(hence contains equality):*)</span>
+
+<span class="command">theorem</span> Ax&#39;<span class="delimiter">:</span> <span class="keyword2">assumes</span> <span class="string">&quot;s &le; Cl r&quot;</span>  <span class="keyword2">shows</span> <span class="string">&quot;r \&lt;turnstile&gt; s&quot;</span>
+<span class="command">apply</span><span class="delimiter">(</span>rule Ax<span class="delimiter">)</span> <span class="command">using</span> assms <span class="command">by</span> <span class="delimiter">(</span>metis <span class="delimiter">(</span>full_types<span class="delimiter">)</span> le_sup_iff monoD mono_Cl sup_absorb2 sup_ge1<span class="delimiter">)</span>
+
+
+<span class="command">end</span> <span class="comment">(* context Incremental *)</span>
+
+
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

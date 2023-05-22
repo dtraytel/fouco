@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Lift_to_Free_base (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Lift_to_Free_base</h1>
+
+<span class="command">theory</span> <span class="name">Lift_to_Free_base</span><br/>
+<span class="keyword">imports</span> <a href="Distributive_Law_base.html"><span class="name">Distributive_Law_base</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Copy of lift_to_free, but for the initial distributive law  *}</span>
+
+<span class="command">theory</span> Lift_to_Free_base
+<span class="keyword2">imports</span> Distributive_Law_base
+<span class="keyword2">begin</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* The lifting *}</span>
+
+<span class="comment">(* Our aim is lift ll to an (S,S,T)-distributive law dd_base compatible with the monadic structure. *)</span>
+
+<span class="comment">(* In order to be able to define dd_base, we need a larger codomain type: *)</span>
+<span class="command">definition</span> ddd_base <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;_base =&gt; &#39;a &Sigma;&Sigma;_base &times; &#39;a &Sigma;&Sigma;_base F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;ddd_base = ext_base &lt;\&lt;oo&gt;\&lt;pp&gt;_base o &Sigma;_base_map fst, F_map flat_base o &Lambda;_base&gt; (leaf_base ** F_map leaf_base)&quot;</span>
+
+<span class="command">definition</span> dd_base <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;_base =&gt; &#39;a &Sigma;&Sigma;_base F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;dd_base = snd o ddd_base&quot;</span>
+
+<span class="command">lemma</span> ddd_base_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;_base_rel (rel_prod R (F_rel R)) ===&gt; rel_prod (&Sigma;&Sigma;_base_rel R) (F_rel (&Sigma;&Sigma;_base_rel R))) ddd_base ddd_base&quot;</span>
+  <span class="command">unfolding</span> ddd_base_def ext_base_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> dd_base_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;_base_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;_base_rel R)) dd_base dd_base&quot;</span>
+  <span class="command">unfolding</span> dd_base_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> F_rel_&Sigma;&Sigma;_base_rel<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;_base_rel (rel_prod R (F_rel R)) x y ==&gt; F_rel (&Sigma;&Sigma;_base_rel R) (dd_base x) (dd_base y)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF dd_base_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* We verify the facts for dd_base: *)</span>
+<span class="command">theorem</span> dd_base_leaf_base<span class="delimiter">:</span> <span class="string">&quot;dd_base o leaf_base = F_map leaf_base o snd&quot;</span>
+<span class="command">unfolding</span> dd_base_def ddd_base_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> ddd_base_natural<span class="delimiter">:</span> <span class="string">&quot;ddd_base o &Sigma;&Sigma;_base_map (f ** F_map f) = (&Sigma;&Sigma;_base_map f ** F_map (&Sigma;&Sigma;_base_map f)) o ddd_base&quot;</span>
+  <span class="command">using</span> ddd_base_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;_base.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">theorem</span> dd_base_natural<span class="delimiter">:</span> <span class="string">&quot;dd_base o &Sigma;&Sigma;_base_map (f ** F_map f) = F_map (&Sigma;&Sigma;_base_map f) o dd_base&quot;</span>
+  <span class="command">using</span> dd_base_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;_base.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;_base_dd_base<span class="delimiter">:</span> <span class="string">&quot;&Lambda;_base = dd_base o \&lt;oo&gt;\&lt;pp&gt;_base o &Sigma;_base_map leaf_base&quot;</span>
+  <span class="command">unfolding</span> dd_base_def ddd_base_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;_base.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext_base_commute
+  <span class="command">unfolding</span> o_assoc snd_convol ext_base_comp_leaf_base
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Lambda;_base_natural
+  <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf_base_flat_base F_map_id id_o
+  <span class="command">..</span>
+
+<span class="command">lemma</span> fst_ddd_base<span class="delimiter">:</span> <span class="string">&quot;fst o ddd_base = &Sigma;&Sigma;_base_map fst&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;fst o ddd_base = ext_base \&lt;oo&gt;\&lt;pp&gt;_base (leaf_base o fst)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule ext_base_unique<span class="delimiter">)</span> <span class="command">unfolding</span> ddd_base_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext_base_comp_leaf_base ext_base_commute
+  <span class="command">unfolding</span> o_assoc fst_comp_map_prod fst_convol
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;_base.map_comp0 <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = &Sigma;&Sigma;_base_map fst&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext_base_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf_base_natural \&lt;oo&gt;\&lt;pp&gt;_base_natural <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> ddd_base_flat_base<span class="delimiter">:</span> <span class="string">&quot;(flat_base ** F_map flat_base) o ddd_base o &Sigma;&Sigma;_base_map ddd_base = ddd_base o flat_base&quot;</span> <span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;?L = ext_base &lt;\&lt;oo&gt;\&lt;pp&gt;_base o &Sigma;_base_map fst, F_map flat_base o &Lambda;_base&gt; ddd_base&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule ext_base_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat_base ** F_map flat_base) o ddd_base o &Sigma;&Sigma;_base_map ddd_base o leaf_base = ddd_base&quot;</span>
+    <span class="command">unfolding</span> ddd_base_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf_base_natural
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext_base_comp_leaf_base
+    <span class="command">unfolding</span> map_prod.comp F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat_base_leaf_base F_map_id map_prod.id id_o <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">have</span> 1<span class="delimiter">:</span> <span class="string">&quot;&lt;flat_base o (\&lt;oo&gt;\&lt;pp&gt;_base o &Sigma;_base_map fst) , F_map flat_base o (F_map flat_base o &Lambda;_base)&gt;  =
+             &lt;\&lt;oo&gt;\&lt;pp&gt;_base o &Sigma;_base_map fst , F_map flat_base o &Lambda;_base&gt; o &Sigma;_base_map (flat_base ** F_map flat_base)&quot;</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> flat_base_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc fst_convol snd_convol
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;_base.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> fst_comp_map_prod snd_comp_map_prod
+    <span class="command">unfolding</span> &Lambda;_base_natural <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat_base_assoc
+    <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat_base ** F_map flat_base) o ddd_base o &Sigma;&Sigma;_base_map ddd_base o \&lt;oo&gt;\&lt;pp&gt;_base =
+          &lt;\&lt;oo&gt;\&lt;pp&gt;_base o &Sigma;_base_map fst , F_map flat_base o &Lambda;_base&gt; o &Sigma;_base_map (flat_base ** F_map flat_base o ddd_base o &Sigma;&Sigma;_base_map ddd_base)&quot;</span>
+    <span class="command">unfolding</span> ddd_base_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> \&lt;oo&gt;\&lt;pp&gt;_base_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext_base_commute
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;_base.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> &Sigma;_base.map_comp0
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> map_prod_o_convol
+    <span class="command">unfolding</span> ext_base_&Sigma;&Sigma;_base_map<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> 1 <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = ?R&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext_base_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;ddd_base o flat_base o leaf_base = ddd_base&quot;</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat_base_leaf_base o_id <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">show</span> <span class="string">&quot;ddd_base o flat_base o \&lt;oo&gt;\&lt;pp&gt;_base = &lt;\&lt;oo&gt;\&lt;pp&gt;_base o &Sigma;_base_map fst , F_map flat_base o &Lambda;_base&gt; o &Sigma;_base_map (ddd_base o flat_base)&quot;</span>
+    <span class="command">unfolding</span> ddd_base_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> flat_base_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> ext_base_commute &Sigma;_base.map_comp0 <span class="command">unfolding</span> o_assoc <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> dd_base_flat_base<span class="delimiter">:</span> <span class="string">&quot;F_map flat_base o dd_base o &Sigma;&Sigma;_base_map &lt;&Sigma;&Sigma;_base_map fst, dd_base&gt; = dd_base o flat_base&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> 1<span class="delimiter">:</span> <span class="string">&quot;snd o ((flat_base ** F_map flat_base) o ddd_base o &Sigma;&Sigma;_base_map ddd_base) = snd o (ddd_base o flat_base)&quot;</span>
+  <span class="command">unfolding</span> ddd_base_flat_base <span class="command">..</span>
+  <span class="command">have</span> 2<span class="delimiter">:</span> <span class="string">&quot;ddd_base = &lt;&Sigma;&Sigma;_base_map fst , snd o ddd_base&gt;&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span>
+  <span class="command">unfolding</span> fst_ddd_base <span class="command">by</span> auto
+  <span class="command">show</span> <span class="var">?thesis</span> <span class="command">unfolding</span> dd_base_def
+  <span class="command">unfolding</span> 1<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> unfolded o_assoc snd_comp_map_prod<span class="delimiter">]</span> o_assoc 2<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+
+<span class="comment">(* The next two theorems are not necessary for the development.
+They show that the conditions dd_base_leaf_base and dd_base_flat_base imply the
+more standard conditions for the distributive law dd_base&#39; = &lt;&Sigma;&Sigma;_base_map fst, dd_base&gt;
+for the functors &Sigma;&Sigma;_base and &#39;a F&#39; = &#39;a &times; &#39;a F_ In fact, they can be shown
+equivalent to these. *)</span>
+
+<span class="command">lemma</span> dd_base_leaf_base2<span class="delimiter">:</span> <span class="string">&quot;&lt;&Sigma;&Sigma;_base_map fst, dd_base&gt; o leaf_base = leaf_base ** F_map leaf_base&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc <span class="command">by</span> <span class="delimiter">(</span>simp_all add<span class="delimiter">:</span> leaf_base_natural dd_base_leaf_base<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ddd_base_leaf_base<span class="delimiter">:</span> <span class="string">&quot;ddd_base o leaf_base = leaf_base ** F_map leaf_base&quot;</span>
+<span class="command">unfolding</span> ddd_base_def ext_base_comp_leaf_base <span class="command">..</span>
+
+<span class="command">lemma</span> ddd_base_\&lt;oo&gt;\&lt;pp&gt;_base<span class="delimiter">:</span>
+<span class="string">&quot;ddd_base o \&lt;oo&gt;\&lt;pp&gt;_base = &lt;\&lt;oo&gt;\&lt;pp&gt;_base o &Sigma;_base_map fst , F_map flat_base o &Lambda;_base&gt; o &Sigma;_base_map ddd_base&quot;</span>
+<span class="command">unfolding</span> ddd_base_def ext_base_commute <span class="command">..</span>
+
+
+<span class="comment">(* More customization *)</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;_base_rel_induct_pointfree<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf_base x1) (leaf_base x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;_base_rel (&Sigma;&Sigma;_base_rel R) y1 y2; &Sigma;_base_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;_base y1) (\&lt;oo&gt;\&lt;pp&gt;_base y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;_base_rel R &le; phi&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;&Sigma;&Sigma;_base_rel R &le; phi \&lt;sqinter&gt; &Sigma;&Sigma;_base_rel R&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>induct rule<span class="delimiter">:</span> &Sigma;&Sigma;_base.ctor_rel_induct<span class="delimiter">)</span>
+  <span class="command">using</span> assms &Sigma;&Sigma;_base.rel_inject<span class="delimiter">[</span>of R<span class="delimiter">]</span> <span class="command">unfolding</span> rel_pre_&Sigma;&Sigma;_base_def &Sigma;&Sigma;_base.leaf_base_def &Sigma;&Sigma;_base.\&lt;oo&gt;\&lt;pp&gt;_base_def
+  <span class="command">using</span> inf_greatest<span class="delimiter">[</span>OF &Sigma;_base.rel_mono<span class="delimiter">[</span>OF inf_le1<span class="delimiter">]</span> &Sigma;_base.rel_mono<span class="delimiter">[</span>OF inf_le2<span class="delimiter">]</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> rel_sum_def BNF_Comp.id_bnf_comp_def vimage2p_def <span class="command">by</span> <span class="delimiter">(</span>auto split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span> blast<span class="delimiter">+</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">by</span> simp
+<span class="command">qed</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;_base_rel_induct<span class="delimiter">[</span>case_names leaf \&lt;oo&gt;\&lt;pp&gt;<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf_base x1) (leaf_base x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;_base_rel (&Sigma;&Sigma;_base_rel R) y1 y2; &Sigma;_base_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;_base y1) (\&lt;oo&gt;\&lt;pp&gt;_base y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;_base_rel R t1 t2 --&gt; phi t1 t2&quot;</span>
+<span class="command">using</span> &Sigma;&Sigma;_base_rel_induct_pointfree<span class="delimiter">[</span>of R<span class="delimiter">,</span> OF assms<span class="delimiter">]</span> <span class="command">by</span> auto
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

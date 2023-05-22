@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Lib (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Lib</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Lib</span><br/>
+<span class="keyword">imports</span> <a href="Stream_More_Corec_Upto9.html"><span class="name">Stream_More_Corec_Upto9</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> Stream_Lib
+<span class="keyword2">imports</span> <span class="string">&quot;../Stream/Stream_Behavior_BNF&quot;</span> <span class="string">&quot;../Stream/Stream_More_Corec_Upto9&quot;</span>
+<span class="keyword2">begin</span>
+
+<span class="comment">(* todo: make them defs eventually: *)</span>
+<span class="command">type_synonym</span> stream <span class="delimiter">=</span> J
+<span class="command">abbreviation</span> <span class="string">&quot;head xs &equiv; fst (dtor_J xs)&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;tail xs &equiv; snd (dtor_J xs)&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;SCons n xs &equiv; ctor_J (n, xs)&quot;</span>
+<span class="command">code_datatype</span> ctor_J
+<span class="command">declare</span> J.dtor_ctor<span class="delimiter">[</span>code<span class="delimiter">]</span>
+
+<span class="command">definition</span> smap <span class="keyword2">where</span>
+  <span class="string">&quot;smap f = corec_J (&lambda;xs. (f (head xs), Inr (tail xs)))&quot;</span>
+
+<span class="command">lemma</span> head_smap<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (smap f xs) = f (head xs)&quot;</span>
+  <span class="command">unfolding</span> smap_def corec_J_def J.dtor_corec BNF_Comp.id_bnf_comp_def map_pre_J_def <span class="command">by</span> simp
+
+<span class="command">lemma</span> tail_smap<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (smap f xs) = smap f (tail xs)&quot;</span>
+  <span class="command">unfolding</span> smap_def corec_J_def J.dtor_corec BNF_Comp.id_bnf_comp_def map_pre_J_def <span class="command">by</span> simp
+
+<span class="command">lemma</span> smap_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;smap f xs = SCons (f (head xs)) (smap f (tail xs))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor prod.collapse head_smap tail_smap<span class="delimiter">)</span>
+
+<span class="command">definition</span> same <span class="keyword2">where</span>
+  <span class="string">&quot;same x = corec_J (&lambda;x. (x, Inr x)) x&quot;</span>
+
+<span class="command">lemma</span> head_same<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (same x) = x&quot;</span>
+  <span class="command">unfolding</span> same_def corec_J_def J.dtor_corec BNF_Comp.id_bnf_comp_def map_pre_J_def <span class="command">by</span> simp
+
+<span class="command">lemma</span> tail_same<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (same x) = same x&quot;</span>
+  <span class="command">unfolding</span> same_def corec_J_def J.dtor_corec BNF_Comp.id_bnf_comp_def map_pre_J_def <span class="command">by</span> simp
+
+<span class="command">definition</span> <span class="string">&quot;sconst x = ctor_J (x, same 0)&quot;</span>
+
+<span class="command">lemma</span> head_sconst<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (sconst x) = x&quot;</span>
+  <span class="command">unfolding</span> sconst_def <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> J.dtor_ctor<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_sconst<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (sconst x) = same 0&quot;</span>
+  <span class="command">unfolding</span> sconst_def <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> J.dtor_ctor<span class="delimiter">)</span>
+
+<span class="command">section</span> <span class="verbatim">{* Abbreviations *}</span>
+          
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS0 &equiv; gg0  :: &#39;a &Sigma;&Sigma;0 F =&gt; &#39;a &Sigma;&Sigma;0&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF0 &equiv; leaf0&quot;</span>
+<span class="command">abbreviation</span> GUARD0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD0 &equiv; LEAF0&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END0 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END0 xs &equiv; LEAF0 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT0 a &equiv; LEAF0 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS1 &equiv; gg1  :: &#39;a &Sigma;&Sigma;1 F =&gt; &#39;a &Sigma;&Sigma;1&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF1 &equiv; leaf1&quot;</span>
+<span class="command">abbreviation</span> GUARD1 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD1 &equiv; LEAF1&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END1 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END1 xs &equiv; LEAF1 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT1 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT1 a &equiv; LEAF1 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS2 &equiv; gg2  :: &#39;a &Sigma;&Sigma;2 F =&gt; &#39;a &Sigma;&Sigma;2&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF2 &equiv; leaf2&quot;</span>
+<span class="command">abbreviation</span> GUARD2 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;2&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD2 &equiv; LEAF2&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END2 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;2&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END2 xs &equiv; LEAF2 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT2 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;2&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT2 a &equiv; LEAF2 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS3 &equiv; gg3  :: &#39;a &Sigma;&Sigma;3 F =&gt; &#39;a &Sigma;&Sigma;3&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF3 &equiv; leaf3&quot;</span>
+<span class="command">abbreviation</span> GUARD3 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;3&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD3 &equiv; LEAF3&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END3 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;3&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END3 xs &equiv; LEAF3 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT3 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;3&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT3 a &equiv; LEAF3 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS4 &equiv; gg4  :: &#39;a &Sigma;&Sigma;4 F =&gt; &#39;a &Sigma;&Sigma;4&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF4 &equiv; leaf4&quot;</span>
+<span class="command">abbreviation</span> GUARD4 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;4&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD4 &equiv; LEAF4&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END4 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;4&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END4 xs &equiv; LEAF4 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT4 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;4&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT4 a &equiv; LEAF4 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS5 &equiv; gg5  :: &#39;a &Sigma;&Sigma;5 F =&gt; &#39;a &Sigma;&Sigma;5&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF5 &equiv; leaf5&quot;</span>
+<span class="command">abbreviation</span> GUARD5 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;5&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD5 &equiv; LEAF5&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END5 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;5&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END5 xs &equiv; LEAF5 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT5 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;5&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT5 a &equiv; LEAF5 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS6 &equiv; gg6  :: &#39;a &Sigma;&Sigma;6 F =&gt; &#39;a &Sigma;&Sigma;6&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF6 &equiv; leaf6&quot;</span>
+<span class="command">abbreviation</span> GUARD6 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;6&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD6 &equiv; LEAF6&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END6 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;6&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END6 xs &equiv; LEAF6 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT6 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;6&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT6 a &equiv; LEAF6 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS7 &equiv; gg7  :: &#39;a &Sigma;&Sigma;7 F =&gt; &#39;a &Sigma;&Sigma;7&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF7 &equiv; leaf7&quot;</span>
+<span class="command">abbreviation</span> GUARD7 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;7&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD7 &equiv; LEAF7&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END7 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;7&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END7 xs &equiv; LEAF7 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT7 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;7&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT7 a &equiv; LEAF7 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS8 &equiv; gg8  :: &#39;a &Sigma;&Sigma;8 F =&gt; &#39;a &Sigma;&Sigma;8&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF8 &equiv; leaf8&quot;</span>
+<span class="command">abbreviation</span> GUARD8 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;8&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD8 &equiv; LEAF8&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END8 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;8&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END8 xs &equiv; LEAF8 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT8 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;8&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT8 a &equiv; LEAF8 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS9 &equiv; gg9  :: &#39;a &Sigma;&Sigma;9 F =&gt; &#39;a &Sigma;&Sigma;9&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF9 &equiv; leaf9&quot;</span>
+<span class="command">abbreviation</span> GUARD9 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;9&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD9 &equiv; LEAF9&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END9 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;9&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END9 xs &equiv; LEAF9 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT9 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;9&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT9 a &equiv; LEAF9 (Inr a)&quot;</span>
+
+<span class="command">lemma</span> SCons_uniform<span class="delimiter">:</span> <span class="string">&quot;SCons x s = eval0 (gg0 (x, leaf0 s))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>rule iffD1<span class="delimiter">[</span>OF J.dtor_inject<span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor o_eq_dest<span class="delimiter">[</span>OF eval0_gg0<span class="delimiter">]</span> eval0_leaf0&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> genCngdd0_SCons<span class="delimiter">:</span> <span class="string">&quot;[|x1 = x2; genCngdd0 R xs1 xs2|] ==&gt; 
+  genCngdd0 R (SCons x1 xs1) (SCons x2 xs2)&quot;</span>
+  <span class="command">unfolding</span> SCons_uniform
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd0_eval0<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF gg0_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> rel_pre_J_def BNF_Comp.id_bnf_comp_def vimage2p_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF Pair_transfer<span class="delimiter">]</span><span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF leaf0_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> assumption
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd0_genCngdd1<span class="delimiter">:</span> <span class="string">&quot;genCngdd0 R xs ys ==&gt; genCngdd1 R xs ys&quot;</span>
+  <span class="command">unfolding</span> genCngdd0_def cngdd0_def cptdd0_def genCngdd1_def cngdd1_def cptdd1_def eval1_embL1<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>intro allI impI<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule conjE<span class="delimiter">)</span><span class="delimiter">+</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>drule spec<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule mp conjI<span class="delimiter">)</span><span class="delimiter">+</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF comp_transfer<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule embL1_transfer<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd1_SCons<span class="delimiter">:</span> <span class="string">&quot;[|x1 = x2; genCngdd1 R xs1 xs2|] ==&gt; 
+  genCngdd1 R (SCons x1 xs1) (SCons x2 xs2)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst I1.idem_Cl<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd0_genCngdd1<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd0_SCons<span class="delimiter">)</span>
+  <span class="command">apply</span> auto
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd1_alg&rho;1<span class="delimiter">:</span> <span class="string">&quot;[|genCngdd1 R xs1 xs2; genCngdd1 R ys1 ys2|] ==&gt; 
+  genCngdd1 R (alg&rho;1 (xs1, ys1)) (alg&rho;1 (xs2, ys2))&quot;</span>
+  <span class="command">unfolding</span> alg&rho;1_def o_apply
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd1_eval1<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF K1_as_&Sigma;&Sigma;1_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> simp
+  <span class="command">done</span>
+
+<span class="command">lemma</span> stream_coinduct<span class="delimiter">[</span>case_names Eq_stream<span class="delimiter">,</span> case_conclusion Eq_stream head tail<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> <span class="string">&quot;R s s&#39;&quot;</span> <span class="string">&quot;!!s s&#39;. R s s&#39; ==&gt; head s = head s&#39; &and; R (tail s) (tail s&#39;)&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;s = s&#39;&quot;</span>
+<span class="command">using</span> assms<span class="delimiter">(</span>1<span class="delimiter">)</span> <span class="command">proof</span> <span class="delimiter">(</span>rule mp<span class="delimiter">[</span>OF J.dtor_coinduct<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">,</span> safe<span class="delimiter">)</span>
+  <span class="command">fix</span> a b
+  <span class="command">assume</span> <span class="string">&quot;R a b&quot;</span>
+  <span class="command">from</span> assms<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">show</span> <span class="string">&quot;F_rel R (dtor_J a) (dtor_J b)&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>cases <span class="string">&quot;dtor_J a&quot;</span> <span class="string">&quot;dtor_J b&quot;</span> rule<span class="delimiter">:</span> prod.exhaust<span class="delimiter">[</span>case_product prod.exhaust<span class="delimiter">]</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> rel_pre_J_def vimage2p_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> stream_coinduct0<span class="delimiter">[</span>case_names Eq_stream<span class="delimiter">,</span> case_conclusion Eq_stream head tail<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> <span class="string">&quot;R s s&#39;&quot;</span> <span class="string">&quot;!!s s&#39;. R s s&#39; ==&gt; head s = head s&#39; &and; genCngdd0 R (tail s) (tail s&#39;)&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;s = s&#39;&quot;</span>
+<span class="command">using</span> assms<span class="delimiter">(</span>1<span class="delimiter">)</span> <span class="command">proof</span> <span class="delimiter">(</span>rule mp<span class="delimiter">[</span>OF coinductionU_genCngdd0<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">,</span> safe<span class="delimiter">)</span>
+  <span class="command">fix</span> a b
+  <span class="command">assume</span> <span class="string">&quot;R a b&quot;</span>
+  <span class="command">from</span> assms<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">show</span> <span class="string">&quot;F_rel (genCngdd0 R) (dtor_J a) (dtor_J b)&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>cases <span class="string">&quot;dtor_J a&quot;</span> <span class="string">&quot;dtor_J b&quot;</span> rule<span class="delimiter">:</span> prod.exhaust<span class="delimiter">[</span>case_product prod.exhaust<span class="delimiter">]</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> rel_pre_J_def vimage2p_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> stream_coinduct1<span class="delimiter">[</span>case_names Eq_stream<span class="delimiter">,</span> case_conclusion Eq_stream head tail<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> <span class="string">&quot;R s s&#39;&quot;</span> <span class="string">&quot;!!s s&#39;. R s s&#39; ==&gt; head s = head s&#39; &and; genCngdd1 R (tail s) (tail s&#39;)&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;s = s&#39;&quot;</span>
+<span class="command">using</span> assms<span class="delimiter">(</span>1<span class="delimiter">)</span> <span class="command">proof</span> <span class="delimiter">(</span>rule mp<span class="delimiter">[</span>OF coinductionU_genCngdd1<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">,</span> safe<span class="delimiter">)</span>
+  <span class="command">fix</span> a b
+  <span class="command">assume</span> <span class="string">&quot;R a b&quot;</span>
+  <span class="command">from</span> assms<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">show</span> <span class="string">&quot;F_rel (genCngdd1 R) (dtor_J a) (dtor_J b)&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>cases <span class="string">&quot;dtor_J a&quot;</span> <span class="string">&quot;dtor_J b&quot;</span> rule<span class="delimiter">:</span> prod.exhaust<span class="delimiter">[</span>case_product prod.exhaust<span class="delimiter">]</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> rel_pre_J_def vimage2p_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

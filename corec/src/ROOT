@@ -1,0 +1,52 @@
+chapter Corec
+
+session Stream_Examples = "HOL" +
+  options [document = pdf, document_output = "../pdf/Stream", browser_info]
+  theories [document = false]
+    "~~/src/HOL/Library/FSet"
+    "Stream_User/Stream_Lib"
+  theories
+    "Stream_User/Stream_Examples"
+    "Stream_User/Fib"
+    "Stream_User/Factorial"
+    "Stream_User/Mixed"
+  document_files (in "document/Stream")
+    "root.tex"
+
+session Tree_Examples = "HOL" +
+  options [document = pdf, document_output = "../pdf/Tree", browser_info]
+  theories [document = false]
+    "~~/src/HOL/Library/FSet"
+    "Tree_User/Tree_Lib"
+  theories
+    "Tree_User/Tree_Examples"
+  document_files (in "document/Tree")
+    "root.tex"
+
+session LList_Examples = "HOL" +
+  options [document = pdf, document_output = "../pdf/LList", browser_info]
+  theories [document = false]
+    "~~/src/HOL/Library/FSet"
+    "LList_User/LList_Lib"
+  theories
+    "LList_User/LFilter"
+  document_files (in "document/LList")
+    "root.tex"
+
+session UFP = "HOL" +
+  options [document = pdf, document_output = "../pdf/UFP", browser_info]
+  theories [document = false]
+    "~~/src/HOL/Library/FSet"
+    "Binary_Tree_User/Binary_Tree_Lib"
+    "Stream_User/Stream_Lib"
+  theories
+    "Stream_User/Stream_UFP_Examples"
+    "Binary_Tree_User/Binary_Tree_UFP_Examples"
+  document_files (in "document/UFP")
+    "root.tex"
+    "root.bib"
+
+session Metatheory = "HOL" +
+  options [document = false, browser_info]
+  theories
+     "Metatheory/More_Corec_Upto_step"
