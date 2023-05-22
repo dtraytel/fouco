@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Distributive_Law3 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Distributive_Law3</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Distributive_Law3</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Integrate_New_Op3.html"><span class="name">Stream_Integrate_New_Op3</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Distributive law for the sum of 2 *}</span>
+
+<span class="comment">(* This is similar to Distributive_Law, but assumes a distributive law &Lambda;3 over (SpK,&Sigma;&Sigma;3,F)
+instead of (S,&Sigma;&Sigma;3,F): *)</span>
+
+<span class="command">theory</span> Stream_Distributive_Law3
+<span class="keyword2">imports</span> Stream_Integrate_New_Op3
+<span class="keyword2">begin</span>
+
+<span class="comment">(* We assume (S,&Sigma;&Sigma;,F)-distributive law, where:
+ -- S is the syntactic signature and T is its term extension (free algebra extension)
+ -- F is the behavior functor  *)</span>
+
+<span class="comment">(*
+(* Distributive law: *)
+consts &Lambda;3 :: &quot;(&#39;a &times; &#39;a F) SpK =&gt; &#39;a &Sigma;&Sigma;3 F&quot;
+
+axiomatization where
+  &Lambda;3_natural: &quot;&Lambda;3 o SpKmap (f ** Fmap f) = Fmap (T1_map f) o &Lambda;3&quot;
+
+*)</span>
+
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

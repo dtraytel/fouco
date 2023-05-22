@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Behavior_BNF (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Behavior_BNF</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Behavior_BNF</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Input0.html"><span class="name">Stream_Input0</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* The fixed behavior BNF *}</span>
+
+<span class="command">theory</span> Stream_Behavior_BNF
+<span class="keyword2">imports</span> Stream_Input0
+<span class="keyword2">begin</span>
+
+<span class="command">codatatype</span> J <span class="delimiter">=</span> ctor <span class="string">&quot;J F&quot;</span>
+
+<span class="command">abbreviation</span> F_map <span class="keyword2">where</span> <span class="string">&quot;F_map &equiv; map_pre_J&quot;</span>
+<span class="command">abbreviation</span> F_rel <span class="keyword2">where</span> <span class="string">&quot;F_rel &equiv; rel_pre_J&quot;</span>
+<span class="command">abbreviation</span> F_set <span class="keyword2">where</span> <span class="string">&quot;F_set &equiv; set_pre_J&quot;</span>
+
+<span class="command">lemmas</span> F_map_comp <span class="delimiter">=</span> pre_J.map_comp0
+<span class="command">lemmas</span> F_map_id <span class="delimiter">=</span> pre_J.map_id0
+<span class="command">lemmas</span> F_map_transfer <span class="delimiter">=</span> pre_J.map_transfer
+<span class="command">lemmas</span> F_rel_Grp <span class="delimiter">=</span> pre_J.rel_Grp
+<span class="command">lemmas</span> F_rel_compp <span class="delimiter">=</span> pre_J.rel_compp
+<span class="command">lemmas</span> F_rel_conversep <span class="delimiter">=</span> pre_J.rel_conversep
+<span class="command">lemmas</span> F_rel_eq <span class="delimiter">=</span> pre_J.rel_eq
+<span class="command">lemmas</span> F_rel_flip <span class="delimiter">=</span> pre_J.rel_flip
+<span class="command">lemmas</span> F_rel_mono <span class="delimiter">=</span> pre_J.rel_mono
+
+<span class="command">declare</span> F_map_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span>
+<span class="command">declare</span> J.dtor_unfold_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span>
+
+<span class="command">lemma</span> dtor_J_o_inj<span class="delimiter">:</span>
+<span class="string">&quot;dtor_J o f = dtor_J o g &lt;-&gt; f = g&quot;</span>
+<span class="command">unfolding</span> o_def fun_eq_iff <span class="command">by</span> <span class="delimiter">(</span>metis J.ctor_dtor<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ctor_J_o_inj<span class="delimiter">:</span>
+<span class="string">&quot;ctor_J o f = ctor_J o g &lt;-&gt; f = g&quot;</span>
+<span class="command">unfolding</span> o_def fun_eq_iff <span class="command">by</span> <span class="delimiter">(</span>metis J.dtor_ctor<span class="delimiter">)</span>
+
+<span class="command">lemma</span> dtor_unfold_J_pointfree<span class="delimiter">:</span> <span class="string">&quot;dtor_J o (dtor_unfold_J s) = F_map (dtor_unfold_J s) o s&quot;</span>
+<span class="command">by</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span> <span class="delimiter">(</span>unfold o_apply J.dtor_unfold<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+
+<span class="command">lemma</span> dtor_J_ctor_pointfree<span class="delimiter">:</span> <span class="string">&quot;dtor_J o ctor_J = id&quot;</span>
+<span class="command">unfolding</span> o_def J.dtor_ctor id_def <span class="command">..</span>
+
+<span class="command">lemma</span> ctor_dtor_J_pointfree<span class="delimiter">:</span> <span class="string">&quot;ctor_J o dtor_J = id&quot;</span>
+<span class="command">unfolding</span> o_def J.ctor_dtor id_def <span class="command">..</span>
+
+<span class="command">lemma</span> convol_ctor_J_dtor_J<span class="delimiter">:</span> <span class="string">&quot;&lt;ctor_J , id&gt; = &lt;id, dtor_J&gt; o ctor_J&quot;</span>
+<span class="command">unfolding</span> convol_o id_o o_id dtor_J_ctor_pointfree <span class="command">..</span>
+
+<span class="command">definition</span> <span class="string">&quot;Retr R a b = F_rel R (dtor_J a) (dtor_J b)&quot;</span>
+
+<span class="command">lemma</span> reflp_Retr<span class="delimiter">:</span> <span class="string">&quot;reflp R ==&gt; reflp (Retr R)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis <span class="delimiter">(</span>full_types<span class="delimiter">)</span> Retr_def F_rel_eq F_rel_mono predicate2I reflpD reflpI rev_predicate2D<span class="delimiter">)</span>
+
+<span class="command">lemma</span> symp_Retr<span class="delimiter">:</span> <span class="string">&quot;symp R ==&gt; symp (Retr R)&quot;</span>
+  <span class="command">unfolding</span> Retr_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> symp_iff
+  <span class="command">apply</span> <span class="delimiter">(</span>subst fun_eq_iff<span class="delimiter">)</span><span class="delimiter">+</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst conversep_iff<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst conversep_conversep<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> of R<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst F_rel_flip<span class="delimiter">)</span>
+  <span class="command">apply</span> simp
+  <span class="command">done</span>
+
+<span class="command">lemma</span> trans_Retr<span class="delimiter">:</span> <span class="string">&quot;transp R ==&gt; transp (Retr R)&quot;</span>
+   <span class="command">unfolding</span> Retr_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> transp_iff
+   <span class="command">apply</span> <span class="delimiter">(</span>rule predicate2I<span class="delimiter">)</span>
+   <span class="command">apply</span> <span class="delimiter">(</span>erule relcomppE<span class="delimiter">)</span>
+   <span class="command">apply</span> <span class="delimiter">(</span>erule rev_predicate2D<span class="delimiter">[</span>OF _ F_rel_mono<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">)</span>
+   <span class="command">apply</span> <span class="delimiter">(</span>subst F_rel_compp<span class="delimiter">)</span>
+   <span class="command">apply</span> auto
+   <span class="command">done</span>
+
+<span class="command">lemma</span> equivp_retr<span class="delimiter">:</span> <span class="string">&quot;equivp R ==&gt; equivp (Retr R)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>metis equivpE equivpI reflp_Retr symp_Retr trans_Retr<span class="delimiter">)</span>
+
+<span class="command">lemma</span> mono_retr<span class="delimiter">:</span> <span class="string">&quot;mono Retr&quot;</span>
+  <span class="command">unfolding</span> mono_def <span class="command">by</span> safe <span class="delimiter">(</span>simp only<span class="delimiter">:</span> Retr_def predicate2D<span class="delimiter">[</span>OF F_rel_mono<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="command">lemma</span> gfp_Retr_eq<span class="delimiter">:</span> <span class="string">&quot;gfp Retr = (op =)&quot;</span>
+<span class="command">apply</span><span class="delimiter">(</span>rule order_class.antisym<span class="delimiter">)</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule J.dtor_rel_coinduct<span class="delimiter">)</span> <span class="command">unfolding</span> Retr_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> gfp_unfold<span class="delimiter">[</span>OF mono_retr<span class="delimiter">,</span> symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span> simp
+  <span class="command">apply</span><span class="delimiter">(</span>rule gfp_upperbound<span class="delimiter">)</span> <span class="command">unfolding</span> Retr_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span> <span class="command">by</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> F_rel_eq<span class="delimiter">)</span>
+
+
+<span class="command">lemma</span> F_rel_F_map_F_map<span class="delimiter">:</span> <span class="string">&quot;F_rel R (F_map f x) (F_map g y) =
+  F_rel (BNF_Def.Grp UNIV f OO R OO (BNF_Def.Grp UNIV g)^--1) x y&quot;</span>
+  <span class="command">unfolding</span> F_rel_compp F_rel_conversep relcompp.simps conversep.simps F_rel_Grp
+  <span class="command">apply</span> <span class="delimiter">(</span>intro iffI exI conjI GrpI<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule CollectI<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule subset_UNIV<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span>
+  <span class="command">apply</span> assumption
+  <span class="command">apply</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule CollectI<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule subset_UNIV<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>elim exE conjE GrpE<span class="delimiter">)</span>
+  <span class="command">apply</span> hypsubst
+  <span class="command">apply</span> assumption
+  <span class="command">done</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory LList_Distributive_Law0 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory LList_Distributive_Law0</h1>
+
+<span class="command">theory</span> <span class="name">LList_Distributive_Law0</span><br/>
+<span class="keyword">imports</span> <a href="LList_FreeAlg0.html"><span class="name">LList_FreeAlg0</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span><span class="verbatim">{* The initial distributive law *}</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="comment">(* This is similar to Distributive_Law, but uses a particular law &Lambda;0: *)</span>
+<span class="comment">(*&gt;*)</span>
+
+<span class="command">theory</span> LList_Distributive_Law0
+<span class="keyword2">imports</span> LList_FreeAlg0
+<span class="keyword2">begin</span>
+
+<span class="command">definition</span> &Lambda;0 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a * &#39;a F) &Sigma;0 =&gt; &#39;a &Sigma;&Sigma;0 F&quot;</span>
+<span class="keyword2">where</span> <span class="string">&quot;&Lambda;0 &equiv; Rep_&Sigma;0 o &Sigma;0_map (\&lt;oo&gt;\&lt;pp&gt;0 o Abs_&Sigma;0 o F_map leaf0 o snd)&quot;</span>
+
+<span class="command">lemma</span> &Lambda;0_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;0_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;0_rel R)) &Lambda;0 &Lambda;0&quot;</span>
+  <span class="command">unfolding</span> &Lambda;0_def <span class="command">by</span> transfer_prover
+
+<span class="command">theorem</span> &Lambda;0_natural<span class="delimiter">:</span> <span class="string">&quot;&Lambda;0 o &Sigma;0_map (f ** F_map f) = F_map (&Sigma;&Sigma;0_map f) o &Lambda;0&quot;</span>
+  <span class="command">using</span> &Lambda;0_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;0.rel_Grp F_rel_Grp prod.rel_Grp &Sigma;&Sigma;0.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

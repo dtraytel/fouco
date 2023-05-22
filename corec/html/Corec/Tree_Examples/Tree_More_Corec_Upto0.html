@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Tree_More_Corec_Upto0 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Tree_More_Corec_Upto0</h1>
+
+<span class="command">theory</span> <span class="name">Tree_More_Corec_Upto0</span><br/>
+<span class="keyword">imports</span> <a href="Tree_Corec_Upto0.html"><span class="name">Tree_Corec_Upto0</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* The initial algll operation is precisely (the copy of) ctor_J *}</span>
+
+<span class="command">theory</span> Tree_More_Corec_Upto0
+<span class="keyword2">imports</span> Tree_Corec_Upto0
+<span class="keyword2">begin</span>
+
+<span class="command">lemma</span> alg&Lambda;0<span class="delimiter">:</span> <span class="string">&quot;alg&Lambda;0 o Abs_&Sigma;0 = ctor_J&quot;</span>
+<span class="command">unfolding</span> ctor_J_def <span class="command">apply</span><span class="delimiter">(</span>rule J.dtor_unfold_unique<span class="delimiter">)</span>
+<span class="command">unfolding</span> o_assoc dtor_J_alg&Lambda;0
+<span class="command">unfolding</span> alg&Lambda;0_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> Abs_&Sigma;0_natural
+<span class="command">unfolding</span> F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc
+<span class="command">unfolding</span> &Lambda;0_def
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> snd_comp_map_prod
+<span class="command">unfolding</span> o_assoc &Sigma;0.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span>
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+            subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+            subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> o_id Abs_&Sigma;0_natural o_assoc Rep_&Sigma;0_o_Abs_&Sigma;0
+<span class="command">unfolding</span> F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> snd_convol
+<span class="command">unfolding</span> o_assoc
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> o_assoc <span class="command">..</span>
+
+<span class="comment">(* This should be the default evaluator for eval0 on the term algebra: *)</span>
+
+<span class="command">theorem</span> eval0_\&lt;oo&gt;\&lt;pp&gt;0_ctor_J<span class="delimiter">:</span>
+<span class="string">&quot;eval0 (\&lt;oo&gt;\&lt;pp&gt;0 t) = ctor_J (Rep_&Sigma;0 (&Sigma;0_map eval0 t))&quot;</span>
+<span class="command">unfolding</span> eval0_\&lt;oo&gt;\&lt;pp&gt;0 alg&Lambda;0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_apply Rep_&Sigma;0_inverse <span class="command">..</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* Up-to corecursor with guard not necessarily at the top *}</span>
+
+<span class="command">definition</span> ff0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a &Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;ff0 &equiv; Abs_&Sigma;0&quot;</span> <span class="comment">(* just for bootstrapping *)</span>
+
+<span class="command">lemma</span> alg&Lambda;0_ff0<span class="delimiter">:</span> <span class="string">&quot;alg&Lambda;0 o ff0 = ctor_J&quot;</span>
+<span class="command">unfolding</span> ff0_def o_assoc alg&Lambda;0 <span class="command">..</span>
+
+<span class="command">lemma</span> ff0_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;(F_rel R ===&gt; &Sigma;0_rel R) ff0 ff0&quot;</span>
+<span class="command">unfolding</span> ff0_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> ff0_natural<span class="delimiter">:</span> <span class="string">&quot;&Sigma;0_map f o ff0 = ff0 o F_map f&quot;</span>
+<span class="command">using</span> ff0_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+<span class="command">unfolding</span> &Sigma;0.rel_Grp F_rel_Grp
+<span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">definition</span> gg0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a &Sigma;&Sigma;0 F =&gt; &#39;a &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;gg0 &equiv; \&lt;oo&gt;\&lt;pp&gt;0 o ff0&quot;</span>
+
+<span class="command">lemma</span> eval0_gg0<span class="delimiter">:</span> <span class="string">&quot;eval0 o gg0 = ctor_J o F_map eval0&quot;</span>
+<span class="command">unfolding</span> o_assoc gg0_def eval0_comp_\&lt;oo&gt;\&lt;pp&gt;0 alg&Lambda;0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> ff0_def Abs_&Sigma;0_natural
+<span class="command">..</span>
+
+<span class="command">lemma</span> gg0_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;(F_rel (&Sigma;&Sigma;0_rel R) ===&gt; &Sigma;&Sigma;0_rel R) gg0 gg0&quot;</span>
+<span class="command">unfolding</span> gg0_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> gg0_natural<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;0_map f o gg0 = gg0 o F_map (&Sigma;&Sigma;0_map f)&quot;</span>
+<span class="command">using</span> gg0_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+<span class="command">unfolding</span> &Sigma;&Sigma;0.rel_Grp F_rel_Grp
+<span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">definition</span> unfoldUU0 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a =&gt; &#39;a &Sigma;&Sigma;0 F &Sigma;&Sigma;0) =&gt; &#39;a =&gt; J&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;unfoldUU0 s &equiv; unfoldU0 (F_map flat0 o dd0 o &Sigma;&Sigma;0_map &lt;gg0, id&gt; o s)&quot;</span>
+
+<span class="command">theorem</span> unfoldUU0<span class="delimiter">:</span>
+<span class="string">&quot;unfoldUU0 s =
+ eval0 o &Sigma;&Sigma;0_map (ctor_J o F_map eval0 o F_map (&Sigma;&Sigma;0_map (unfoldUU0 s))) o s&quot;</span>
+<span class="command">unfolding</span> unfoldUU0_def <span class="command">apply</span><span class="delimiter">(</span>subst unfoldU0_ctor_J_pointfree<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> unfoldUU0_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> extdd0_def F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> flat0_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">)</span> <span class="command">unfolding</span> eval0_flat0
+<span class="command">unfolding</span> F_map_comp
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> dd0_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> dd0_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;0.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc eval0_gg0 <span class="command">unfolding</span> &Sigma;&Sigma;0.map_comp0 o_assoc
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+      subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> &Sigma;&Sigma;0.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> &Sigma;&Sigma;0.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> map_prod.comp map_prod_o_convol o_id F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> &Sigma;&Sigma;0.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> gg0_natural
+<span class="command">unfolding</span> o_assoc eval0_gg0
+<span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span>
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> convol_comp_id2 convol_ctor_J_dtor_J
+          &Sigma;&Sigma;0.map_comp0 o_assoc eval0 ctor_dtor_J_pointfree id_o <span class="command">..</span>
+
+<span class="command">theorem</span> unfoldUU0_unique<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> f<span class="delimiter">:</span> <span class="string">&quot;f = eval0 o &Sigma;&Sigma;0_map (ctor_J o F_map eval0 o F_map (&Sigma;&Sigma;0_map f)) o s&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;f = unfoldUU0 s&quot;</span>
+<span class="command">unfolding</span> unfoldUU0_def <span class="command">apply</span><span class="delimiter">(</span>rule unfoldU0_unique<span class="delimiter">)</span>
+<span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span> <span class="command">apply</span><span class="delimiter">(</span>subst f<span class="delimiter">)</span> <span class="command">unfolding</span> extdd0_def
+<span class="command">unfolding</span> o_assoc
+<span class="command">apply</span><span class="delimiter">(</span>subst eval0_def<span class="delimiter">)</span> <span class="command">unfolding</span> dtor_unfold_J_pointfree <span class="command">apply</span><span class="delimiter">(</span>subst eval0_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> o_assoc
+<span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> o_assoc &Sigma;&Sigma;0.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>  convol_o id_o dtor_J_ctor_pointfree F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat0_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc eval0_flat0 <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> F_map_comp
+<span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span> <span class="command">apply</span><span class="delimiter">(</span>subst F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst &Sigma;&Sigma;0.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> o_assoc <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> dd0_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;&Sigma;0.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> map_prod_o_convol o_id
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> gg0_natural
+<span class="command">unfolding</span> o_assoc eval0_gg0 F_map_comp <span class="command">..</span>
+
+<span class="comment">(* corecursion: *)</span>
+<span class="command">definition</span> corecUU0 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;0 F &Sigma;&Sigma;0) =&gt; &#39;a =&gt; J&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;corecUU0 s &equiv;
+ unfoldUU0 (case_sum (leaf0 o dd0 o leaf0 o &lt;Inl , F_map Inl o dtor_J&gt;) s) o Inr&quot;</span>
+
+<span class="command">lemma</span> unfoldUU0_Inl<span class="delimiter">:</span>
+<span class="string">&quot;unfoldUU0 (case_sum (leaf0 o dd0 o leaf0 o &lt;Inl , F_map Inl o dtor_J&gt;) s) o Inl = id&quot;</span>
+<span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;?L = unfoldUU0 (leaf0 o dd0 o leaf0 o &lt;id, dtor_J&gt;)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule unfoldUU0_unique<span class="delimiter">)</span>
+  <span class="command">apply</span><span class="delimiter">(</span>subst unfoldUU0<span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> case_sum_o_inj snd_convol
+  <span class="command">unfolding</span> F_map_comp &Sigma;&Sigma;0.map_comp0
+  <span class="command">unfolding</span> o_assoc
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">)</span>
+  <span class="command">unfolding</span> o_assoc
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+              subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+              subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+              subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf0_natural <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+              subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> dd0_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+              subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf0_natural
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> map_prod_o_convol o_id <span class="command">..</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = ?R&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule unfoldUU0_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;0.map_id0 F_map_id o_id
+  <span class="command">unfolding</span> o_assoc
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span>
+              subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> dd0_leaf0
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> snd_convol
+  <span class="command">unfolding</span> o_assoc
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf0_natural <span class="command">unfolding</span> o_assoc eval0_leaf0 id_o
+  <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> eval0_leaf0 F_map_id o_id ctor_dtor_J_pointfree <span class="command">..</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> corecUU0_pointfree<span class="delimiter">:</span>
+<span class="string">&quot;corecUU0 s =
+ eval0 o &Sigma;&Sigma;0_map (ctor_J o F_map eval0 o F_map (&Sigma;&Sigma;0_map (case_sum id (corecUU0 s)))) o s&quot;</span>
+<span class="command">unfolding</span> corecUU0_def
+<span class="command">apply</span><span class="delimiter">(</span>subst unfoldUU0<span class="delimiter">)</span>
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> case_sum_o_inj
+<span class="command">apply</span><span class="delimiter">(</span>subst unfoldUU0_Inl<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> of s<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">unfolding</span> o_assoc case_sum_Inl_Inr_L extdd0_def <span class="command">..</span>
+
+<span class="command">theorem</span> corecUU0_unique<span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> f<span class="delimiter">:</span> <span class="string">&quot;f = eval0 o &Sigma;&Sigma;0_map (ctor_J o F_map eval0 o F_map (&Sigma;&Sigma;0_map (case_sum id f))) o s&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;f = corecUU0 s&quot;</span>
+  <span class="command">unfolding</span> corecUU0_def
+  <span class="command">apply</span><span class="delimiter">(</span>rule eq_o_InrI<span class="delimiter">[</span>OF unfoldUU0_Inl unfoldUU0_unique<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst f<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> fun_eq_iff eval0_leaf0&#39; pre_J.map_comp o_eq_dest<span class="delimiter">[</span>OF dd0_leaf0<span class="delimiter">]</span> convol_def
+    leaf0_natural o_assoc case_sum_o_inj<span class="delimiter">(</span>1<span class="delimiter">)</span> eval0_leaf0 pre_J.map_id J.ctor_dtor split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+<span class="command">theorem</span> corecUU0<span class="delimiter">:</span>
+<span class="string">&quot;corecUU0 s a =
+ eval0 (&Sigma;&Sigma;0_map (ctor_J o F_map eval0 o F_map (&Sigma;&Sigma;0_map (case_sum id (corecUU0 s)))) (s a))&quot;</span>
+<span class="command">using</span> corecUU0_pointfree <span class="command">unfolding</span> o_def fun_eq_iff <span class="command">by</span><span class="delimiter">(</span>rule allE<span class="delimiter">)</span>
+
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

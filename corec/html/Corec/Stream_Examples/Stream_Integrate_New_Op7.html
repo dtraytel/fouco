@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Integrate_New_Op7 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Integrate_New_Op7</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Integrate_New_Op7</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Op_Input7.html"><span class="name">Stream_Op_Input7</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span><span class="verbatim">{* The integration of a new operation in the up-to setting *}</span>
+
+<span class="command">theory</span> Stream_Integrate_New_Op7
+<span class="keyword2">imports</span> Stream_Op_Input7
+<span class="keyword2">begin</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* The assumptions *}</span>
+
+<span class="comment">(*
+(* The operation that creates the new distributive law, since its definition splits
+trough a natural transformation ll, which will be defined in More_Corec_Upto7 as follows: *)
+definition alg&rho;7 :: &quot;J K7 =&gt; J&quot; where
+&quot;alg&rho;7 = unfoldU6 (&rho;7 o K7_map &lt;id, dtor_J&gt;)&quot;
+*)</span>
+
+<span class="command">lemma</span> &rho;7_natural<span class="delimiter">:</span> <span class="string">&quot;&rho;7 o K7_map (f ** F_map f) = F_map (&Sigma;&Sigma;7_map f) o &rho;7&quot;</span>
+  <span class="command">using</span> &rho;7_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp &Sigma;&Sigma;7.rel_Grp K7.rel_Grp prod.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">subsection</span><span class="verbatim">{* The integration *}</span>
+
+<span class="command">definition</span> embL7 <span class="delimiter">::</span> <span class="string">&quot;&#39;a &Sigma;&Sigma;6 =&gt; &#39;a &Sigma;&Sigma;7&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;embL7 &equiv; ext6 (\&lt;oo&gt;\&lt;pp&gt;7 o Abs_&Sigma;7 o Inl) leaf7&quot;</span>
+
+<span class="command">definition</span> embR7 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a K7) &Sigma;&Sigma;6 =&gt; &#39;a &Sigma;&Sigma;7&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;embR7 &equiv; ext6 (\&lt;oo&gt;\&lt;pp&gt;7 o Abs_&Sigma;7 o Inl) (\&lt;oo&gt;\&lt;pp&gt;7 o &Sigma;7_map leaf7 o Abs_&Sigma;7 o Inr)&quot;</span>
+
+<span class="command">definition</span> &Lambda;7 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;7 =&gt; &#39;a &Sigma;&Sigma;7 F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;&Lambda;7 = case_sum (F_map embL7 o &Lambda;6) &rho;7 o Rep_&Sigma;7&quot;</span>
+
+<span class="command">lemma</span> embL7_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;6_rel R ===&gt; &Sigma;&Sigma;7_rel R) embL7 embL7&quot;</span>
+  <span class="command">unfolding</span> embL7_def ext6_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> embR7_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;6_rel (K7_rel R) ===&gt; &Sigma;&Sigma;7_rel R) embR7 embR7&quot;</span>
+  <span class="command">unfolding</span> embR7_def ext6_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> &Lambda;7_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;7_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;7_rel R)) &Lambda;7 &Lambda;7&quot;</span>
+  <span class="command">unfolding</span> &Lambda;7_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> &Lambda;7_natural<span class="delimiter">:</span> <span class="string">&quot;&Lambda;7 o &Sigma;7_map (f ** F_map f) = F_map (&Sigma;&Sigma;7_map f) o &Lambda;7&quot;</span>
+  <span class="command">using</span> &Lambda;7_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp &Sigma;&Sigma;7.rel_Grp &Sigma;7.rel_Grp prod.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> embL7_natural<span class="delimiter">:</span> <span class="string">&quot;embL7 o &Sigma;&Sigma;6_map f = &Sigma;&Sigma;7_map f o embL7&quot;</span>
+  <span class="command">using</span> embL7_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;6.rel_Grp &Sigma;&Sigma;7.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> embR7_natural<span class="delimiter">:</span> <span class="string">&quot;embR7 o &Sigma;&Sigma;6_map (K7_map f) = &Sigma;&Sigma;7_map f o embR7&quot;</span>
+  <span class="command">using</span> embR7_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;6.rel_Grp K7.rel_Grp &Sigma;&Sigma;7.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;7_Inl<span class="delimiter">:</span> <span class="string">&quot;&Lambda;7 o Abs_&Sigma;7 o Inl = F_map embL7 o &Lambda;6&quot;</span>
+  <span class="keyword2">and</span> &Lambda;7_Inr<span class="delimiter">:</span> <span class="string">&quot;&Lambda;7 o Abs_&Sigma;7 o Inr = &rho;7&quot;</span>
+<span class="command">unfolding</span> &Lambda;7_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> Rep_&Sigma;7_o_Abs_&Sigma;7 o_id <span class="command">by</span> auto
+
+<span class="command">lemma</span> embL7_leaf6<span class="delimiter">:</span> <span class="string">&quot;embL7 o leaf6 = leaf7&quot;</span>
+<span class="command">unfolding</span> embL7_def ext6_comp_leaf6 <span class="command">..</span>
+
+<span class="command">lemma</span> embL7_\&lt;oo&gt;\&lt;pp&gt;6<span class="delimiter">:</span> <span class="string">&quot;embL7 o \&lt;oo&gt;\&lt;pp&gt;6 = \&lt;oo&gt;\&lt;pp&gt;7 o Abs_&Sigma;7 o Inl o &Sigma;6_map embL7&quot;</span>
+<span class="command">unfolding</span> embL7_def ext6_commute <span class="command">..</span>
+
+<span class="command">lemma</span> embR7_leaf6<span class="delimiter">:</span> <span class="string">&quot;embR7 o leaf6 = \&lt;oo&gt;\&lt;pp&gt;7 o Abs_&Sigma;7 o Inr o K7_map leaf7&quot;</span>
+<span class="command">unfolding</span> embR7_def ext6_comp_leaf6
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> Abs_&Sigma;7_natural map_sum_Inr <span class="command">..</span>
+
+<span class="command">lemma</span> embR7_\&lt;oo&gt;\&lt;pp&gt;6<span class="delimiter">:</span> <span class="string">&quot;embR7 o \&lt;oo&gt;\&lt;pp&gt;6 = \&lt;oo&gt;\&lt;pp&gt;7 o Abs_&Sigma;7 o  Inl o &Sigma;6_map embR7&quot;</span>
+<span class="command">unfolding</span> embR7_def ext6_commute <span class="command">..</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

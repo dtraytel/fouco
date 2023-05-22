@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Factorial (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Factorial</h1>
+
+<span class="command">theory</span> <span class="name">Factorial</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Examples.html"><span class="name">Stream_Examples</span></a> <a href="../../HOL/HOL/Fact.html"><span class="name">Fact</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Streams of Factorials *}</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">theory</span> Factorial
+<span class="keyword2">imports</span> Stream_Examples Fact
+<span class="keyword2">begin</span>
+<span class="comment">(*&gt;*)</span>
+
+<span class="command">definition</span> <span class="string">&quot;facsA = corecUU2 (&lambda;xs. PRD2 (GUARD2 (1, CONT2 xs), GUARD2 (1, CONT2 xs))) ()&quot;</span>
+
+<span class="command">lemma</span> facsA_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;facsA = prd (SCons 1 facsA) (SCons 1 facsA)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst facsA_def<span class="delimiter">)</span>
+  <span class="command">unfolding</span> corecUU2
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval2_leaf2&#39;
+    eval2_\&lt;oo&gt;\&lt;pp&gt;2 alg&Lambda;2_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;2_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF gg2_natural<span class="delimiter">]</span>
+    o_eq_dest<span class="delimiter">[</span>OF eval2_gg2<span class="delimiter">]</span> prd_uniform facsA_def<span class="delimiter">)</span>
+
+<span class="command">definition</span> <span class="string">&quot;facsB = corecUU3 (&lambda;xs. EXP3 (K3.I (GUARD3 (0, CONT3 xs)))) ()&quot;</span>
+
+<span class="command">lemma</span> facsB_code<span class="delimiter">[</span>code<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;facsB = Exp (SCons 0 facsB)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst facsB_def<span class="delimiter">)</span>
+  <span class="command">unfolding</span> corecUU3
+  <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor eval3_leaf3&#39;
+    eval3_\&lt;oo&gt;\&lt;pp&gt;3 alg&Lambda;3_Inr o_eq_dest<span class="delimiter">[</span>OF Abs_&Sigma;3_natural<span class="delimiter">]</span> o_eq_dest<span class="delimiter">[</span>OF gg3_natural<span class="delimiter">]</span>
+    o_eq_dest<span class="delimiter">[</span>OF eval3_gg3<span class="delimiter">]</span> Exp_uniform facsB_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> head_facsB<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head facsB = 1&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>subst facsB_code<span class="delimiter">)</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> J.dtor_ctor exp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> tail_facsB<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail facsB = prd facsB facsB&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>subst facsB_code<span class="delimiter">,</span> subst tail_Exp<span class="delimiter">)</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> J.dtor_ctor facsB_code<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="command">lemma</span> facsA_facsB<span class="delimiter">:</span> <span class="string">&quot;SCons 1 facsA = facsB&quot;</span>
+<span class="command">proof</span> <span class="delimiter">(</span>coinduction rule<span class="delimiter">:</span> stream_coinduct3<span class="delimiter">)</span>
+  <span class="command">case</span> Eq_stream
+  <span class="command">have</span> <span class="var">?head</span> <span class="command">by</span> <span class="delimiter">(</span>subst facsA_code<span class="delimiter">)</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> J.dtor_ctor exp_def<span class="delimiter">)</span>
+  <span class="command">moreover</span>
+  <span class="command">have</span> <span class="var">?tail</span> <span class="command">by</span> <span class="delimiter">(</span>subst <span class="delimiter">(</span>2<span class="delimiter">)</span> facsA_code<span class="delimiter">)</span> <span class="delimiter">(</span>auto intro<span class="delimiter">!</span><span class="delimiter">:</span> genCngdd3_prd simp<span class="delimiter">:</span> J.dtor_ctor<span class="delimiter">)</span>
+  <span class="command">ultimately</span> <span class="command">show</span> <span class="var">?case</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="command">fun</span> facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> <span class="keyword2">where</span>
+  <span class="string">&quot;facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (n, fn, i) =
+     (if i = 0 then GUARD0 (fn, CONT0 (n + 1, 1, n + 1)) else facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (n, fn * i, i - 1))&quot;</span>
+
+<span class="command">definition</span> <span class="string">&quot;facsC = corecUU0 facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (1, 1, 1)&quot;</span>
+
+<span class="command">lemma</span> factsD<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>_code<span class="delimiter">:</span>
+  <span class="string">&quot;corecUU0 facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (n, fn, i) =
+    (if i = 0 then SCons fn (corecUU0 facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (n + 1, 1, n + 1))
+    else corecUU0 facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (n, fn * i, i - 1))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>subst corecUU0<span class="delimiter">,</span> subst facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>.simps<span class="delimiter">)</span>
+    <span class="delimiter">(</span>simp del<span class="delimiter">:</span> facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>.simps add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def eval0_leaf0&#39; corecUU0<span class="delimiter">)</span>
+
+<span class="command">definition</span> <span class="string">&quot;fromN = dtor_corec_J (&lambda;n. (n, Inr (Suc n)))&quot;</span>
+
+<span class="command">lemma</span> head_fromN<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (fromN n) = n&quot;</span>
+  <span class="command">unfolding</span> fromN_def J.dtor_corec map_pre_J_def BNF_Comp.id_bnf_comp_def <span class="command">by</span> simp
+
+<span class="command">lemma</span> tail_fromN<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (fromN n) = fromN (Suc n)&quot;</span>
+  <span class="command">unfolding</span> fromN_def J.dtor_corec map_pre_J_def BNF_Comp.id_bnf_comp_def <span class="command">by</span> simp
+
+<span class="command">abbreviation</span> <span class="string">&quot;facsD n &equiv; smap fact (fromN n)&quot;</span>
+
+<span class="command">primrec</span> prds <span class="keyword2">where</span>
+  <span class="string">&quot;prds 0 s = s&quot;</span>
+<span class="delimiter">|</span> <span class="string">&quot;prds (Suc n) s = prd s (prds n s)&quot;</span>
+
+<span class="command">lemma</span> head_prds<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;head (prds n s) = head s ^ (Suc n)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>induct n<span class="delimiter">)</span> auto
+
+<span class="command">lemma</span> tail_prds_fac<span class="delimiter">[</span>simp<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;tail (prds n facsB) = scale (Suc n) (prds (Suc n) facsB)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>induct n<span class="delimiter">)</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> scale_Suc<span class="delimiter">,</span> auto simp<span class="delimiter">:</span> prd_distribL pls_ac_simps prd_ac_simps<span class="delimiter">)</span>
+
+<span class="command">lemma</span> facsD_facsB<span class="delimiter">:</span> <span class="string">&quot;facsD n = scale (fact n) (prds n facsB)&quot;</span>
+<span class="command">proof</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> n rule<span class="delimiter">:</span> stream_coinduct3<span class="delimiter">)</span>
+  <span class="command">case</span> Eq_stream
+  <span class="command">have</span> <span class="var">?head</span> <span class="command">by</span> <span class="delimiter">(</span>subst facsB_code<span class="delimiter">)</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> J.dtor_ctor exp_def<span class="delimiter">)</span>
+  <span class="command">moreover</span>
+  <span class="command">have</span> <span class="var">?tail</span> <span class="command">by</span> <span class="delimiter">(</span>subst <span class="delimiter">(</span>2<span class="delimiter">)</span> facsB_code<span class="delimiter">)</span> <span class="delimiter">(</span>auto simp add<span class="delimiter">:</span> J.dtor_ctor facsB_code<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    scale_mult<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> trans<span class="delimiter">[</span>OF mult.commute fact_Suc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">]</span>
+    simp del<span class="delimiter">:</span> mult_Suc_right mult_Suc fact_Suc prds.simps<span class="delimiter">)</span>
+  <span class="command">ultimately</span> <span class="command">show</span> <span class="var">?case</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="command">corollary</span> <span class="string">&quot;facsA = facsD 1&quot;</span>
+  <span class="command">unfolding</span> facsD_facsB facsA_facsB<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">by</span> <span class="delimiter">(</span>subst facsA_code<span class="delimiter">)</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> scale_Suc<span class="delimiter">)</span>
+
+<span class="command">corollary</span> <span class="string">&quot;facsB = facsD 0&quot;</span>
+  <span class="command">unfolding</span> facsD_facsB <span class="command">by</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> scale_Suc<span class="delimiter">)</span>
+
+<span class="command">primrec</span> ffac <span class="keyword2">where</span>
+  <span class="string">&quot;ffac fn 0 = fn&quot;</span>
+<span class="delimiter">|</span> <span class="string">&quot;ffac fn (Suc i) = ffac (fn * Suc i) i&quot;</span>
+
+<span class="command">lemma</span> ffac_fact<span class="delimiter">:</span> <span class="string">&quot;ffac m n = m * fact n&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>induct n arbitrary<span class="delimiter">:</span> m<span class="delimiter">)</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> algebra_simps<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ffac_fact_Suc<span class="delimiter">:</span> <span class="string">&quot;ffac (Suc n) n = fact (Suc n)&quot;</span>
+  <span class="command">unfolding</span> ffac_fact fact_Suc <span class="command">..</span>
+
+<span class="command">lemma</span> factsD<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>_facsD<span class="delimiter">:</span> <span class="string">&quot;corecUU0 facsC<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub> (n, fn, i) = SCons (ffac fn i) (facsD (n + 1))&quot;</span>
+<span class="command">proof</span> <span class="delimiter">(</span>coinduction arbitrary<span class="delimiter">:</span> n fn i rule<span class="delimiter">:</span> stream_coinduct<span class="delimiter">)</span>
+  <span class="command">case</span> Eq_stream
+  <span class="command">have</span> <span class="var">?head</span>
+  <span class="command">proof</span> <span class="delimiter">(</span>induct i arbitrary<span class="delimiter">:</span> fn<span class="delimiter">)</span>
+    <span class="command">case</span> 0 <span class="command">then</span> <span class="command">show</span> <span class="var">?case</span> <span class="command">by</span> <span class="delimiter">(</span>subst factsD<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>_code<span class="delimiter">)</span> <span class="delimiter">(</span>simp add<span class="delimiter">:</span> J.dtor_ctor<span class="delimiter">)</span>
+  <span class="command">next</span>
+    <span class="command">case</span> <span class="delimiter">(</span>Suc i<span class="delimiter">)</span> <span class="command">then</span> <span class="command">show</span> <span class="var">?case</span> <span class="command">by</span> <span class="delimiter">(</span>subst factsD<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>_code<span class="delimiter">)</span> simp
+  <span class="command">qed</span>
+  <span class="command">moreover</span> <span class="command">have</span> <span class="var">?tail</span>
+  <span class="command">proof</span> <span class="delimiter">(</span>induct i arbitrary<span class="delimiter">:</span> fn<span class="delimiter">)</span>
+    <span class="command">case</span> 0
+    <span class="command">have</span> <span class="string">&quot;facsD (Suc n) = SCons (ffac (Suc n) n) (facsD (Suc (Suc n)))&quot;</span>
+      <span class="command">by</span> <span class="delimiter">(</span>coinduction rule<span class="delimiter">:</span> stream_coinduct0<span class="delimiter">)</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> J.dtor_ctor ffac_fact_Suc<span class="delimiter">)</span>
+    <span class="command">then</span> <span class="command">show</span> <span class="var">?case</span> <span class="command">by</span> <span class="delimiter">(</span>subst factsD<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>_code<span class="delimiter">)</span> <span class="delimiter">(</span>force simp<span class="delimiter">:</span> J.dtor_ctor<span class="delimiter">)</span>
+  <span class="command">next</span>
+    <span class="command">case</span> <span class="delimiter">(</span>Suc i<span class="delimiter">)</span>
+    <span class="command">then</span> <span class="command">show</span> <span class="var">?case</span> <span class="command">by</span> <span class="delimiter">(</span>subst factsD<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>_code<span class="delimiter">)</span> simp
+  <span class="command">qed</span>
+  <span class="command">ultimately</span> <span class="command">show</span> <span class="var">?case</span> <span class="command">by</span> blast
+<span class="command">qed</span>
+
+<span class="command">lemma</span> facsC_facsD<span class="delimiter">:</span> <span class="string">&quot;facsC = facsD 1&quot;</span>
+  <span class="command">unfolding</span> facsC_def factsD<span class="hidden">&#8681;</span><sub>r</sub><span class="hidden">&#8681;</span><sub>e</sub><span class="hidden">&#8681;</span><sub>c</sub>_facsD <span class="command">by</span> <span class="delimiter">(</span>subst <span class="delimiter">(</span>2<span class="delimiter">)</span> smap_code<span class="delimiter">)</span> auto
+
+<span class="comment">(*&lt;*)</span>
+<span class="command">end</span>
+<span class="comment">(*&gt;*)</span>
+</pre>
+
+</div>
+</body>
+</html>

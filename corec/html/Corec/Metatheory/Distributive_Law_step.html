@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Distributive_Law_step (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Distributive_Law_step</h1>
+
+<span class="command">theory</span> <span class="name">Distributive_Law_step</span><br/>
+<span class="keyword">imports</span> <a href="Integrate_New_Op_step.html"><span class="name">Integrate_New_Op_step</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Distributive law for the sum of 2 *}</span>
+
+<span class="comment">(* This is similar to Distributive_Law, but assumes a distributive law &Lambda;_step over (SpK,&Sigma;&Sigma;_step,F)
+instead of (S,&Sigma;&Sigma;_step,F): *)</span>
+
+<span class="command">theory</span> Distributive_Law_step
+<span class="keyword2">imports</span> Integrate_New_Op_step
+<span class="keyword2">begin</span>
+
+<span class="comment">(* We assume (S,&Sigma;&Sigma;,F)-distributive law, where:
+ -- S is the syntactic signature and T is its term extension (free algebra extension)
+ -- F is the behavior functor  *)</span>
+
+<span class="comment">(*
+(* Distributive law: *)
+consts &Lambda;_step :: &quot;(&#39;a &times; &#39;a F) SpK =&gt; &#39;a &Sigma;&Sigma;_step F&quot;
+
+axiomatization where
+  &Lambda;_step_natural: &quot;&Lambda;_step o SpKmap (f ** Fmap f) = Fmap (T1_map f) o &Lambda;_step&quot;
+
+*)</span>
+
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

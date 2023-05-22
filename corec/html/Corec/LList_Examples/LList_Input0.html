@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory LList_Input0 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory LList_Input0</h1>
+
+<span class="command">theory</span> <span class="name">LList_Input0</span><br/>
+<span class="keyword">imports</span> <a href="Prelim.html"><span class="name">Prelim</span></a> <a href="BNF_Axiomatization.html"><span class="name">BNF_Axiomatization</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> LList_Input0
+<span class="keyword2">imports</span> <span class="string">&quot;../Prelim&quot;</span>
+  <span class="string">&quot;~~/src/HOL/Library/BNF_Axiomatization&quot;</span>
+<span class="keyword2">begin</span>
+
+<span class="command">type_synonym</span> <span class="tfree">&#39;a</span> F <span class="delimiter">=</span> <span class="string">&quot;unit + nat * &#39;a&quot;</span>
+<span class="command">composition_bnf</span> F<span class="delimiter">:</span> <span class="string">&quot;&#39;a F&quot;</span>
+<span class="command">type_synonym</span> bd_type_F <span class="delimiter">=</span> nat
+<span class="command">abbreviation</span> <span class="string">&quot;F_bd &equiv; natLeq&quot;</span>
+
+<span class="command">end</span>
+</pre>
+
+</div>
+</body>
+</html>

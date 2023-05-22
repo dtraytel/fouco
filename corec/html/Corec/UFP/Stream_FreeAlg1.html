@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_FreeAlg1 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_FreeAlg1</h1>
+
+<span class="command">theory</span> <span class="name">Stream_FreeAlg1</span><br/>
+<span class="keyword">imports</span> <a href="Stream_Input1.html"><span class="name">Stream_Input1</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span><span class="verbatim">{* Free algebras for an BNF *}</span>
+
+<span class="comment">(* Free algebra constructed for a sum of two BNF&#39;s S and K: *)</span>
+<span class="comment">(* Notations: Identical to FreeAlg, just that constants and types are suffixed by &quot;step&quot; instead of &quot;base&quot;: *)</span>
+
+<span class="command">theory</span> Stream_FreeAlg1
+<span class="keyword2">imports</span> Stream_Input1
+<span class="keyword2">begin</span>
+
+<span class="command">declare</span> K1.map_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span>
+
+<span class="comment">(* The new-operation functor: *)</span>
+
+<span class="command">composition_bnf</span> <span class="delimiter">(</span><span class="keyword2">open</span><span class="delimiter">)</span> raw_&Sigma;1<span class="delimiter">:</span> <span class="string">&quot;&#39;a &Sigma;0 + &#39;a K1&quot;</span>
+<span class="command">typedef</span> <span class="tfree">&#39;a</span> &Sigma;1 <span class="delimiter">=</span> <span class="string">&quot;UNIV :: (&#39;a &Sigma;0 + &#39;a K1) set&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>rule UNIV_witness<span class="delimiter">)</span>
+
+<span class="command">setup_lifting</span> type_definition_&Sigma;1
+
+<span class="command">lift_definition</span> &Sigma;1_map <span class="delimiter">::</span> <span class="string">&quot;(&#39;a =&gt; &#39;b) =&gt; &#39;a &Sigma;1 =&gt; &#39;b &Sigma;1&quot;</span> <span class="keyword2">is</span> <span class="string">&quot;&lambda;f. map_sum (&Sigma;0_map f) (K1_map f)&quot;</span> <span class="command">.</span>
+<span class="command">lift_definition</span> &Sigma;1_set <span class="delimiter">::</span> <span class="string">&quot;&#39;a &Sigma;1 =&gt; &#39;a set&quot;</span>
+  <span class="keyword2">is</span> <span class="string">&quot;&lambda;x. UNION (Basic_BNFs.setl x) &Sigma;0_set &cup; UNION (Basic_BNFs.setr x) K1_set&quot;</span> <span class="command">.</span>
+<span class="command">lift_definition</span> &Sigma;1_rel <span class="delimiter">::</span> <span class="string">&quot;(&#39;a =&gt; &#39;b =&gt; bool) =&gt; &#39;a &Sigma;1 =&gt; &#39;b &Sigma;1 =&gt; bool&quot;</span>
+  <span class="keyword2">is</span> <span class="string">&quot;&lambda;R. rel_sum (&Sigma;0_rel R) (K1_rel R)&quot;</span> <span class="command">.</span>
+<span class="command">typedef</span> &Sigma;1_bd_type <span class="delimiter">=</span> <span class="string">&quot;UNIV :: ((&Sigma;0_bd_type + bd_type_K1) &times; nat) set&quot;</span> <span class="command">by</span> <span class="delimiter">(</span>rule UNIV_witness<span class="delimiter">)</span>
+<span class="command">definition</span> <span class="string">&quot;&Sigma;1_bd = dir_image ((&Sigma;0_bd +c bd_K1) *c natLeq) Abs_&Sigma;1_bd_type&quot;</span>
+
+<span class="command">bnf</span> <span class="string">&quot;&#39;a &Sigma;1&quot;</span>
+  map<span class="delimiter">:</span> &Sigma;1_map
+  sets<span class="delimiter">:</span> &Sigma;1_set
+  bd<span class="delimiter">:</span> &Sigma;1_bd 
+  rel<span class="delimiter">:</span> &Sigma;1_rel
+<span class="command">unfolding</span> &Sigma;1_bd_def
+<span class="command">apply</span> -
+<span class="command">apply</span> transfer <span class="command">apply</span> <span class="delimiter">(</span>rule raw_&Sigma;1.map_id0<span class="delimiter">)</span>
+<span class="command">apply</span> transfer <span class="command">apply</span> <span class="delimiter">(</span>rule raw_&Sigma;1.map_comp0<span class="delimiter">)</span>
+<span class="command">apply</span> transfer <span class="command">apply</span> <span class="delimiter">(</span>erule raw_&Sigma;1.map_cong0<span class="delimiter">)</span>
+<span class="command">apply</span> transfer <span class="command">apply</span> <span class="delimiter">(</span>rule raw_&Sigma;1.set_map0<span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule card_order_dir_image<span class="delimiter">[</span>OF bijI raw_&Sigma;1.bd_card_order<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>metis inj_on_def Abs_&Sigma;1_bd_type_inverse<span class="delimiter">[</span>OF UNIV_I<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>metis surj_def Abs_&Sigma;1_bd_type_cases<span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule conjunct1<span class="delimiter">[</span>OF Cinfinite_cong<span class="delimiter">[</span>OF dir_image<span class="delimiter">[</span>OF _ raw_&Sigma;1.bd_Card_order<span class="delimiter">]</span> raw_&Sigma;1.bd_Cinfinite<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>metis Abs_&Sigma;1_bd_type_inverse<span class="delimiter">[</span>OF UNIV_I<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>unfold &Sigma;1_set_def map_fun_def id_o<span class="delimiter">)</span> <span class="delimiter">[</span>1<span class="delimiter">]</span> <span class="command">apply</span> <span class="delimiter">(</span>subst o_apply<span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule ordLeq_ordIso_trans<span class="delimiter">[</span>OF raw_&Sigma;1.set_bd dir_image<span class="delimiter">[</span>OF _ raw_&Sigma;1.bd_Card_order<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>metis Abs_&Sigma;1_bd_type_inverse<span class="delimiter">[</span>OF UNIV_I<span class="delimiter">]</span><span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule predicate2I<span class="delimiter">)</span> <span class="command">apply</span> transfer <span class="command">apply</span> <span class="delimiter">(</span>subst raw_&Sigma;1.rel_compp<span class="delimiter">)</span> <span class="command">apply</span> assumption
+<span class="command">apply</span> transfer&#39; <span class="command">apply</span> <span class="delimiter">(</span>rule raw_&Sigma;1.rel_compp_Grp<span class="delimiter">)</span>
+<span class="command">done</span>
+
+<span class="command">declare</span> &Sigma;1.map_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span>
+
+<span class="command">lemma</span> Rep_&Sigma;1_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;(&Sigma;1_rel R ===&gt; rel_sum (&Sigma;0_rel R) (K1_rel R)) Rep_&Sigma;1 Rep_&Sigma;1&quot;</span>
+  <span class="command">unfolding</span> rel_fun_def <span class="command">by</span> transfer blast
+
+<span class="command">lemma</span> Abs_&Sigma;1_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;(rel_sum (&Sigma;0_rel R) (K1_rel R) ===&gt; &Sigma;1_rel R) Abs_&Sigma;1 Abs_&Sigma;1&quot;</span>
+  <span class="command">unfolding</span> rel_fun_def <span class="command">by</span> transfer blast
+
+<span class="command">theorem</span> Rep_&Sigma;1_natural<span class="delimiter">:</span> <span class="string">&quot;map_sum (&Sigma;0_map f) (K1_map f) o Rep_&Sigma;1 = Rep_&Sigma;1 o &Sigma;1_map f&quot;</span>
+  <span class="command">using</span> Rep_&Sigma;1_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;1.rel_Grp raw_&Sigma;1.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">theorem</span> Abs_&Sigma;1_natural<span class="delimiter">:</span> <span class="string">&quot;&Sigma;1_map f o Abs_&Sigma;1 = Abs_&Sigma;1 o map_sum (&Sigma;0_map f) (K1_map f)&quot;</span>
+  <span class="command">using</span> Abs_&Sigma;1_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;1.rel_Grp raw_&Sigma;1.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> Rep_&Sigma;1_o_Abs_&Sigma;1<span class="delimiter">:</span> <span class="string">&quot;Rep_&Sigma;1 o Abs_&Sigma;1 = id&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule box_equals<span class="delimiter">[</span>OF _ o_apply<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> id_apply<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule Abs_&Sigma;1_inverse<span class="delimiter">[</span>OF UNIV_I<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">done</span>
+
+<span class="command">lemma</span> &Sigma;1_rel_&Sigma;1_map_&Sigma;1_map<span class="delimiter">:</span>
+  <span class="string">&quot;&Sigma;1_rel R (&Sigma;1_map f x) (&Sigma;1_map g y) = &Sigma;1_rel (BNF_Def.vimage2p f g R) x y&quot;</span>
+  <span class="command">unfolding</span> &Sigma;1.rel_Grp vimage2p_Grp &Sigma;1.rel_compp &Sigma;1.rel_conversep
+  <span class="command">unfolding</span> relcompp.simps Grp_def <span class="command">by</span> simp
+
+<span class="command">subsection</span><span class="verbatim">{* Definitions and basic setup *}</span>
+
+<span class="comment">(* &#39;x &Sigma;&Sigma;1 consist of &Sigma;1-terms with variables in &#39;x: *)</span>
+<span class="command">datatype_new</span> <span class="delimiter">(</span>&Sigma;&Sigma;1_set<span class="delimiter">:</span> <span class="tfree">&#39;x</span><span class="delimiter">)</span> &Sigma;&Sigma;1 <span class="delimiter">=</span>
+  \&lt;oo&gt;\&lt;pp&gt;1 <span class="string">&quot;&#39;x &Sigma;&Sigma;1 &Sigma;1&quot;</span> <span class="delimiter">|</span> leaf1 <span class="string">&quot;&#39;x&quot;</span>
+  <span class="keyword2">for</span> map<span class="delimiter">:</span> &Sigma;&Sigma;1_map rel<span class="delimiter">:</span> &Sigma;&Sigma;1_rel
+<span class="command">declare</span> &Sigma;&Sigma;1.ctor_fold_transfer
+  <span class="delimiter">[</span>unfolded rel_pre_&Sigma;&Sigma;1_def id_apply BNF_Comp.id_bnf_comp_def vimage2p_def<span class="delimiter">,</span> transfer_rule<span class="delimiter">]</span>
+
+<span class="command">lemma</span> \&lt;oo&gt;\&lt;pp&gt;1_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;1_rel (&Sigma;&Sigma;1_rel R) ===&gt; &Sigma;&Sigma;1_rel R) \&lt;oo&gt;\&lt;pp&gt;1 \&lt;oo&gt;\&lt;pp&gt;1&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>rule rel_funI<span class="delimiter">)</span> <span class="delimiter">(</span>erule iffD2<span class="delimiter">[</span>OF &Sigma;&Sigma;1.rel_inject<span class="delimiter">(</span>1<span class="delimiter">)</span><span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="command">lemma</span> leaf1_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;(R ===&gt; &Sigma;&Sigma;1_rel R) leaf1 leaf1&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>rule rel_funI<span class="delimiter">)</span> <span class="delimiter">(</span>erule iffD2<span class="delimiter">[</span>OF &Sigma;&Sigma;1.rel_inject<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* The free extension, for an algebra s, of an inteprleaftion i of the
+variables into the algebra carrier:  *)</span>
+<span class="command">abbreviation</span> <span class="string">&quot;ext1 s &equiv; rec_&Sigma;&Sigma;1 (s o &Sigma;1_map snd)&quot;</span>
+<span class="command">lemmas</span> ext1_\&lt;oo&gt;\&lt;pp&gt;1 <span class="delimiter">=</span> &Sigma;&Sigma;1.rec<span class="delimiter">(</span>1<span class="delimiter">)</span><span class="delimiter">[</span>of <span class="string">&quot;s o &Sigma;1_map snd&quot;</span> <span class="keyword2">for</span> s<span class="delimiter">,</span>
+  unfolded o_apply &Sigma;1.map_comp snd_convol<span class="delimiter">[</span>unfolded convol_def<span class="delimiter">]</span><span class="delimiter">]</span>
+<span class="command">lemmas</span> ext1_leaf1 <span class="delimiter">=</span> &Sigma;&Sigma;1.rec<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>of <span class="string">&quot;s o &Sigma;1_map snd&quot;</span> <span class="keyword2">for</span> s<span class="delimiter">,</span>
+  unfolded o_apply &Sigma;1.map_comp snd_convol<span class="delimiter">[</span>unfolded convol_def<span class="delimiter">]</span><span class="delimiter">]</span>
+<span class="command">lemmas</span> leaf1_inj <span class="delimiter">=</span> &Sigma;&Sigma;1.inject<span class="delimiter">(</span>2<span class="delimiter">)</span>
+<span class="command">lemmas</span> \&lt;oo&gt;\&lt;pp&gt;1_inj <span class="delimiter">=</span> &Sigma;&Sigma;1.inject<span class="delimiter">(</span>1<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ext1_alt<span class="delimiter">:</span> <span class="string">&quot;ext1 s f = ctor_fold_&Sigma;&Sigma;1 (case_sum s f)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule &Sigma;&Sigma;1.ctor_fold_unique<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule ext<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rename_tac x<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>case_tac x<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>auto simp only<span class="delimiter">:</span> rec_&Sigma;&Sigma;1_def &Sigma;&Sigma;1.ctor_rec fun_eq_iff o_apply BNF_Comp.id_bnf_comp_def
+    id_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_id map_pre_&Sigma;&Sigma;1_def id_apply map_sum.simps sum.inject sum.distinct
+    &Sigma;1.map_comp snd_convol split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+<span class="comment">(* The term algebra: *)</span>
+
+<span class="command">lemma</span> \&lt;oo&gt;\&lt;pp&gt;1_def_pointfree<span class="delimiter">:</span> <span class="string">&quot;\&lt;oo&gt;\&lt;pp&gt;1 &equiv; ctor_&Sigma;&Sigma;1 o Inl&quot;</span>
+<span class="command">unfolding</span> \&lt;oo&gt;\&lt;pp&gt;1_def comp_def BNF_Comp.id_bnf_comp_def <span class="command">.</span>
+
+<span class="comment">(* Monadic structure *)</span>
+<span class="command">lemma</span> leaf1_def_pointfree<span class="delimiter">:</span> <span class="string">&quot;leaf1 &equiv; ctor_&Sigma;&Sigma;1 o Inr&quot;</span>
+<span class="command">unfolding</span> leaf1_def comp_def BNF_Comp.id_bnf_comp_def <span class="command">.</span>
+
+<span class="command">definition</span> flat1 <span class="delimiter">::</span> <span class="string">&quot;(&#39;x &Sigma;&Sigma;1) &Sigma;&Sigma;1 =&gt; &#39;x &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span>
+  flat1_def<span class="delimiter">:</span> <span class="string">&quot;flat1 &equiv; ext1 \&lt;oo&gt;\&lt;pp&gt;1 id&quot;</span>
+
+<span class="command">lemma</span> flat1_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span> <span class="string">&quot;(&Sigma;&Sigma;1_rel (&Sigma;&Sigma;1_rel R) ===&gt; &Sigma;&Sigma;1_rel R) flat1 flat1&quot;</span>
+  <span class="command">unfolding</span> flat1_def ext1_alt <span class="command">by</span> transfer_prover
+
+<span class="comment">(* facts about &Sigma;&Sigma;1: *)</span>
+<span class="command">lemma</span> ctor_fold_&Sigma;&Sigma;1_pointfree<span class="delimiter">:</span>
+<span class="string">&quot;ctor_fold_&Sigma;&Sigma;1 s o ctor_&Sigma;&Sigma;1 = s o (map_pre_&Sigma;&Sigma;1 id (ctor_fold_&Sigma;&Sigma;1 s))&quot;</span>
+<span class="command">unfolding</span> comp_def &Sigma;&Sigma;1.ctor_fold <span class="command">..</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;1_map_ctor_&Sigma;&Sigma;1<span class="delimiter">:</span>
+<span class="string">&quot;&Sigma;&Sigma;1_map f o ctor_&Sigma;&Sigma;1 = ctor_&Sigma;&Sigma;1 o map_sum (&Sigma;1_map (&Sigma;&Sigma;1_map f)) f&quot;</span>
+<span class="command">unfolding</span> comp_def
+<span class="command">unfolding</span> fun_eq_iff
+<span class="command">unfolding</span> &Sigma;&Sigma;1.ctor_map
+<span class="command">unfolding</span> map_pre_&Sigma;&Sigma;1_def  <span class="comment">(* careful here and elsewhere: data newdatatype unfolds more *)</span>
+<span class="command">unfolding</span> id_apply BNF_Comp.id_bnf_comp_def id_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_id id_o <span class="command">by</span> simp
+
+<span class="command">lemma</span> dtor_&Sigma;&Sigma;1_&Sigma;&Sigma;1_map<span class="delimiter">:</span>
+<span class="string">&quot;dtor_&Sigma;&Sigma;1 o &Sigma;&Sigma;1_map f = map_sum (&Sigma;1_map (&Sigma;&Sigma;1_map f)) f o dtor_&Sigma;&Sigma;1&quot;</span>
+<span class="command">using</span> &Sigma;&Sigma;1_map_ctor_&Sigma;&Sigma;1<span class="delimiter">[</span>of f<span class="delimiter">]</span> &Sigma;&Sigma;1.dtor_ctor &Sigma;&Sigma;1.ctor_dtor <span class="command">unfolding</span> comp_def fun_eq_iff <span class="command">by</span> metis
+
+<span class="command">lemma</span> dtor_&Sigma;&Sigma;1_ctor_&Sigma;&Sigma;1<span class="delimiter">:</span> <span class="string">&quot;dtor_&Sigma;&Sigma;1 o ctor_&Sigma;&Sigma;1 = id&quot;</span>
+<span class="command">unfolding</span> comp_def &Sigma;&Sigma;1.dtor_ctor id_def <span class="command">..</span>
+
+<span class="command">lemma</span> ctor_&Sigma;&Sigma;1_dtor_&Sigma;&Sigma;1<span class="delimiter">:</span> <span class="string">&quot;ctor_&Sigma;&Sigma;1 o dtor_&Sigma;&Sigma;1 = id&quot;</span>
+<span class="command">unfolding</span> comp_def &Sigma;&Sigma;1.ctor_dtor id_def <span class="command">..</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;1_rel_inf<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;1_rel (R \&lt;sqinter&gt; &Sigma;0) &le; &Sigma;&Sigma;1_rel R \&lt;sqinter&gt; &Sigma;&Sigma;1_rel &Sigma;0&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule inf_greatest<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule &Sigma;&Sigma;1.rel_mono<span class="delimiter">[</span>OF inf_sup_ord<span class="delimiter">(</span>1<span class="delimiter">)</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule &Sigma;&Sigma;1.rel_mono<span class="delimiter">[</span>OF inf_sup_ord<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">done</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;1_rel_Grp_&Sigma;&Sigma;1_map<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;1_rel (BNF_Def.Grp UNIV f) x y &lt;-&gt; &Sigma;&Sigma;1_map f x = y&quot;</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;1.rel_Grp <span class="command">by</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> Grp_def<span class="delimiter">)</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;1_rel_&Sigma;&Sigma;1_map_&Sigma;&Sigma;1_map<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;1_rel R (&Sigma;&Sigma;1_map f x) (&Sigma;&Sigma;1_map g y) =
+  &Sigma;&Sigma;1_rel (BNF_Def.vimage2p f g R) x y&quot;</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;1.rel_Grp vimage2p_Grp <span class="command">apply</span> <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> &Sigma;&Sigma;1.rel_compp &Sigma;&Sigma;1.rel_conversep relcompp.simps<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>intro exI conjI<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule iffD2<span class="delimiter">[</span>OF &Sigma;&Sigma;1_rel_Grp_&Sigma;&Sigma;1_map refl<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> assumption
+  <span class="command">apply</span> <span class="delimiter">(</span>rule iffD2<span class="delimiter">[</span>OF &Sigma;&Sigma;1_rel_Grp_&Sigma;&Sigma;1_map refl<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;1_rel_Grp_&Sigma;&Sigma;1_map
+  <span class="command">apply</span> simp
+  <span class="command">done</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* @{term &Sigma;1} extension theorems *}</span>
+
+<span class="command">theorem</span> ext1_commute<span class="delimiter">:</span>
+<span class="string">&quot;ext1 s i o \&lt;oo&gt;\&lt;pp&gt;1 = s o &Sigma;1_map (ext1 s i)&quot;</span>
+<span class="command">unfolding</span> ext1_alt \&lt;oo&gt;\&lt;pp&gt;1_def_pointfree o_assoc ctor_fold_&Sigma;&Sigma;1_pointfree map_pre_&Sigma;&Sigma;1_def
+  case_sum_o_map_sum case_sum_o_inj<span class="delimiter">(</span>1<span class="delimiter">)</span> BNF_Comp.id_bnf_comp_def id_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_id <span class="command">..</span>
+
+<span class="command">theorem</span> ext1_comp_leaf1<span class="delimiter">:</span>
+<span class="string">&quot;ext1 s i o leaf1 = i&quot;</span>
+<span class="command">unfolding</span> ext1_alt leaf1_def_pointfree o_assoc ctor_fold_&Sigma;&Sigma;1_pointfree map_pre_&Sigma;&Sigma;1_def
+  case_sum_o_map_sum case_sum_o_inj<span class="delimiter">(</span>2<span class="delimiter">)</span> id_apply BNF_Comp.id_bnf_comp_def id_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> o_id <span class="command">..</span>
+
+<span class="command">theorem</span> ext1_unique<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf1<span class="delimiter">:</span> <span class="string">&quot;f o leaf1 = i&quot;</span> <span class="keyword2">and</span> com<span class="delimiter">:</span> <span class="string">&quot;f o \&lt;oo&gt;\&lt;pp&gt;1 = s o &Sigma;1_map f&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;f = ext1 s i&quot;</span>
+<span class="command">unfolding</span> ext1_alt
+<span class="command">apply</span> <span class="delimiter">(</span>rule &Sigma;&Sigma;1.ctor_fold_unique<span class="delimiter">)</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule sum_comp_cases<span class="delimiter">)</span>
+<span class="command">unfolding</span> map_pre_&Sigma;&Sigma;1_def case_sum_o_map_sum id_apply o_id case_sum_o_inj
+  leaf1<span class="delimiter">[</span>unfolded leaf1_def_pointfree o_assoc<span class="delimiter">]</span> com<span class="delimiter">[</span>unfolded \&lt;oo&gt;\&lt;pp&gt;1_def_pointfree o_assoc<span class="delimiter">]</span>
+  BNF_Comp.id_bnf_comp_def id_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> id_o
+<span class="command">by</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span><span class="delimiter">+</span>
+
+<span class="command">subsection</span><span class="verbatim">{* Customizing @{term &Sigma;&Sigma;1} *}</span>
+
+<span class="command">subsection</span><span class="verbatim">{* Injectiveness, naturality, adjunction *}</span>
+
+<span class="command">theorem</span> leaf1_natural<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;1_map f o leaf1 = leaf1 o f&quot;</span>
+  <span class="command">using</span> leaf1_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;1.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> \&lt;oo&gt;\&lt;pp&gt;1_natural<span class="delimiter">:</span> <span class="string">&quot;\&lt;oo&gt;\&lt;pp&gt;1 o &Sigma;1_map (&Sigma;&Sigma;1_map f) = &Sigma;&Sigma;1_map f o \&lt;oo&gt;\&lt;pp&gt;1&quot;</span>
+  <span class="command">using</span> \&lt;oo&gt;\&lt;pp&gt;1_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;1.rel_Grp &Sigma;&Sigma;1.rel_Grp &Sigma;1_map_def
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Sigma;&Sigma;1_map_def2<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;1_map i = ext1 \&lt;oo&gt;\&lt;pp&gt;1 (leaf1 o i)&quot;</span>
+<span class="command">by</span> <span class="delimiter">(</span>rule ext1_unique<span class="delimiter">[</span>OF leaf1_natural \&lt;oo&gt;\&lt;pp&gt;1_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="command">lemma</span> ext1_\&lt;oo&gt;\&lt;pp&gt;1_leaf1<span class="delimiter">:</span> <span class="string">&quot;ext1 \&lt;oo&gt;\&lt;pp&gt;1 leaf1 = id&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule ext1_unique<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> &Sigma;1.map_id0 o_id id_o <span class="command">by</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span><span class="delimiter">+</span>
+
+<span class="command">lemma</span> ext1_&Sigma;&Sigma;1_map<span class="delimiter">:</span>
+<span class="string">&quot;ext1 s (j o f) = ext1 s j o &Sigma;&Sigma;1_map f&quot;</span>
+<span class="command">proof</span> <span class="delimiter">(</span>rule ext1_unique<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">show</span> <span class="string">&quot;ext1 s j o &Sigma;&Sigma;1_map f o leaf1 = j o f&quot;</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf1_natural
+  <span class="command">unfolding</span> o_assoc ext1_comp_leaf1 <span class="command">..</span>
+<span class="command">next</span>
+  <span class="command">show</span> <span class="string">&quot;ext1 s j o &Sigma;&Sigma;1_map f o \&lt;oo&gt;\&lt;pp&gt;1 = s o &Sigma;1_map (ext1 s j o &Sigma;&Sigma;1_map f)&quot;</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> \&lt;oo&gt;\&lt;pp&gt;1_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> o_assoc ext1_commute
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;1.map_comp0 <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> ext1_&Sigma;1_map<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> <span class="string">&quot;t o &Sigma;1_map f = f o s&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;ext1 t (f o i) = f o ext1 s i&quot;</span>
+<span class="command">proof</span> <span class="delimiter">(</span>rule ext1_unique<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">show</span> <span class="string">&quot;f o ext1 s i o leaf1 = f o i&quot;</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext1_comp_leaf1 <span class="command">..</span>
+<span class="command">next</span>
+  <span class="command">show</span> <span class="string">&quot;f o ext1 s i o \&lt;oo&gt;\&lt;pp&gt;1 = t o &Sigma;1_map (f o ext1 s i)&quot;</span>
+  <span class="command">unfolding</span> &Sigma;1.map_comp0 o_assoc assms
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext1_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* Monadic laws *}</span>
+
+<span class="command">lemma</span> flat1_commute<span class="delimiter">:</span> <span class="string">&quot;\&lt;oo&gt;\&lt;pp&gt;1 o &Sigma;1_map flat1 = flat1 o \&lt;oo&gt;\&lt;pp&gt;1&quot;</span>
+<span class="command">unfolding</span> flat1_def ext1_commute <span class="command">..</span>
+
+<span class="comment">(* The 2 identity laws*)</span>
+<span class="command">theorem</span> flat1_leaf1<span class="delimiter">:</span> <span class="string">&quot;flat1 o leaf1 = id&quot;</span>
+<span class="command">unfolding</span> flat1_def ext1_comp_leaf1 <span class="command">..</span>
+
+<span class="command">theorem</span> leaf1_flat1<span class="delimiter">:</span> <span class="string">&quot;flat1 o &Sigma;&Sigma;1_map leaf1 = id&quot;</span>
+<span class="command">unfolding</span> flat1_def ext1_&Sigma;&Sigma;1_map<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> id_o ext1_\&lt;oo&gt;\&lt;pp&gt;1_leaf1 <span class="command">..</span>
+
+<span class="command">theorem</span> flat1_natural<span class="delimiter">:</span> <span class="string">&quot;flat1 o &Sigma;&Sigma;1_map (&Sigma;&Sigma;1_map i) = &Sigma;&Sigma;1_map i o flat1&quot;</span>
+  <span class="command">using</span> flat1_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV i&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> prod.rel_Grp &Sigma;&Sigma;1.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="comment">(* Associativity *)</span>
+<span class="command">theorem</span> flat1_assoc<span class="delimiter">:</span> <span class="string">&quot;flat1 o &Sigma;&Sigma;1_map flat1 = flat1 o flat1&quot;</span>
+<span class="command">unfolding</span> flat1_def <span class="command">unfolding</span> ext1_&Sigma;&Sigma;1_map<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> id_o
+<span class="command">proof</span><span class="delimiter">(</span>rule ext1_unique<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">,</span> unfold flat1_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">show</span> <span class="string">&quot;flat1 o flat1 o leaf1 = flat1&quot;</span>
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat1_leaf1 o_id <span class="command">..</span>
+<span class="command">next</span>
+  <span class="command">show</span> <span class="string">&quot;flat1 o flat1 o \&lt;oo&gt;\&lt;pp&gt;1 = \&lt;oo&gt;\&lt;pp&gt;1 o &Sigma;1_map (flat1 o flat1)&quot;</span>
+  <span class="command">unfolding</span> flat1_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext1_commute
+  <span class="command">unfolding</span> flat1_def<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;1.map_comp0 o_assoc <span class="command">unfolding</span> flat1_commute <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="command">definition</span> K1_as_&Sigma;&Sigma;1 <span class="delimiter">::</span> <span class="string">&quot;&#39;a K1 =&gt; &#39;a &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;K1_as_&Sigma;&Sigma;1 &equiv; \&lt;oo&gt;\&lt;pp&gt;1 o &Sigma;1_map leaf1 o Abs_&Sigma;1 o Inr&quot;</span>
+
+<span class="command">lemma</span> K1_as_&Sigma;&Sigma;1_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K1_rel R ===&gt; &Sigma;&Sigma;1_rel R) K1_as_&Sigma;&Sigma;1 K1_as_&Sigma;&Sigma;1&quot;</span>
+  <span class="command">unfolding</span> K1_as_&Sigma;&Sigma;1_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> K1_as_&Sigma;&Sigma;1_natural<span class="delimiter">:</span>
+<span class="string">&quot;K1_as_&Sigma;&Sigma;1 o K1_map f = &Sigma;&Sigma;1_map f o K1_as_&Sigma;&Sigma;1&quot;</span>
+  <span class="command">using</span> K1_as_&Sigma;&Sigma;1_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> K1.rel_Grp &Sigma;&Sigma;1.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

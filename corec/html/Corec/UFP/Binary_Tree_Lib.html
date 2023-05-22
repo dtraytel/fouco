@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Binary_Tree_Lib (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Binary_Tree_Lib</h1>
+
+<span class="command">theory</span> <span class="name">Binary_Tree_Lib</span><br/>
+<span class="keyword">imports</span> <a href="Binary_Tree_More_Corec_Upto2.html"><span class="name">Binary_Tree_More_Corec_Upto2</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> Binary_Tree_Lib
+<span class="keyword2">imports</span> <span class="string">&quot;../Binary_Tree/Binary_Tree_Behavior_BNF&quot;</span> <span class="string">&quot;../Binary_Tree/Binary_Tree_More_Corec_Upto2&quot;</span>
+<span class="keyword2">begin</span>
+
+<span class="comment">(* todo: make them defs eventually: *)</span>
+<span class="command">type_synonym</span> btree <span class="delimiter">=</span> J
+<span class="command">abbreviation</span> <span class="string">&quot;val t &equiv; fst (dtor_J t)&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;left t &equiv; fst (snd (dtor_J t))&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;right t &equiv; snd (snd (dtor_J t))&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;Node n l r &equiv; ctor_J (n, l, r)&quot;</span>
+<span class="command">code_datatype</span> ctor_J
+<span class="command">declare</span> J.dtor_ctor<span class="delimiter">[</span>code<span class="delimiter">]</span>
+
+<span class="command">section</span> <span class="verbatim">{* Abbreviations *}</span>
+          
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS0 &equiv; gg0  :: &#39;a &Sigma;&Sigma;0 F =&gt; &#39;a &Sigma;&Sigma;0&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF0 &equiv; leaf0&quot;</span>
+<span class="command">abbreviation</span> GUARD0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD0 &equiv; LEAF0&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END0 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END0 xs &equiv; LEAF0 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT0 a &equiv; LEAF0 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS1 &equiv; gg1  :: &#39;a &Sigma;&Sigma;1 F =&gt; &#39;a &Sigma;&Sigma;1&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF1 &equiv; leaf1&quot;</span>
+<span class="command">abbreviation</span> GUARD1 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD1 &equiv; LEAF1&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END1 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END1 xs &equiv; LEAF1 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT1 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;1&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT1 a &equiv; LEAF1 (Inr a)&quot;</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS2 &equiv; gg2  :: &#39;a &Sigma;&Sigma;2 F =&gt; &#39;a &Sigma;&Sigma;2&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF2 &equiv; leaf2&quot;</span>
+<span class="command">abbreviation</span> GUARD2 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;2&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD2 &equiv; LEAF2&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END2 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;2&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END2 xs &equiv; LEAF2 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT2 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;2&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT2 a &equiv; LEAF2 (Inr a)&quot;</span>
+
+<span class="command">lemma</span> Node_uniform<span class="delimiter">:</span> <span class="string">&quot;Node x l r = eval0 (gg0 (x, leaf0 l, leaf0 r))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>rule iffD1<span class="delimiter">[</span>OF J.dtor_inject<span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor o_eq_dest<span class="delimiter">[</span>OF eval0_gg0<span class="delimiter">]</span> eval0_leaf0&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> genCngdd0_Node<span class="delimiter">:</span> <span class="string">&quot;[|x1 = x2; genCngdd0 R l1 l2; genCngdd0 R r1 r2|] ==&gt; 
+  genCngdd0 R (Node x1 l1 r1) (Node x2 l2 r2)&quot;</span>
+  <span class="command">unfolding</span> Node_uniform
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd0_eval0<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF gg0_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> rel_pre_J_def BNF_Comp.id_bnf_comp_def vimage2p_def
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF Pair_transfer<span class="delimiter">]</span><span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF Pair_transfer<span class="delimiter">]</span><span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF leaf0_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF leaf0_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> assumption
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd0_genCngdd1<span class="delimiter">:</span> <span class="string">&quot;genCngdd0 R xs ys ==&gt; genCngdd1 R xs ys&quot;</span>
+  <span class="command">unfolding</span> genCngdd0_def cngdd0_def cptdd0_def genCngdd1_def cngdd1_def cptdd1_def eval1_embL1<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>intro allI impI<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule conjE<span class="delimiter">)</span><span class="delimiter">+</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>drule spec<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule mp conjI<span class="delimiter">)</span><span class="delimiter">+</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF comp_transfer<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule embL1_transfer<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd1_Node<span class="delimiter">:</span> <span class="string">&quot;[|x1 = x2; genCngdd1 R l1 l2; genCngdd1 R r1 r2|] ==&gt; 
+  genCngdd1 R (Node x1 l1 r1) (Node x2 l2 r2)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst I1.idem_Cl<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd0_genCngdd1<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd0_Node<span class="delimiter">)</span>
+  <span class="command">apply</span> auto
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd1_alg&rho;1<span class="delimiter">:</span> <span class="string">&quot;[|genCngdd1 R t1 t2; genCngdd1 R u1 u2|] ==&gt; 
+  genCngdd1 R (alg&rho;1 (t1, u1)) (alg&rho;1 (t2, u2))&quot;</span>
+  <span class="command">unfolding</span> alg&rho;1_def o_apply
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd1_eval1<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF K1_as_&Sigma;&Sigma;1_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> simp
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd1_genCngdd2<span class="delimiter">:</span> <span class="string">&quot;genCngdd1 R xs ys ==&gt; genCngdd2 R xs ys&quot;</span>
+  <span class="command">unfolding</span> genCngdd1_def cngdd1_def cptdd1_def genCngdd2_def cngdd2_def cptdd2_def eval2_embL2<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>intro allI impI<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule conjE<span class="delimiter">)</span><span class="delimiter">+</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>drule spec<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule mp conjI<span class="delimiter">)</span><span class="delimiter">+</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF comp_transfer<span class="delimiter">]</span><span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule embL2_transfer<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd2_Node<span class="delimiter">:</span> <span class="string">&quot;[|x1 = x2; genCngdd2 R l1 l2; genCngdd2 R r1 r2|] ==&gt; 
+  genCngdd2 R (Node x1 l1 r1) (Node x2 l2 r2)&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst I2.idem_Cl<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd1_genCngdd2<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd1_Node<span class="delimiter">)</span>
+  <span class="command">apply</span> auto
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd2_alg&rho;1<span class="delimiter">:</span> <span class="string">&quot;[|genCngdd2 R t1 t2; genCngdd2 R u1 u2|] ==&gt; 
+  genCngdd2 R (alg&rho;1 (t1, u1)) (alg&rho;1 (t2, u2))&quot;</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>subst I2.idem_Cl<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd1_genCngdd2<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd1_alg&rho;1<span class="delimiter">)</span>
+  <span class="command">apply</span> auto
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd2_alg&rho;2<span class="delimiter">:</span> <span class="string">&quot;[|genCngdd2 R t1 t2; genCngdd2 R u1 u2|] ==&gt; 
+  genCngdd2 R (alg&rho;2 (t1, u1)) (alg&rho;2 (t2, u2))&quot;</span>
+  <span class="command">unfolding</span> alg&rho;2_def o_apply
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd2_eval2<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF K2_as_&Sigma;&Sigma;2_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> simp
+  <span class="command">done</span>
+
+<span class="command">lemma</span> btree_coinduct<span class="delimiter">[</span>case_names Eq_btree<span class="delimiter">,</span> case_conclusion Eq_btree head tail<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> <span class="string">&quot;R s s&#39;&quot;</span> <span class="string">&quot;!!s s&#39;. R s s&#39; ==&gt; val s = val s&#39; &and; R (left s) (left s&#39;) &and; R (right s) (right s&#39;)&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;s = s&#39;&quot;</span>
+<span class="command">using</span> assms<span class="delimiter">(</span>1<span class="delimiter">)</span> <span class="command">proof</span> <span class="delimiter">(</span>rule mp<span class="delimiter">[</span>OF J.dtor_coinduct<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">,</span> safe<span class="delimiter">)</span>
+  <span class="command">fix</span> a b
+  <span class="command">assume</span> <span class="string">&quot;R a b&quot;</span>
+  <span class="command">from</span> assms<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">show</span> <span class="string">&quot;F_rel R (dtor_J a) (dtor_J b)&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>cases <span class="string">&quot;dtor_J a&quot;</span> <span class="string">&quot;dtor_J b&quot;</span> rule<span class="delimiter">:</span> prod.exhaust<span class="delimiter">[</span>case_product prod.exhaust<span class="delimiter">]</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> rel_pre_J_def vimage2p_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> btree_coinduct0<span class="delimiter">[</span>case_names Eq_btree<span class="delimiter">,</span> case_conclusion Eq_btree head tail<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> <span class="string">&quot;R s s&#39;&quot;</span> <span class="string">&quot;!!s s&#39;. R s s&#39; ==&gt; val s = val s&#39; &and; genCngdd0 R (left s) (left s&#39;) &and; genCngdd0 R (right s) (right s&#39;)&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;s = s&#39;&quot;</span>
+<span class="command">using</span> assms<span class="delimiter">(</span>1<span class="delimiter">)</span> <span class="command">proof</span> <span class="delimiter">(</span>rule mp<span class="delimiter">[</span>OF coinductionU_genCngdd0<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">,</span> safe<span class="delimiter">)</span>
+  <span class="command">fix</span> a b
+  <span class="command">assume</span> <span class="string">&quot;R a b&quot;</span>
+  <span class="command">from</span> assms<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">show</span> <span class="string">&quot;F_rel (genCngdd0 R) (dtor_J a) (dtor_J b)&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>cases <span class="string">&quot;dtor_J a&quot;</span> <span class="string">&quot;dtor_J b&quot;</span> rule<span class="delimiter">:</span> prod.exhaust<span class="delimiter">[</span>case_product prod.exhaust<span class="delimiter">]</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> rel_pre_J_def vimage2p_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> btree_coinduct1<span class="delimiter">[</span>case_names Eq_btree<span class="delimiter">,</span> case_conclusion Eq_btree head tail<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> <span class="string">&quot;R s s&#39;&quot;</span> <span class="string">&quot;!!s s&#39;. R s s&#39; ==&gt; val s = val s&#39; &and; genCngdd1 R (left s) (left s&#39;) &and; genCngdd1 R (right s) (right s&#39;)&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;s = s&#39;&quot;</span>
+<span class="command">using</span> assms<span class="delimiter">(</span>1<span class="delimiter">)</span> <span class="command">proof</span> <span class="delimiter">(</span>rule mp<span class="delimiter">[</span>OF coinductionU_genCngdd1<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">,</span> safe<span class="delimiter">)</span>
+  <span class="command">fix</span> a b
+  <span class="command">assume</span> <span class="string">&quot;R a b&quot;</span>
+  <span class="command">from</span> assms<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">show</span> <span class="string">&quot;F_rel (genCngdd1 R) (dtor_J a) (dtor_J b)&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>cases <span class="string">&quot;dtor_J a&quot;</span> <span class="string">&quot;dtor_J b&quot;</span> rule<span class="delimiter">:</span> prod.exhaust<span class="delimiter">[</span>case_product prod.exhaust<span class="delimiter">]</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> rel_pre_J_def vimage2p_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> btree_coinduct2<span class="delimiter">[</span>case_names Eq_btree<span class="delimiter">,</span> case_conclusion Eq_btree head tail<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> <span class="string">&quot;R s s&#39;&quot;</span> <span class="string">&quot;!!s s&#39;. R s s&#39; ==&gt; val s = val s&#39; &and; genCngdd2 R (left s) (left s&#39;) &and; genCngdd2 R (right s) (right s&#39;)&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;s = s&#39;&quot;</span>
+<span class="command">using</span> assms<span class="delimiter">(</span>1<span class="delimiter">)</span> <span class="command">proof</span> <span class="delimiter">(</span>rule mp<span class="delimiter">[</span>OF coinductionU_genCngdd2<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">,</span> safe<span class="delimiter">)</span>
+  <span class="command">fix</span> a b
+  <span class="command">assume</span> <span class="string">&quot;R a b&quot;</span>
+  <span class="command">from</span> assms<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">show</span> <span class="string">&quot;F_rel (genCngdd2 R) (dtor_J a) (dtor_J b)&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>cases <span class="string">&quot;dtor_J a&quot;</span> <span class="string">&quot;dtor_J b&quot;</span> rule<span class="delimiter">:</span> prod.exhaust<span class="delimiter">[</span>case_product prod.exhaust<span class="delimiter">]</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> rel_pre_J_def vimage2p_def BNF_Comp.id_bnf_comp_def<span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">end</span>
+</pre>
+
+</div>
+</body>
+</html>

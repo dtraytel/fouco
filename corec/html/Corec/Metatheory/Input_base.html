@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Input_base (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Input_base</h1>
+
+<span class="command">theory</span> <span class="name">Input_base</span><br/>
+<span class="keyword">imports</span> <a href="Prelim.html"><span class="name">Prelim</span></a> <a href="BNF_Axiomatization.html"><span class="name">BNF_Axiomatization</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> Input_base
+<span class="keyword2">imports</span> Prelim
+  <span class="string">&quot;~~/src/HOL/Library/BNF_Axiomatization&quot;</span>
+<span class="keyword2">begin</span>
+
+<span class="comment">(*REPLACE_F*)</span>
+<span class="command">bnf_axiomatization</span> <span class="delimiter">(</span>F_set<span class="delimiter">:</span> <span class="tfree">&#39;a</span><span class="delimiter">)</span> F <span class="keyword2">for</span> map<span class="delimiter">:</span> F_map rel<span class="delimiter">:</span> F_rel
+<span class="command">abbreviation</span> <span class="string">&quot;F_bd &equiv; bd_F&quot;</span>
+<span class="comment">(*REPLACE_F_END*)</span>
+
+<span class="command">end</span>
+</pre>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Tree_Input1 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Tree_Input1</h1>
+
+<span class="command">theory</span> <span class="name">Tree_Input1</span><br/>
+<span class="keyword">imports</span> <a href="Tree_More_Corec_Upto0.html"><span class="name">Tree_More_Corec_Upto0</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> Tree_Input1
+<span class="keyword2">imports</span> Tree_More_Corec_Upto0
+<span class="keyword2">begin</span>
+
+<span class="command">type_synonym</span> <span class="tfree">&#39;a</span> K1 <span class="delimiter">=</span> <span class="string">&quot;&#39;a * &#39;a&quot;</span>
+<span class="command">composition_bnf</span> <span class="delimiter">(</span><span class="keyword2">open</span><span class="delimiter">)</span> K1<span class="delimiter">:</span> <span class="string">&quot;&#39;a * &#39;a&quot;</span>
+<span class="command">thm</span> K1.set_map
+<span class="command">abbreviation</span> <span class="string">&quot;K1_map &equiv; &lambda;f. f ** f&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;K1_rel &equiv; &lambda;R. rel_prod R R&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;K1_set &equiv; &lambda;x. Basic_BNFs.fsts x &cup; Basic_BNFs.snds x&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;bd_K1 &equiv; natLeq&quot;</span>
+<span class="command">type_synonym</span> bd_type_K1 <span class="delimiter">=</span> nat
+
+<span class="command">end</span>
+</pre>
+
+</div>
+</body>
+</html>

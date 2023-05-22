@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Lift_to_Free_step (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Lift_to_Free_step</h1>
+
+<span class="command">theory</span> <span class="name">Lift_to_Free_step</span><br/>
+<span class="keyword">imports</span> <a href="Distributive_Law_step.html"><span class="name">Distributive_Law_step</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span> <span class="verbatim">{* Lifting of the distributive law to the free algebra *}</span>
+
+
+<span class="comment">(* This is silimar to Lift_to_Free, but uses &Lambda;_step, &Sigma;&Sigma;_step, dd_step, SpK instead of S, etc. *)</span>
+
+<span class="command">theory</span> Lift_to_Free_step
+<span class="keyword2">imports</span> Distributive_Law_step
+<span class="keyword2">begin</span>
+
+<span class="command">subsection</span><span class="verbatim">{* The lifting *}</span>
+
+<span class="comment">(* Our aim is lift &Lambda;_step to an (SpK,SpK,T)-distributive law dd_step compatible with the monadic structure. *)</span>
+
+<span class="comment">(* In order to be able to define dd_step, we need a larger codomain type: *)</span>
+<span class="command">definition</span> ddd_step <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;_step =&gt; &#39;a &Sigma;&Sigma;_step &times; &#39;a &Sigma;&Sigma;_step F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;ddd_step = ext_step &lt;\&lt;oo&gt;\&lt;pp&gt;_step o &Sigma;_step_map fst, F_map flat_step o &Lambda;_step&gt; (leaf_step ** F_map leaf_step)&quot;</span>
+
+<span class="command">definition</span> dd_step <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;&Sigma;_step =&gt; &#39;a &Sigma;&Sigma;_step F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;dd_step = snd o ddd_step&quot;</span>
+
+<span class="command">lemma</span> ddd_step_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;_step_rel (rel_prod R (F_rel R)) ===&gt; rel_prod (&Sigma;&Sigma;_step_rel R) (F_rel (&Sigma;&Sigma;_step_rel R))) ddd_step ddd_step&quot;</span>
+  <span class="command">unfolding</span> ddd_step_def ext_step_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> dd_step_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;_step_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;_step_rel R)) dd_step dd_step&quot;</span>
+  <span class="command">unfolding</span> dd_step_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> F_rel_&Sigma;&Sigma;_step_rel<span class="delimiter">:</span> <span class="string">&quot;&Sigma;&Sigma;_step_rel (rel_prod R (F_rel R)) x y ==&gt; F_rel (&Sigma;&Sigma;_step_rel R) (dd_step x) (dd_step y)&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF dd_step_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="comment">(* We verify the facts for dd_step: *)</span>
+<span class="command">theorem</span> dd_step_leaf_step<span class="delimiter">:</span> <span class="string">&quot;dd_step o leaf_step = F_map leaf_step o snd&quot;</span>
+<span class="command">unfolding</span> dd_step_def ddd_step_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext_step_comp_leaf_step snd_comp_map_prod <span class="command">..</span>
+
+<span class="command">lemma</span> ddd_step_natural<span class="delimiter">:</span> <span class="string">&quot;ddd_step o &Sigma;&Sigma;_step_map (f ** F_map f) = (&Sigma;&Sigma;_step_map f ** F_map (&Sigma;&Sigma;_step_map f)) o ddd_step&quot;</span>
+  <span class="command">using</span> ddd_step_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;_step.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">theorem</span> dd_step_natural<span class="delimiter">:</span> <span class="string">&quot;dd_step o &Sigma;&Sigma;_step_map (f ** F_map f) = F_map (&Sigma;&Sigma;_step_map f) o dd_step&quot;</span>
+  <span class="command">using</span> dd_step_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp prod.rel_Grp &Sigma;&Sigma;_step.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;_step_dd_step<span class="delimiter">:</span> <span class="string">&quot;&Lambda;_step = dd_step o \&lt;oo&gt;\&lt;pp&gt;_step o &Sigma;_step_map leaf_step&quot;</span>
+  <span class="command">unfolding</span> dd_step_def ddd_step_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;_step.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext_step_commute
+  <span class="command">unfolding</span> o_assoc snd_convol ext_step_comp_leaf_step
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Lambda;_step_natural
+  <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf_step_flat_step F_map_id id_o
+  <span class="command">..</span>
+
+<span class="command">lemma</span> fst_ddd_step<span class="delimiter">:</span> <span class="string">&quot;fst o ddd_step = &Sigma;&Sigma;_step_map fst&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;fst o ddd_step = ext_step \&lt;oo&gt;\&lt;pp&gt;_step (leaf_step o fst)&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule ext_step_unique<span class="delimiter">)</span> <span class="command">unfolding</span> ddd_step_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> ext_step_comp_leaf_step ext_step_commute
+  <span class="command">unfolding</span> o_assoc fst_comp_map_prod fst_convol
+  <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;_step.map_comp0 <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = &Sigma;&Sigma;_step_map fst&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext_step_unique<span class="delimiter">)</span>
+  <span class="command">unfolding</span> leaf_step_natural \&lt;oo&gt;\&lt;pp&gt;_step_natural <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> ddd_step_flat_step<span class="delimiter">:</span> <span class="string">&quot;(flat_step ** F_map flat_step) o ddd_step o &Sigma;&Sigma;_step_map ddd_step = ddd_step o flat_step&quot;</span> <span class="delimiter">(</span><span class="keyword2">is</span> <span class="string">&quot;?L = ?R&quot;</span><span class="delimiter">)</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;?L = ext_step &lt;\&lt;oo&gt;\&lt;pp&gt;_step o &Sigma;_step_map fst, F_map flat_step o &Lambda;_step&gt; ddd_step&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule ext_step_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat_step ** F_map flat_step) o ddd_step o &Sigma;&Sigma;_step_map ddd_step o leaf_step = ddd_step&quot;</span>
+    <span class="command">unfolding</span> ddd_step_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> leaf_step_natural
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext_step_comp_leaf_step
+    <span class="command">unfolding</span> map_prod.comp F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat_step_leaf_step F_map_id map_prod.id id_o <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;&lt;flat_step o (\&lt;oo&gt;\&lt;pp&gt;_step o &Sigma;_step_map fst) , F_map flat_step o (F_map flat_step o &Lambda;_step)&gt;  =
+             &lt;\&lt;oo&gt;\&lt;pp&gt;_step o &Sigma;_step_map fst , F_map flat_step o &Lambda;_step&gt; o &Sigma;_step_map (flat_step ** F_map flat_step)&quot;</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> flat_step_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc fst_convol snd_convol
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;_step.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> fst_comp_map_prod snd_comp_map_prod
+    <span class="command">unfolding</span> &Lambda;_step_natural <span class="command">unfolding</span> o_assoc F_map_comp<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat_step_assoc <span class="command">by</span><span class="delimiter">(</span>rule refl<span class="delimiter">,</span> rule refl<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;(flat_step ** F_map flat_step) o ddd_step o &Sigma;&Sigma;_step_map ddd_step o \&lt;oo&gt;\&lt;pp&gt;_step =
+          &lt;\&lt;oo&gt;\&lt;pp&gt;_step o &Sigma;_step_map fst , F_map flat_step o &Lambda;_step&gt; o &Sigma;_step_map (flat_step ** F_map flat_step o ddd_step o &Sigma;&Sigma;_step_map ddd_step)&quot;</span>
+    <span class="command">unfolding</span> ddd_step_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> \&lt;oo&gt;\&lt;pp&gt;_step_natural<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc
+    <span class="command">apply</span><span class="delimiter">(</span>subst o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span><span class="delimiter">)</span> <span class="command">unfolding</span> ext_step_commute
+    <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> &Sigma;_step.map_comp0<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> &Sigma;_step.map_comp0
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> map_prod_o_convol
+    <span class="command">unfolding</span> ext_step_&Sigma;&Sigma;_step_map<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> A <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">also</span> <span class="command">have</span> <span class="string">&quot;... = ?R&quot;</span>
+  <span class="command">proof</span><span class="delimiter">(</span>rule sym<span class="delimiter">,</span> rule ext_step_unique<span class="delimiter">)</span>
+    <span class="command">show</span> <span class="string">&quot;ddd_step o flat_step o leaf_step = ddd_step&quot;</span> <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> flat_step_leaf_step o_id <span class="command">..</span>
+  <span class="command">next</span>
+    <span class="command">show</span> <span class="string">&quot;ddd_step o flat_step o \&lt;oo&gt;\&lt;pp&gt;_step = &lt;\&lt;oo&gt;\&lt;pp&gt;_step o &Sigma;_step_map fst , F_map flat_step o &Lambda;_step&gt; o &Sigma;_step_map (ddd_step o flat_step)&quot;</span>
+    <span class="command">unfolding</span> ddd_step_def <span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">unfolding</span> flat_step_commute<span class="delimiter">[</span>symmetric<span class="delimiter">]</span>
+    <span class="command">unfolding</span> o_assoc <span class="command">unfolding</span> ext_step_commute &Sigma;_step.map_comp0 <span class="command">unfolding</span> o_assoc <span class="command">..</span>
+  <span class="command">qed</span>
+  <span class="command">finally</span> <span class="command">show</span> <span class="var">?thesis</span> <span class="command">.</span>
+<span class="command">qed</span>
+
+<span class="command">theorem</span> dd_step_flat_step<span class="delimiter">:</span> <span class="string">&quot;F_map flat_step o dd_step o &Sigma;&Sigma;_step_map &lt;&Sigma;&Sigma;_step_map fst, dd_step&gt; = dd_step o flat_step&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> A<span class="delimiter">:</span> <span class="string">&quot;snd o ((flat_step ** F_map flat_step) o ddd_step o &Sigma;&Sigma;_step_map ddd_step) = snd o (ddd_step o flat_step)&quot;</span>
+  <span class="command">unfolding</span> ddd_step_flat_step <span class="command">..</span>
+  <span class="command">have</span> B<span class="delimiter">:</span> <span class="string">&quot;ddd_step = &lt;&Sigma;&Sigma;_step_map fst , snd o ddd_step&gt;&quot;</span> <span class="command">apply</span><span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span>
+  <span class="command">unfolding</span> fst_ddd_step <span class="command">by</span> auto
+  <span class="command">show</span> <span class="var">?thesis</span> <span class="command">unfolding</span> dd_step_def
+  <span class="command">unfolding</span> A<span class="delimiter">[</span>symmetric<span class="delimiter">,</span> unfolded o_assoc snd_comp_map_prod<span class="delimiter">]</span> o_assoc B<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> <span class="command">..</span>
+<span class="command">qed</span>
+
+<span class="comment">(* The next two theorems are not necessary for the development.
+They show that the conditions dd_step_leaf_step and dd_step_flat_step imply the
+more standard conditions for the distributive law dd_step&#39; = &lt;&Sigma;&Sigma;_step_map fst, dd_step&gt;
+for the functors &Sigma;&Sigma;_step and &#39;a F&#39; = &#39;a &times; &#39;a F_ In fact, they can be shown
+equivalent to these. *)</span>
+
+<span class="command">lemma</span> dd_step_leaf_step2<span class="delimiter">:</span> <span class="string">&quot;&lt;&Sigma;&Sigma;_step_map fst, dd_step&gt; o leaf_step = leaf_step ** F_map leaf_step&quot;</span>
+<span class="command">apply</span> <span class="delimiter">(</span>rule fst_snd_cong<span class="delimiter">)</span> <span class="command">unfolding</span> o_assoc <span class="command">by</span> <span class="delimiter">(</span>simp_all add<span class="delimiter">:</span> leaf_step_natural dd_step_leaf_step<span class="delimiter">)</span>
+
+<span class="command">lemma</span> ddd_step_leaf_step<span class="delimiter">:</span> <span class="string">&quot;ddd_step o leaf_step = leaf_step ** F_map leaf_step&quot;</span>
+<span class="command">unfolding</span> ddd_step_def ext_step_comp_leaf_step <span class="command">..</span>
+
+<span class="command">lemma</span> ddd_step_\&lt;oo&gt;\&lt;pp&gt;_step<span class="delimiter">:</span> <span class="string">&quot;ddd_step o \&lt;oo&gt;\&lt;pp&gt;_step = &lt;\&lt;oo&gt;\&lt;pp&gt;_step o &Sigma;_step_map fst , F_map flat_step o &Lambda;_step&gt; o &Sigma;_step_map ddd_step&quot;</span>
+<span class="command">unfolding</span> ddd_step_def ext_step_commute <span class="command">..</span>
+
+
+<span class="comment">(* More customization *)</span>
+
+<span class="comment">(* TODO Jasmin: Add_step this high-level induction for the relator of datatypes:
+(similarly, coinduction for codatatypes): *)</span>
+<span class="command">lemma</span> &Sigma;&Sigma;_step_rel_induct_pointfree<span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf_step<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf_step x1) (leaf_step x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;_step<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;_step_rel (&Sigma;&Sigma;_step_rel R) y1 y2; &Sigma;_step_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;_step y1) (\&lt;oo&gt;\&lt;pp&gt;_step y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;_step_rel R &le; phi&quot;</span>
+<span class="command">proof</span>-
+  <span class="command">have</span> <span class="string">&quot;&Sigma;&Sigma;_step_rel R &le; phi \&lt;sqinter&gt; &Sigma;&Sigma;_step_rel R&quot;</span>
+  <span class="command">apply</span><span class="delimiter">(</span>induct rule<span class="delimiter">:</span> &Sigma;&Sigma;_step.ctor_rel_induct<span class="delimiter">)</span>
+  <span class="command">using</span> assms &Sigma;&Sigma;_step.rel_inject<span class="delimiter">[</span>of R<span class="delimiter">]</span> <span class="command">unfolding</span> rel_pre_&Sigma;&Sigma;_step_def &Sigma;&Sigma;_step.leaf_step_def &Sigma;&Sigma;_step.\&lt;oo&gt;\&lt;pp&gt;_step_def
+  <span class="command">using</span> inf_greatest<span class="delimiter">[</span>OF &Sigma;_step.rel_mono<span class="delimiter">[</span>OF inf_le1<span class="delimiter">]</span> &Sigma;_step.rel_mono<span class="delimiter">[</span>OF inf_le2<span class="delimiter">]</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> rel_sum_def BNF_Comp.id_bnf_comp_def vimage2p_def <span class="command">by</span> <span class="delimiter">(</span>auto split<span class="delimiter">:</span> sum.splits<span class="delimiter">)</span> blast<span class="delimiter">+</span>
+  <span class="command">thus</span> <span class="var">?thesis</span> <span class="command">by</span> simp
+<span class="command">qed</span>
+
+<span class="command">lemma</span> &Sigma;&Sigma;_step_rel_induct<span class="delimiter">[</span>case_names leaf_step \&lt;oo&gt;\&lt;pp&gt;_step<span class="delimiter">]</span><span class="delimiter">:</span>
+<span class="keyword2">assumes</span> leaf_step<span class="delimiter">:</span> <span class="string">&quot;!! x1 x2. R x1 x2 ==&gt; phi (leaf_step x1) (leaf_step x2)&quot;</span>
+<span class="keyword2">and</span> \&lt;oo&gt;\&lt;pp&gt;_step<span class="delimiter">:</span> <span class="string">&quot;!! y1 y2. [|&Sigma;_step_rel (&Sigma;&Sigma;_step_rel R) y1 y2; &Sigma;_step_rel phi y1 y2|] ==&gt; phi (\&lt;oo&gt;\&lt;pp&gt;_step y1) (\&lt;oo&gt;\&lt;pp&gt;_step y2)&quot;</span>
+<span class="keyword2">shows</span> <span class="string">&quot;&Sigma;&Sigma;_step_rel R t1 t2 --&gt; phi t1 t2&quot;</span>
+<span class="command">using</span> &Sigma;&Sigma;_step_rel_induct_pointfree<span class="delimiter">[</span>of R<span class="delimiter">,</span> OF assms<span class="delimiter">]</span> <span class="command">by</span> auto
+<span class="comment">(* end TODO *)</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

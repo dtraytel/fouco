@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Lattice_Syntax (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Lattice_Syntax</h1>
+
+<span class="command">theory</span> <span class="name">Lattice_Syntax</span><br/>
+<span class="keyword">imports</span> <a href="../../HOL/HOL/Complete_Lattices.html"><span class="name">Complete_Lattices</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="comment">(* Author: Florian Haftmann, TU Muenchen *)</span>
+
+<span class="command">header</span> <span class="verbatim">{* Pretty syntax for lattice operations *}</span>
+
+<span class="command">theory</span> Lattice_Syntax
+<span class="keyword2">imports</span> Complete_Lattices
+<span class="keyword2">begin</span>
+
+<span class="command">notation</span>
+  bot <span class="delimiter">(</span><span class="string">&quot;&perp;&quot;</span><span class="delimiter">)</span> <span class="keyword2">and</span>
+  top <span class="delimiter">(</span><span class="string">&quot;\&lt;top&gt;&quot;</span><span class="delimiter">)</span> <span class="keyword2">and</span>
+  inf  <span class="delimiter">(</span><span class="keyword2">infixl</span> <span class="string">&quot;\&lt;sqinter&gt;&quot;</span> 70<span class="delimiter">)</span> <span class="keyword2">and</span>
+  sup  <span class="delimiter">(</span><span class="keyword2">infixl</span> <span class="string">&quot;\&lt;squnion&gt;&quot;</span> 65<span class="delimiter">)</span> <span class="keyword2">and</span>
+  Inf  <span class="delimiter">(</span><span class="string">&quot;\&lt;Sqinter&gt;_&quot;</span> <span class="delimiter">[</span>900<span class="delimiter">]</span> 900<span class="delimiter">)</span> <span class="keyword2">and</span>
+  Sup  <span class="delimiter">(</span><span class="string">&quot;\&lt;Squnion&gt;_&quot;</span> <span class="delimiter">[</span>900<span class="delimiter">]</span> 900<span class="delimiter">)</span>
+
+<span class="command">syntax</span> <span class="delimiter">(</span>xsymbols<span class="delimiter">)</span>
+  <span class="string">&quot;_INF1&quot;</span>     <span class="delimiter">::</span> <span class="string">&quot;pttrns =&gt; &#39;b =&gt; &#39;b&quot;</span>           <span class="delimiter">(</span><span class="string">&quot;(3\&lt;Sqinter&gt;_./ _)&quot;</span> <span class="delimiter">[</span>0<span class="delimiter">,</span> 10<span class="delimiter">]</span> 10<span class="delimiter">)</span>
+  <span class="string">&quot;_INF&quot;</span>      <span class="delimiter">::</span> <span class="string">&quot;pttrn =&gt; &#39;a set =&gt; &#39;b =&gt; &#39;b&quot;</span>  <span class="delimiter">(</span><span class="string">&quot;(3\&lt;Sqinter&gt;_&isin;_./ _)&quot;</span> <span class="delimiter">[</span>0<span class="delimiter">,</span> 0<span class="delimiter">,</span> 10<span class="delimiter">]</span> 10<span class="delimiter">)</span>
+  <span class="string">&quot;_SUP1&quot;</span>     <span class="delimiter">::</span> <span class="string">&quot;pttrns =&gt; &#39;b =&gt; &#39;b&quot;</span>           <span class="delimiter">(</span><span class="string">&quot;(3\&lt;Squnion&gt;_./ _)&quot;</span> <span class="delimiter">[</span>0<span class="delimiter">,</span> 10<span class="delimiter">]</span> 10<span class="delimiter">)</span>
+  <span class="string">&quot;_SUP&quot;</span>      <span class="delimiter">::</span> <span class="string">&quot;pttrn =&gt; &#39;a set =&gt; &#39;b =&gt; &#39;b&quot;</span>  <span class="delimiter">(</span><span class="string">&quot;(3\&lt;Squnion&gt;_&isin;_./ _)&quot;</span> <span class="delimiter">[</span>0<span class="delimiter">,</span> 0<span class="delimiter">,</span> 10<span class="delimiter">]</span> 10<span class="delimiter">)</span>
+
+<span class="command">end</span>
+</pre>
+
+</div>
+</body>
+</html>

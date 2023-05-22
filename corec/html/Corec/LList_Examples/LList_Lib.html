@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory LList_Lib (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory LList_Lib</h1>
+
+<span class="command">theory</span> <span class="name">LList_Lib</span><br/>
+<span class="keyword">imports</span> <a href="LList_More_Corec_Upto0.html"><span class="name">LList_More_Corec_Upto0</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> LList_Lib
+<span class="keyword2">imports</span> <span class="string">&quot;../LList/LList_Behavior_BNF&quot;</span> <span class="string">&quot;../LList/LList_More_Corec_Upto0&quot;</span>
+<span class="keyword2">begin</span>
+
+<span class="comment">(* todo: make them defs eventually: *)</span>
+<span class="command">type_synonym</span> llist <span class="delimiter">=</span> J
+<span class="command">abbreviation</span> <span class="string">&quot;LNil &equiv; ctor_J (Inl ())&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LCons n xs &equiv; ctor_J (Inr (n, xs))&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;head xs &equiv; (case dtor_J xs of Inr (x, xs) =&gt; x)&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;tail xs &equiv; (case dtor_J xs of Inr (x, xs) =&gt; xs | _ =&gt; LNil)&quot;</span>
+<span class="command">code_datatype</span> ctor_J
+<span class="command">declare</span> J.dtor_ctor<span class="delimiter">[</span>code<span class="delimiter">]</span>
+
+<span class="command">section</span> <span class="verbatim">{* Abbreviations *}</span>
+          
+<span class="command">abbreviation</span> <span class="string">&quot;SCONS0 &equiv; gg0  :: &#39;a &Sigma;&Sigma;0 F =&gt; &#39;a &Sigma;&Sigma;0&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;LEAF0 &equiv; leaf0&quot;</span>
+<span class="command">abbreviation</span> GUARD0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a F =&gt; &#39;a F &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;GUARD0 &equiv; LEAF0&quot;</span>
+<span class="comment">(* local (&quot;inside&quot;) end and continuation: within the upto-corecursive definition of a function f,
+END immediately an element of J, while CONT calls f corecursively  *)</span>
+<span class="command">abbreviation</span> END0 <span class="delimiter">::</span> <span class="string">&quot;J =&gt; (J + &#39;a) &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;END0 xs &equiv; LEAF0 (Inl xs)&quot;</span>
+<span class="command">abbreviation</span> CONT0 <span class="delimiter">::</span> <span class="string">&quot;&#39;a =&gt; (J + &#39;a) &Sigma;&Sigma;0&quot;</span> <span class="keyword2">where</span> <span class="string">&quot;CONT0 a &equiv; LEAF0 (Inr a)&quot;</span>
+
+<span class="command">lemma</span> LNil_uniform<span class="delimiter">:</span> <span class="string">&quot;LNil = eval0 (gg0 (Inl ()))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>rule iffD1<span class="delimiter">[</span>OF J.dtor_inject<span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def o_eq_dest<span class="delimiter">[</span>OF eval0_gg0<span class="delimiter">]</span><span class="delimiter">)</span>
+
+<span class="command">lemma</span> LCons_uniform<span class="delimiter">:</span> <span class="string">&quot;LCons x s = eval0 (gg0 (Inr (x, leaf0 s)))&quot;</span>
+  <span class="command">by</span> <span class="delimiter">(</span>rule iffD1<span class="delimiter">[</span>OF J.dtor_inject<span class="delimiter">]</span><span class="delimiter">)</span>
+    <span class="delimiter">(</span>simp add<span class="delimiter">:</span> map_pre_J_def BNF_Comp.id_bnf_comp_def J.dtor_ctor o_eq_dest<span class="delimiter">[</span>OF eval0_gg0<span class="delimiter">]</span> eval0_leaf0&#39;<span class="delimiter">)</span>
+
+<span class="command">lemma</span> genCngdd0_LNil<span class="delimiter">:</span> <span class="string">&quot;genCngdd0 R LNil LNil&quot;</span>
+  <span class="command">unfolding</span> LNil_uniform
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd0_eval0<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF gg0_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> rel_pre_J_def BNF_Comp.id_bnf_comp_def vimage2p_def rel_sum_simps
+  <span class="command">apply</span> <span class="delimiter">(</span>rule refl<span class="delimiter">)</span>
+  <span class="command">done</span>
+
+<span class="command">lemma</span> genCngdd0_LCons<span class="delimiter">:</span> <span class="string">&quot;[|x1 = x2; genCngdd0 R xs1 xs2|] ==&gt; 
+  genCngdd0 R (LCons x1 xs1) (LCons x2 xs2)&quot;</span>
+  <span class="command">unfolding</span> LCons_uniform
+  <span class="command">apply</span> <span class="delimiter">(</span>rule genCngdd0_eval0<span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF gg0_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">unfolding</span> rel_pre_J_def BNF_Comp.id_bnf_comp_def vimage2p_def rel_sum_simps
+  <span class="command">apply</span> <span class="delimiter">(</span>rule rel_funD<span class="delimiter">[</span>OF rel_funD<span class="delimiter">[</span>OF Pair_transfer<span class="delimiter">]</span><span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> <span class="delimiter">(</span>erule rel_funD<span class="delimiter">[</span>OF leaf0_transfer<span class="delimiter">]</span><span class="delimiter">)</span>
+  <span class="command">apply</span> assumption
+  <span class="command">done</span>
+
+<span class="command">lemma</span> llist_coinduct<span class="delimiter">[</span>case_names Eq_llist<span class="delimiter">,</span> case_conclusion Eq_llist head tail<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> <span class="string">&quot;R s s&#39;&quot;</span> <span class="string">&quot;!!s s&#39;. R s s&#39; ==&gt; (s = LNil &lt;-&gt; s&#39; = LNil) &and;
+    (s &ne; LNil --&gt; s&#39; &ne; LNil --&gt; head s = head s&#39; &and; R (tail s) (tail s&#39;))&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;s = s&#39;&quot;</span>
+<span class="command">using</span> assms<span class="delimiter">(</span>1<span class="delimiter">)</span> <span class="command">proof</span> <span class="delimiter">(</span>rule mp<span class="delimiter">[</span>OF J.dtor_coinduct<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">,</span> safe<span class="delimiter">)</span>
+  <span class="command">fix</span> a b
+  <span class="command">assume</span> <span class="string">&quot;R a b&quot;</span>
+  <span class="command">from</span> assms<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">show</span> <span class="string">&quot;F_rel R (dtor_J a) (dtor_J b)&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>cases <span class="string">&quot;dtor_J a&quot;</span> <span class="string">&quot;dtor_J b&quot;</span> rule<span class="delimiter">:</span> sum.exhaust<span class="delimiter">[</span>case_product sum.exhaust<span class="delimiter">]</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> rel_pre_J_def vimage2p_def BNF_Comp.id_bnf_comp_def J.dtor_ctor<span class="delimiter">,</span> <span class="delimiter">(</span>metis J.ctor_dtor<span class="delimiter">)</span><span class="delimiter">+</span><span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">lemma</span> llist_coinduct0<span class="delimiter">[</span>case_names Eq_llist<span class="delimiter">,</span> case_conclusion Eq_llist head tail<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="keyword2">assumes</span> <span class="string">&quot;R s s&#39;&quot;</span> <span class="string">&quot;!!s s&#39;. R s s&#39; ==&gt; (s = LNil &lt;-&gt; s&#39; = LNil) &and;
+    (s &ne; LNil --&gt; s&#39; &ne; LNil --&gt; head s = head s&#39; &and; genCngdd0 R (tail s) (tail s&#39;))&quot;</span>
+  <span class="keyword2">shows</span> <span class="string">&quot;s = s&#39;&quot;</span>
+<span class="command">using</span> assms<span class="delimiter">(</span>1<span class="delimiter">)</span> <span class="command">proof</span> <span class="delimiter">(</span>rule mp<span class="delimiter">[</span>OF coinductionU_genCngdd0<span class="delimiter">,</span> rotated<span class="delimiter">]</span><span class="delimiter">,</span> safe<span class="delimiter">)</span>
+  <span class="command">fix</span> a b
+  <span class="command">assume</span> <span class="string">&quot;R a b&quot;</span>
+  <span class="command">from</span> assms<span class="delimiter">(</span>2<span class="delimiter">)</span><span class="delimiter">[</span>OF this<span class="delimiter">]</span> <span class="command">show</span> <span class="string">&quot;F_rel (genCngdd0 R) (dtor_J a) (dtor_J b)&quot;</span>
+    <span class="command">by</span> <span class="delimiter">(</span>cases <span class="string">&quot;dtor_J a&quot;</span> <span class="string">&quot;dtor_J b&quot;</span> rule<span class="delimiter">:</span> sum.exhaust<span class="delimiter">[</span>case_product sum.exhaust<span class="delimiter">]</span><span class="delimiter">)</span>
+      <span class="delimiter">(</span>auto simp<span class="delimiter">:</span> rel_pre_J_def vimage2p_def BNF_Comp.id_bnf_comp_def J.dtor_ctor<span class="delimiter">,</span> <span class="delimiter">(</span>metis J.ctor_dtor<span class="delimiter">)</span><span class="delimiter">+</span><span class="delimiter">)</span>
+<span class="command">qed</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

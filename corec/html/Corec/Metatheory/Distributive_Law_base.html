@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Distributive_Law_base (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Distributive_Law_base</h1>
+
+<span class="command">theory</span> <span class="name">Distributive_Law_base</span><br/>
+<span class="keyword">imports</span> <a href="FreeAlg_base.html"><span class="name">FreeAlg_base</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span><span class="verbatim">{* The initial distributive law *}</span>
+
+<span class="comment">(*&lt;*)</span>
+<span class="comment">(* This is similar to Distributive_Law, but uses a particular law &Lambda;_base: *)</span>
+<span class="comment">(*&gt;*)</span>
+
+<span class="command">theory</span> Distributive_Law_base
+<span class="keyword2">imports</span> FreeAlg_base
+<span class="keyword2">begin</span>
+
+<span class="command">definition</span> &Lambda;_base <span class="delimiter">::</span> <span class="string">&quot;(&#39;a * &#39;a F) &Sigma;_base =&gt; &#39;a &Sigma;&Sigma;_base F&quot;</span>
+<span class="keyword2">where</span> <span class="string">&quot;&Lambda;_base &equiv; Rep_&Sigma;_base o &Sigma;_base_map (\&lt;oo&gt;\&lt;pp&gt;_base o Abs_&Sigma;_base o F_map leaf_base o snd)&quot;</span>
+
+<span class="command">lemma</span> &Lambda;_base_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;_base_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;_base_rel R)) &Lambda;_base &Lambda;_base&quot;</span>
+  <span class="command">unfolding</span> &Lambda;_base_def <span class="command">by</span> transfer_prover
+
+<span class="command">theorem</span> &Lambda;_base_natural<span class="delimiter">:</span> <span class="string">&quot;&Lambda;_base o &Sigma;_base_map (f ** F_map f) = F_map (&Sigma;&Sigma;_base_map f) o &Lambda;_base&quot;</span>
+  <span class="command">using</span> &Lambda;_base_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;_base.rel_Grp F_rel_Grp prod.rel_Grp &Sigma;&Sigma;_base.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

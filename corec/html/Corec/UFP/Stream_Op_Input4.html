@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Op_Input4 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Op_Input4</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Op_Input4</span><br/>
+<span class="keyword">imports</span> <a href="Stream_FreeAlg4.html"><span class="name">Stream_FreeAlg4</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> Stream_Op_Input4
+<span class="keyword2">imports</span> Stream_FreeAlg4
+<span class="keyword2">begin</span>
+
+<span class="command">abbreviation</span> <span class="string">&quot;PLS4 &equiv; \&lt;oo&gt;\&lt;pp&gt;4 o Abs_&Sigma;4 o Inl o Abs_&Sigma;3 o Inl o Abs_&Sigma;2 o Inl o Abs_&Sigma;1 o Inr :: &#39;a &Sigma;&Sigma;4 K1 =&gt; &#39;a &Sigma;&Sigma;4&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;PRD4 &equiv; \&lt;oo&gt;\&lt;pp&gt;4 o Abs_&Sigma;4 o Inl o Abs_&Sigma;3 o Inl o Abs_&Sigma;2 o Inr :: &#39;a &Sigma;&Sigma;4 K2 =&gt; &#39;a &Sigma;&Sigma;4&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;EXP4 &equiv; \&lt;oo&gt;\&lt;pp&gt;4 o Abs_&Sigma;4 o Inl o Abs_&Sigma;3 o Inr :: &#39;a &Sigma;&Sigma;4 K3 =&gt; &#39;a &Sigma;&Sigma;4&quot;</span>
+<span class="command">abbreviation</span> <span class="string">&quot;SUP4 &equiv; \&lt;oo&gt;\&lt;pp&gt;4 o Abs_&Sigma;4 o Inr :: &#39;a &Sigma;&Sigma;4 K4 =&gt; &#39;a &Sigma;&Sigma;4&quot;</span>
+
+<span class="command">lemma</span> PLS4_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K1_rel (&Sigma;&Sigma;4_rel R) ===&gt; &Sigma;&Sigma;4_rel R) PLS4 PLS4&quot;</span>
+  <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> PRD4_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K2_rel (&Sigma;&Sigma;4_rel R) ===&gt; &Sigma;&Sigma;4_rel R) PRD4 PRD4&quot;</span>
+  <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> EXP4_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K3_rel (&Sigma;&Sigma;4_rel R) ===&gt; &Sigma;&Sigma;4_rel R) EXP4 EXP4&quot;</span>
+  <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> SUP4_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K4_rel (&Sigma;&Sigma;4_rel R) ===&gt; &Sigma;&Sigma;4_rel R) SUP4 SUP4&quot;</span>
+  <span class="command">by</span> transfer_prover
+
+<span class="command">definition</span> fMax <span class="keyword2">where</span>
+  <span class="string">&quot;fMax F = (if F = {||} then 0 :: nat else Max (fset F))&quot;</span>
+
+<span class="command">definition</span> &rho;4 <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) K4 =&gt; &#39;a &Sigma;&Sigma;4 F&quot;</span> <span class="keyword2">where</span>
+  <span class="string">&quot;&rho;4 F = (fMax ((fst o snd) |`| F), K4_as_&Sigma;&Sigma;4 ((snd o snd) |`| F))&quot;</span>
+ 
+<span class="command">lemma</span> &rho;4_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(K4_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;4_rel R)) &rho;4 &rho;4&quot;</span>
+  <span class="command">unfolding</span> rel_pre_J_def id_apply vimage2p_def BNF_Comp.id_bnf_comp_def &rho;4_def<span class="delimiter">[</span>abs_def<span class="delimiter">]</span>
+  <span class="command">by</span> transfer_prover
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

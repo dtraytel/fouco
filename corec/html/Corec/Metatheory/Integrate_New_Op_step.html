@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Integrate_New_Op_step (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Integrate_New_Op_step</h1>
+
+<span class="command">theory</span> <span class="name">Integrate_New_Op_step</span><br/>
+<span class="keyword">imports</span> <a href="Op_Input_step.html"><span class="name">Op_Input_step</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">header</span><span class="verbatim">{* The integration of a new operation in the up-to setting *}</span>
+
+<span class="command">theory</span> Integrate_New_Op_step
+<span class="keyword2">imports</span> Op_Input_step
+<span class="keyword2">begin</span>
+
+
+<span class="command">subsection</span><span class="verbatim">{* The assumptions *}</span>
+
+<span class="comment">(*
+(* The operation that creates the new distributive law, since its definition splits
+trough a natural transformation ll, which will be defined in More_Corec_Upto_step as follows: *)
+definition alg&rho;_step :: &quot;J K_step =&gt; J&quot; where
+&quot;alg&rho;_step = unfoldU_base (&rho;_step o K_step_map &lt;id, dtor_J&gt;)&quot;
+*)</span>
+
+<span class="command">lemma</span> &rho;_step_natural<span class="delimiter">:</span> <span class="string">&quot;&rho;_step o K_step_map (f ** F_map f) = F_map (&Sigma;&Sigma;_step_map f) o &rho;_step&quot;</span>
+  <span class="command">using</span> &rho;_step_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp &Sigma;&Sigma;_step.rel_Grp K_step.rel_Grp prod.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">subsection</span><span class="verbatim">{* The integration *}</span>
+
+<span class="command">definition</span> embL_step <span class="delimiter">::</span> <span class="string">&quot;&#39;a &Sigma;&Sigma;_base =&gt; &#39;a &Sigma;&Sigma;_step&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;embL_step &equiv; ext_base (\&lt;oo&gt;\&lt;pp&gt;_step o Abs_&Sigma;_step o Inl) leaf_step&quot;</span>
+
+<span class="command">definition</span> embR_step <span class="delimiter">::</span> <span class="string">&quot;(&#39;a K_step) &Sigma;&Sigma;_base =&gt; &#39;a &Sigma;&Sigma;_step&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;embR_step &equiv; ext_base (\&lt;oo&gt;\&lt;pp&gt;_step o Abs_&Sigma;_step o Inl) (\&lt;oo&gt;\&lt;pp&gt;_step o &Sigma;_step_map leaf_step o Abs_&Sigma;_step o Inr)&quot;</span>
+
+<span class="command">definition</span> &Lambda;_step <span class="delimiter">::</span> <span class="string">&quot;(&#39;a &times; &#39;a F) &Sigma;_step =&gt; &#39;a &Sigma;&Sigma;_step F&quot;</span> <span class="keyword2">where</span>
+<span class="string">&quot;&Lambda;_step = case_sum (F_map embL_step o &Lambda;_base) &rho;_step o Rep_&Sigma;_step&quot;</span>
+
+<span class="command">lemma</span> embL_step_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;_base_rel R ===&gt; &Sigma;&Sigma;_step_rel R) embL_step embL_step&quot;</span>
+  <span class="command">unfolding</span> embL_step_def ext_base_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> embR_step_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;&Sigma;_base_rel (K_step_rel R) ===&gt; &Sigma;&Sigma;_step_rel R) embR_step embR_step&quot;</span>
+  <span class="command">unfolding</span> embR_step_def ext_base_alt <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> &Lambda;_step_transfer<span class="delimiter">[</span>transfer_rule<span class="delimiter">]</span><span class="delimiter">:</span>
+  <span class="string">&quot;(&Sigma;_step_rel (rel_prod R (F_rel R)) ===&gt; F_rel (&Sigma;&Sigma;_step_rel R)) &Lambda;_step &Lambda;_step&quot;</span>
+  <span class="command">unfolding</span> &Lambda;_step_def <span class="command">by</span> transfer_prover
+
+<span class="command">lemma</span> &Lambda;_step_natural<span class="delimiter">:</span> <span class="string">&quot;&Lambda;_step o &Sigma;_step_map (f ** F_map f) = F_map (&Sigma;&Sigma;_step_map f) o &Lambda;_step&quot;</span>
+  <span class="command">using</span> &Lambda;_step_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> F_rel_Grp &Sigma;&Sigma;_step.rel_Grp &Sigma;_step.rel_Grp prod.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> embL_step_natural<span class="delimiter">:</span> <span class="string">&quot;embL_step o &Sigma;&Sigma;_base_map f = &Sigma;&Sigma;_step_map f o embL_step&quot;</span>
+  <span class="command">using</span> embL_step_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;_base.rel_Grp &Sigma;&Sigma;_step.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> embR_step_natural<span class="delimiter">:</span> <span class="string">&quot;embR_step o &Sigma;&Sigma;_base_map (K_step_map f) = &Sigma;&Sigma;_step_map f o embR_step&quot;</span>
+  <span class="command">using</span> embR_step_transfer<span class="delimiter">[</span>of <span class="string">&quot;BNF_Def.Grp UNIV f&quot;</span><span class="delimiter">]</span>
+  <span class="command">unfolding</span> &Sigma;&Sigma;_base.rel_Grp K_step.rel_Grp &Sigma;&Sigma;_step.rel_Grp
+  <span class="command">unfolding</span> Grp_def rel_fun_def <span class="command">by</span> auto
+
+<span class="command">lemma</span> &Lambda;_step_Inl<span class="delimiter">:</span> <span class="string">&quot;&Lambda;_step o Abs_&Sigma;_step o Inl = F_map embL_step o &Lambda;_base&quot;</span>
+  <span class="keyword2">and</span> &Lambda;_step_Inr<span class="delimiter">:</span> <span class="string">&quot;&Lambda;_step o Abs_&Sigma;_step o Inr = &rho;_step&quot;</span>
+<span class="command">unfolding</span> &Lambda;_step_def o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> Rep_&Sigma;_step_o_Abs_&Sigma;_step o_id <span class="command">by</span> auto
+
+<span class="command">lemma</span> embL_step_leaf_base<span class="delimiter">:</span> <span class="string">&quot;embL_step o leaf_base = leaf_step&quot;</span>
+<span class="command">unfolding</span> embL_step_def ext_base_comp_leaf_base <span class="command">..</span>
+
+<span class="command">lemma</span> embL_step_\&lt;oo&gt;\&lt;pp&gt;_base<span class="delimiter">:</span> <span class="string">&quot;embL_step o \&lt;oo&gt;\&lt;pp&gt;_base = \&lt;oo&gt;\&lt;pp&gt;_step o Abs_&Sigma;_step o Inl o &Sigma;_base_map embL_step&quot;</span>
+<span class="command">unfolding</span> embL_step_def ext_base_commute <span class="command">..</span>
+
+<span class="command">lemma</span> embR_step_leaf_base<span class="delimiter">:</span> <span class="string">&quot;embR_step o leaf_base = \&lt;oo&gt;\&lt;pp&gt;_step o Abs_&Sigma;_step o Inr o K_step_map leaf_step&quot;</span>
+<span class="command">unfolding</span> embR_step_def ext_base_comp_leaf_base
+<span class="command">unfolding</span> o_assoc<span class="delimiter">[</span>symmetric<span class="delimiter">]</span> Abs_&Sigma;_step_natural map_sum_Inr <span class="command">..</span>
+
+<span class="command">lemma</span> embR_step_\&lt;oo&gt;\&lt;pp&gt;_base<span class="delimiter">:</span> <span class="string">&quot;embR_step o \&lt;oo&gt;\&lt;pp&gt;_base = \&lt;oo&gt;\&lt;pp&gt;_step o Abs_&Sigma;_step o  Inl o &Sigma;_base_map embR_step&quot;</span>
+<span class="command">unfolding</span> embR_step_def ext_base_commute <span class="command">..</span>
+
+<span class="command">end</span></pre>
+
+</div>
+</body>
+</html>

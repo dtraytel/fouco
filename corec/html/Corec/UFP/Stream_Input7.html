@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Theory Stream_Input7 (Isabelle2014: August 2014)</title>
+<link media="all" rel="stylesheet" type="text/css" href="isabelle.css"/>
+</head>
+
+<body>
+<div class="head"><h1>Theory Stream_Input7</h1>
+
+<span class="command">theory</span> <span class="name">Stream_Input7</span><br/>
+<span class="keyword">imports</span> <a href="Stream_More_Corec_Upto6.html"><span class="name">Stream_More_Corec_Upto6</span></a><br/>
+
+</div>
+<div class="source">
+<pre><span class="command">theory</span> Stream_Input7
+<span class="keyword2">imports</span> Stream_More_Corec_Upto6
+<span class="keyword2">begin</span>
+
+<span class="command">datatype_new</span> <span class="delimiter">(</span>K7_set<span class="delimiter">:</span> <span class="tfree">&#39;a</span><span class="delimiter">)</span> K7 <span class="delimiter">=</span> I <span class="tfree">&#39;a</span> <span class="keyword2">for</span> map<span class="delimiter">:</span> K7_map rel<span class="delimiter">:</span> K7_rel
+<span class="command">abbreviation</span> <span class="string">&quot;bd_K7 &equiv; natLeq&quot;</span>
+<span class="command">type_synonym</span> bd_type_K7 <span class="delimiter">=</span> nat
+
+<span class="command">end</span>
+</pre>
+
+</div>
+</body>
+</html>
